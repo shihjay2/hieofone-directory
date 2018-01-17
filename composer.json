@@ -1,6 +1,6 @@
 {
-    "name": "hieofone-as/hieofone-as",
-    "description": "Health Information Exchange of One Authorization Server.",
+    "name": "hieofone-directory/hieofone-directory",
+    "description": "Health Information Exchange of One Directory Server.",
     "keywords": ["hieofone", "laravel", "uma", "oauth2", "oidc", "php", "javascript", "health", "fhir", "medical"],
     "license": "MIT",
     "type": "project",
