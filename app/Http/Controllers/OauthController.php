@@ -172,7 +172,8 @@ class OauthController extends Controller
 
     public function setup_mail(Request $request)
     {
-        if (Session::get('is_owner') == 'yes') {
+        $query = DB::table('owner')->first();
+        if (Session::get('is_owner') == 'yes' || $query == false) {
             if ($request->isMethod('post')) {
                 $this->validate($request, [
                     'mail_type' => 'required'
@@ -422,10 +423,7 @@ class OauthController extends Controller
                     return view('auth.login', $data);
                 } else {
                     // Not installed yet
-                    $data2 = [
-                        'noheader' => true
-                    ];
-                    return view('install', $data2);
+                    return redirect()->route('install');
                 }
             }
         } else {
