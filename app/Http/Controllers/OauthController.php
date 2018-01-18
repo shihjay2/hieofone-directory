@@ -101,16 +101,12 @@ class OauthController extends Controller
                     'password' => 'required|min:4',
                     'confirm_password' => 'required|min:4|same:password',
                     'last_name' => 'required',
-                    'google_client_id' => 'required',
-                    'google_client_secret' => 'required',
-                    'smtp_username' => 'required'
                 ]);
                 // Register user
                 $sub = $this->gen_uuid();
                 $user_data = [
                     'username' => $request->input('username'),
                     'password' => sha1($request->input('password')),
-                    //'password' => substr_replace(Hash::make($request->input('password')),"$2a",0,3),
                     'last_name' => $request->input('last_name'),
                     'sub' => $sub,
                     'email' => $request->input('email')
@@ -131,24 +127,6 @@ class OauthController extends Controller
                     'sub' => $sub
                 ];
                 DB::table('owner')->insert($owner_data);
-                // Register oauth for Google and Twitter
-                $google_data = [
-                    'type' => 'google',
-                    'client_id' => $request->input('google_client_id'),
-                    'client_secret' => $request->input('google_client_secret'),
-                    'redirect_uri' => URL::to('account/google'),
-                    'smtp_username' => $request->input('smtp_username')
-                ];
-                DB::table('oauth_rp')->insert($google_data);
-                if ($request->input('twitter_client_id') !== '') {
-                    $twitter_data = [
-                        'type' => 'twitter',
-                        'client_id' => $request->input('twitter_client_id'),
-                        'client_secret' => $request->input('twitter_client_secret'),
-                        'redirect_uri' => URL::to('account/twitter')
-                    ];
-                    DB::table('oauth_rp')->insert($twitter_data);
-                }
                 // Register server as its own client
                 $grant_types = 'client_credentials password authorization_code implicit jwt-bearer refresh_token';
                 $scopes = 'openid profile email address phone offline_access';
@@ -182,7 +160,7 @@ class OauthController extends Controller
                     ];
                     DB::table('oauth_scopes')->insert($scope_data);
                 }
-                // Go register with Google to get refresh token for email setup
+                // Go to email setup
                 return redirect()->route('setup_mail');
             } else {
                 $data2['noheader'] = true;
@@ -206,7 +184,10 @@ class OauthController extends Controller
                         'MAIL_PORT' => 465,
                         'MAIL_ENCRYPTION' => 'ssl',
                         'MAIL_USERNAME' => $request->input('mail_username'),
-                        'MAIL_PASSWORD' => ''
+                        'MAIL_PASSWORD' => '',
+                        'GOOGLE_KEY' => $request->input('google_client_id'),
+                        'GOOGLE_SECRET' => $request->input('google_client_secret'),
+                        'GOOGLE_REDIRECT_URI' => URL::to('account/google')
                     ],
                     'mailgun' => [
                         'MAIL_DRIVER' => 'mailgun',
@@ -216,7 +197,10 @@ class OauthController extends Controller
                         'MAIL_PORT' => '',
                         'MAIL_ENCRYPTION' => '',
                         'MAIL_USERNAME' => '',
-                        'MAIL_PASSWORD' => ''
+                        'MAIL_PASSWORD' => '',
+                        'GOOGLE_KEY' => '',
+                        'GOOGLE_SECRET' => '',
+                        'GOOGLE_REDIRECT_URI' => ''
                     ],
                     'sparkpost' => [
                         'MAIL_DRIVER' => 'sparkpost',
@@ -225,7 +209,10 @@ class OauthController extends Controller
                         'MAIL_PORT' => '',
                         'MAIL_ENCRYPTION' => '',
                         'MAIL_USERNAME' => '',
-                        'MAIL_PASSWORD' => ''
+                        'MAIL_PASSWORD' => '',
+                        'GOOGLE_KEY' => '',
+                        'GOOGLE_SECRET' => '',
+                        'GOOGLE_REDIRECT_URI' => ''
                     ],
                     'ses' => [
                         'MAIL_DRIVER' => 'ses',
@@ -235,7 +222,10 @@ class OauthController extends Controller
                         'MAIL_PORT' => '',
                         'MAIL_ENCRYPTION' => '',
                         'MAIL_USERNAME' => '',
-                        'MAIL_PASSWORD' => ''
+                        'MAIL_PASSWORD' => '',
+                        'GOOGLE_KEY' => '',
+                        'GOOGLE_SECRET' => '',
+                        'GOOGLE_REDIRECT_URI' => ''
                     ],
                     'unique' => [
                         'MAIL_DRIVER' => 'smtp',
@@ -243,11 +233,22 @@ class OauthController extends Controller
                         'MAIL_PORT' => $request->input('mail_port'),
                         'MAIL_ENCRYPTION' => $request->input('mail_encryption'),
                         'MAIL_USERNAME' => $request->input('mail_username'),
-                        'MAIL_PASSWORD' => $request->input('mail_password')
+                        'MAIL_PASSWORD' => $request->input('mail_password'),
+                        'GOOGLE_KEY' => '',
+                        'GOOGLE_SECRET' => '',
+                        'GOOGLE_REDIRECT_URI' => ''
                     ]
                 ];
                 $this->changeEnv($mail_arr[$request->input('mail_type')]);
                 if ($request->input('mail_type') == 'gmail') {
+                    $google_data = [
+                        'type' => 'google',
+                        'client_id' => $request->input('google_client_id'),
+                        'client_secret' => $request->input('google_client_secret'),
+                        'redirect_uri' => URL::to('account/google'),
+                        'smtp_username' => $request->input('mail_username')
+                    ];
+                    DB::table('oauth_rp')->insert($google_data);
                     return redirect()->route('installgoogle');
                 } else {
                     return redirect()->route('home');

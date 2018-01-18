@@ -61,6 +61,34 @@
 							</div>
 						</div>
 
+						<div class="mail_form gmail form-group{{ $errors->has('google_client_id') ? ' has-error' : '' }}">
+							<label for="google_client_id" class="col-md-4 control-label">Google Client ID</label>
+
+							<div class="col-md-6">
+								<input id="google_client_id" class="form-control" name="google_client_id" value="{{ old('google_client_id') }}">
+
+								@if ($errors->has('google_client_id'))
+									<span class="help-block">
+										<strong>{{ $errors->first('google_client_id') }}</strong>
+									</span>
+								@endif
+							</div>
+						</div>
+
+						<div class="mail_form gmail form-group{{ $errors->has('google_client_secret') ? ' has-error' : '' }}">
+							<label for="google_client_secret" class="col-md-4 control-label">Google Client Secret</label>
+
+							<div class="col-md-6">
+								<input id="google_client_secret" class="form-control" name="google_client_secret" value="{{ old('google_client_secret') }}">
+
+								@if ($errors->has('google_client_secret'))
+									<span class="help-block">
+										<strong>{{ $errors->first('google_client_secret') }}</strong>
+									</span>
+								@endif
+							</div>
+						</div>
+
 						<div class="mail_form mailgun form-group{{ $errors->has('mailgun_domain') ? ' has-error' : '' }}">
 							<label for="mailgun_domain" class="col-md-4 control-label">Mailgun Domain</label>
 
