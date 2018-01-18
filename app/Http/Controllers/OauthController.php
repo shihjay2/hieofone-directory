@@ -81,7 +81,7 @@ class OauthController extends Controller
     *
     */
 
-    public function install(Request $request)
+        public function install(Request $request)
     {
         // Check if already installed, if so, go back to home page
         $query = DB::table('owner')->first();
@@ -161,6 +161,7 @@ class OauthController extends Controller
                     DB::table('oauth_scopes')->insert($scope_data);
                 }
                 // Go to email setup
+                Session::put('install', 'yes');
                 return redirect()->route('setup_mail');
             } else {
                 $data2['noheader'] = true;
@@ -173,7 +174,7 @@ class OauthController extends Controller
     public function setup_mail(Request $request)
     {
         $query = DB::table('owner')->first();
-        if (Session::get('is_owner') == 'yes' || $query == false) {
+        if (Session::get('is_owner') == 'yes' || $query == false || Session::get('install') == 'yes') {
             if ($request->isMethod('post')) {
                 $this->validate($request, [
                     'mail_type' => 'required'
