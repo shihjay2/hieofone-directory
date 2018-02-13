@@ -37,11 +37,11 @@
 							<label for="mail_username" class="col-md-4 control-label">Username</label>
 
 							<div class="col-md-6">
-								<input id="maiL_username" type="username" class="form-control" name="maiL_username" value="{{ old('maiL_username') }}">
+								<input id="mail_username" type="username" class="form-control" name="mail_username" value="{{ old('mail_username') }}">
 
-								@if ($errors->has('maiL_username'))
+								@if ($errors->has('mail_username'))
 									<span class="help-block">
-										<strong>{{ $errors->first('maiL_username') }}</strong>
+										<strong>{{ $errors->first('mail_username') }}</strong>
 									</span>
 								@endif
 							</div>

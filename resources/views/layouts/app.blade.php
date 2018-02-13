@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 
-	<title>HIE of One Directory</title>
+	<title>Directory</title>
 
 	<!-- Styles -->
 	<link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
@@ -38,7 +38,7 @@
 
 				<!-- Branding Image -->
 				<a class="navbar-brand" href="{{ url('/') }}">
-					HIE of One Directory
+					Directory
 					@if (isset($name))
 						for {{ $name }}
 					@endif

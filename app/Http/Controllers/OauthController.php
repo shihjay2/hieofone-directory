@@ -334,7 +334,7 @@ class OauthController extends Controller
                     $oauth_user = DB::table('oauth_users')->where('username', '=', $request->username)->first();
                     Session::put('access_token',  $bridgedResponse['access_token']);
                     Session::put('client_id', $client_id);
-                    Session::put('owner', $owner_query->firstname . ' ' . $owner_query->lastname);
+                    Session::put('owner', $owner_query->lastname);
                     Session::put('username', $request->input('username'));
                     Session::put('full_name', $oauth_user->first_name . ' ' . $oauth_user->last_name);
                     Session::put('client_name', $client1->client_name);
@@ -1802,11 +1802,53 @@ class OauthController extends Controller
 		return view('home', $data1);
 	}
 
-    public function uma_register_quick(Request $request, $domain)
+    public function directory_auth(Request $request)
 	{
-		$as_uri = 'https://' . $domain;
-		$client_name = "HIE of One Directory";
-		$url1 = route('uma_auth');
+		$url = route('directory_auth');
+		$open_id_url = Session::get('pnosh_url');
+		$client_id = Session::get('pnosh_client_id');
+		$client_secret = Session::get('pnosh_client_secret');
+		$oidc = new OpenIDConnectClient($open_id_url, $client_id, $client_secret);
+		$oidc->setRedirectURL($url);
+		$oidc->addScope('openid');
+		$oidc->addScope('email');
+		$oidc->addScope('profile');
+		$oidc->addScope('offline_access');
+		$oidc->addScope('uma_authorization');
+		$oidc->addScope('uma_protection');
+		$oidc->authenticate(true);
+		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
+		$name = $oidc->requestUserInfo('name');
+		$birthday = $oidc->requestUserInfo('birthday');
+		$refresh_data['as_name'] = $name . '(DOB: ' . $birthday . ')';
+		$refresh_data['picture'] = $oidc->requestUserInfo('picture');
+		DB::table('oauth_rp')->where('id', '=', Session::get('pnosh_id'))->update($refresh_data);
+        $owner = DB::table('owner')->first();
+        $params = [
+            'name' => $owner->lastname,
+            'uri' => $request->root(),
+            'directory_id' => Session::get('pnosh_id')
+        ];
+        $redirect_url = rtrim($open_id_url, '/') . '/directory_add/approve' . http_build_query($params, null, '&');
+        return redirect($redirect_url);
+	}
+
+    public function directory_check(Request $request, $id)
+    {
+        $row = DB::table('oauth_rp')->where('id', '=', $id)->first();
+        if ($row) {
+            return 'OK';
+        } else {
+            return 'Not registered to this directory';
+        }
+    }
+
+    public function directory_registration(Request $request)
+	{
+        $owner = DB::table('owner')->first();
+		$as_uri = $request->input('as_uri');
+		$client_name = "Directory - " . $owner->lastname;
+		$url1 = route('directory_auth');
 		$oidc = new OpenIDConnectClient($as_uri);
 		$oidc->setClientName($client_name);
 		$oidc->setRedirectURL($url1);
@@ -1841,8 +1883,16 @@ class OauthController extends Controller
 		Session::put('pnosh_url', $as_uri);
 		Session::put('pnosh_id', $id);
 		Session::save();
-		return redirect()->route('uma_auth');
+		return redirect()->route('directory_auth');
 	}
+
+    public function directory_remove(Request $request, $id, $client_id)
+    {
+        $row = DB::table('oauth_rp')->where('id', '=', $id)->first();
+        $redirect_uri = rtrim($row->as_uri, '/') . '/directory_remove/remove';
+        $row = DB::table('oauth_rp')->where('id', '=', $id)->delete();
+        return redirect($redirect_uri);
+    }
 
 	public function uma_register(Request $request)
 	{
@@ -1917,4 +1967,10 @@ class OauthController extends Controller
 			return view('uma_register', $data);
 		}
 	}
+
+    public function check(Request $request)
+    {
+        $query = DB::table('owner')->first();
+        return $query->lastname;
+    }
 }
