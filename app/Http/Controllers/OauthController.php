@@ -274,7 +274,7 @@ class OauthController extends Controller
                 ];
                 return view('welcome', $data);
             }
-            return redirect()->route('home');
+            return redirect()->route('login');
         } else {
             return redirect()->route('install');
         }
