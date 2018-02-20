@@ -25,7 +25,7 @@
 							<ul>
 								<li>You will be allowing directory users the potential to access your health information</li>
 								<!-- <li>You will be able to make your authorization server identifiable in a patient directory for future physicians using mdNOSH to access your health information</li> -->
-								<li>For more information about how your email address identifies you, <abbr data-toggle="tooltip" id="more_info" title="Click here">click here</abbr>
+								<li>For more information about how your web address identifies you, <abbr data-toggle="tooltip" id="more_info" title="Click here">click here</abbr>
 							</ul>
 						</div>
 						<div class="form_group" id="more_info_div">
