@@ -14,26 +14,20 @@
 					<p>Welome to the Directory for {{ $name }}.</p>
 					<p>{{ $text }}</p>
 				</div>
-				<div class="panel-heading">Get Started</div>
+				<div class="panel-heading">Add yourself to the Directory Listing</div>
 				<div class="panel-body">
-					<p>Register using your HIE of One by copying our URL and paste it in your HIE of One Authorization Server Settings</p>
+					<p>Register using your HIE of One by chosing one of the following methods:</p>
 					<div class="col-md-8 col-md-offset-2">
 						<button type="button" class="btn btn-primary btn-block" id="copy_url" url-val="{{ url('/') }}">
 							<i class="fa fa-btn fa-copy"></i> Copy URL of this Directory
 						</button>
 						<a href="{{ url('/uma_register_url') }}" class="btn btn-primary btn-block">
-							<i class="fa fa-btn fa-copy"></i> or Enter the Web Address (URL) associated with your HIE of One
+							<i class="fa fa-btn fa-hand-o-right"></i> or Enter the Web Address (URL) associated with your HIE of One
 						</a>
 						<a href="{{ url('/uma_register') }}" class="btn btn-primary btn-block">
-							<i class="fa fa-btn fa-copy"></i> or Enter E-mail associated with your HIE of One
+							<i class="fa fa-btn fa-hand-o-right"></i> or Enter E-mail associated with your HIE of One
 						</a>
 					</div>
-				</div>
-				<div class="panel-body">
-					<p>Or enter the URL of your HIE of One below</p>
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/uma_register') }}">
-						{{ csrf_field() }}
-					</form>
 				</div>
 				<div class="panel-heading">Are you a healthcare provider?</div>
 				<div class="panel-body">
@@ -41,7 +35,7 @@
 						<a href="{{ url('/signup') }}" class="btn btn-primary btn-block">Sign Up</a>
 					</div>
 					<div class="col-md-8 col-md-offset-2">
-						<a href="{{ url('/login') }}" class="btn btn-primary btn-block">Login</a>
+						<a href="{{ url('/login') }}" class="btn btn-primary btn-block"><i class="fa fa-btn fa-sign-in"></i> Login</a>
 					</div>
 				</div>
 			</div>
