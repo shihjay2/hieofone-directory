@@ -33,7 +33,7 @@
 							<ol>
 								<li>The directory will be contacting the server to validate if a user tied to this e-mail address exists.</li>
 								<li>The directory will then determine if an authorization service (like HIE of One) exists on the domain.</li>
-								<li>The directory will then make a call to register itself as a client to the authorization service so that physicians who have an account with mdNOSH that you invite can access your health-related resources.</li>
+								<li>The directory will then make a call to register itself as a client to the authorization service.</li>
 								<li>You will be prompted to accept or deny the registration of this directory to your HIE of One authorization service.</li>
 							</ol>
 						</div>

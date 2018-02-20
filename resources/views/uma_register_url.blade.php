@@ -32,7 +32,7 @@
 							<h4 style="color:yellow;">How this directory will contact your authorization server</h4>
 							<ol>
 								<li>The directory will determine if an authorization service (like HIE of One) exists with the URL provided.</li>
-								<li>The directory will then make a call to register itself as a client to the authorization service so that physicians who have an account with mdNOSH that you invite can access your health-related resources.</li>
+								<li>The directory will then make a call to register itself as a client to the authorization service.</li>
 								<li>You will be prompted to accept or deny the registration of this directory to your HIE of One authorization service.</li>
 							</ol>
 						</div>
