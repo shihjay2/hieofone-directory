@@ -272,9 +272,13 @@ class OauthController extends Controller
                 $data = [
                     'name' => $query->lastname
                 ];
+                $data['text'] = '';
                 return view('welcome', $data);
             }
-            return redirect()->route('login');
+            $data['name'] = $query->lastname;
+            $data['text'] = 'This is some test text you can enter';
+            return view('welcome', $data);
+            // return redirect()->route('login');
         } else {
             return redirect()->route('install');
         }
@@ -397,7 +401,7 @@ class OauthController extends Controller
                 $query = DB::table('owner')->first();
                 if ($query) {
                     // Show login form
-                    $data['name'] = $query->firstname . ' ' . $query->lastname;
+                    $data['name'] = $query->lastname;
                     $data['noheader'] = true;
                     if (Session::get('oauth_response_type') == 'code') {
                         // Check if owner has set default policies and show other OIDC IDP's to relay information with HIE of One AS as relaying IDP
@@ -1751,8 +1755,10 @@ class OauthController extends Controller
 			$to = $request->input('email');
 			$this->send_mail('auth.emails.generic', $data2, $title, $to);
 		} else {
+            $query = DB::table('owner')->first();
 			$data2 = [
-				'noheader' => true
+				'noheader' => true,
+                'name' => $query->lastname
 			];
 			return view('signup', $data2);
 		}
@@ -1920,8 +1926,8 @@ class OauthController extends Controller
 			curl_close($ch);
 			if (isset($result_array['subject'])) {
 				$as_uri = $result_array['links'][0]['href'];
-				// $client_name = 'mdNOSH';
-				$client_name = "HIE of One Directory";
+                $owner_query = DB::table('owner')->first();
+				$client_name = $owner_query->lastname . " Directory";
 				$url1 = route('uma_auth');
 				$oidc = new OpenIDConnectClient($as_uri);
 				$oidc->setClientName($client_name);
@@ -1963,8 +1969,76 @@ class OauthController extends Controller
 			}
 		} else {
 			$data['noheader'] = true;
-			$data['demo_title'] = "Register your HIE of One AS to the HIE of One Directory";
 			return view('uma_register', $data);
+		}
+	}
+
+    public function uma_register_url(Request $request)
+	{
+		if ($request->isMethod('post')) {
+			$this->validate($request, [
+				'url' => 'required'
+			]);
+			Session::forget('type');
+			Session::forget('client_id');
+			Session::forget('url');
+			// webfinger
+			$url = $request->input('url');
+			$ch = curl_init();
+			curl_setopt($ch,CURLOPT_URL, $url);
+			curl_setopt($ch,CURLOPT_FAILONERROR,1);
+			curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+			curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+			curl_setopt($ch,CURLOPT_TIMEOUT, 60);
+			curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
+			$result = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			curl_close($ch);
+            if ($httpCode !== 404) {
+                $owner_query = DB::table('owner')->first();
+				$client_name = $owner_query->lastname . " Directory";
+				$url1 = route('uma_auth');
+				$oidc = new OpenIDConnectClient($as_uri);
+				$oidc->setClientName($client_name);
+				$oidc->setRedirectURL($url1);
+				$oidc->addScope('openid');
+				$oidc->addScope('email');
+				$oidc->addScope('profile');
+				$oidc->addScope('address');
+				$oidc->addScope('phone');
+				$oidc->addScope('offline_access');
+				$oidc->addScope('uma_authorization');
+				$oidc->addScope('uma_protection');
+				$oidc->register(true);
+				$client_id = $oidc->getClientID();
+				$client_secret = $oidc->getClientSecret();
+				$data1 = [
+					'type' => 'pnosh',
+					'client_id' => $client_id,
+					'client_secret' => $client_secret,
+					'as_uri' => $url
+				];
+				// Check if as_uri already exists
+				$query = DB::table('oauth_rp')->where('as_uri', '=', $url)->first();
+				if ($query) {
+					$id = $query->id;
+					// Update information
+					DB::table('oauth_rp')->where('id', '=', $query->id)->update($data1);
+				} else {
+					$id = DB::table('oauth_rp')->insertGetId($data1);
+				}
+				Session::put('pnosh_client_id', $client_id);
+				Session::put('pnosh_client_secret', $client_secret);
+				Session::put('pnosh_url', $url);
+				Session::put('pnosh_id', $id);
+				Session::save();
+				return redirect()->route('uma_auth');
+			} else {
+				return redirect()->back()->withErrors(['tryagain' => 'Try again']);
+			}
+		} else {
+			$data['noheader'] = true;
+			return view('uma_register_url', $data);
 		}
 	}
 

@@ -76,6 +76,7 @@
 					@if (Auth::guest())
 						@if (!isset($noheader))
 							<li><a href="{{ url('/login') }}">Login</a></li>
+							<li><a href="{{ url('/signup') }}">Sign Up</a></li>
 						@endif
 					@else
 						<li class="dropdown">

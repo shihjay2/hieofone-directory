@@ -66,6 +66,7 @@ Route::any('uma_aat', ['as' => 'uma_aat', 'uses' => 'HomeController@uma_aat']);
 Route::any('uma_api', ['as' => 'uma_api', 'uses' => 'HomeController@uma_api']);
 Route::any('uma_auth', ['as' => 'uma_auth', 'uses' => 'OauthController@uma_auth']);
 Route::any('uma_register', ['as' => 'uma_register', 'uses' => 'OauthController@uma_register']);
+Route::any('uma_register_url', ['as' => 'uma_register_url', 'uses' => 'OauthController@uma_register_url']);
 Route::any('directory_auth', ['as' => 'directory_auth', 'uses' => 'OauthController@directory_auth']);
 Route::get('directory_check/{id}', ['as' => 'directory_check', 'uses' => 'HomeController@directory_check']);
 Route::get('directory_registration', ['as' => 'directory_registration', 'uses' => 'OauthController@directory_registration']);
