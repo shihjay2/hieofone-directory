@@ -136,7 +136,7 @@ class OauthController extends Controller
                     'grant_types' => $grant_types,
                     'scope' => $scopes,
                     'user_id' => $request->input('username'),
-                    'client_name' => 'HIE of One Directory' . $request->input('last_name'),
+                    'client_name' => $request->input('last_name'),
                     'client_uri' => URL::to('/'),
                     'redirect_uri' => URL::to('oauth_login'),
                     'authorized' => 1,
@@ -1821,7 +1821,7 @@ class OauthController extends Controller
 		$oidc->addScope('profile');
 		$oidc->addScope('offline_access');
 		$oidc->addScope('uma_authorization');
-		$oidc->addScope('uma_protection');
+		// $oidc->addScope('uma_protection');
 		$oidc->authenticate(true);
 		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
 		$name = $oidc->requestUserInfo('name');
@@ -1865,7 +1865,7 @@ class OauthController extends Controller
 		$oidc->addScope('phone');
 		$oidc->addScope('offline_access');
 		$oidc->addScope('uma_authorization');
-		$oidc->addScope('uma_protection');
+		// $oidc->addScope('uma_protection');
 		$oidc->register(true);
 		$client_id = $oidc->getClientID();
 		$client_secret = $oidc->getClientSecret();
