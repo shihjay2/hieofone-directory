@@ -1794,7 +1794,7 @@ class OauthController extends Controller
 		$oidc->addScope('profile');
 		$oidc->addScope('offline_access');
 		$oidc->addScope('uma_authorization');
-		$oidc->addScope('uma_protection');
+		// $oidc->addScope('uma_protection');
 		$oidc->authenticate(true);
 		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
 		$name = $oidc->requestUserInfo('name');
