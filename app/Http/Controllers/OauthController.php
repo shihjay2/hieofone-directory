@@ -1999,7 +1999,7 @@ class OauthController extends Controller
                 $owner_query = DB::table('owner')->first();
 				$client_name = $owner_query->lastname . " Directory";
 				$url1 = route('uma_auth');
-				$oidc = new OpenIDConnectClient($as_uri);
+				$oidc = new OpenIDConnectClient($url);
 				$oidc->setClientName($client_name);
 				$oidc->setRedirectURL($url1);
 				$oidc->addScope('openid');
