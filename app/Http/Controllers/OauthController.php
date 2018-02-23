@@ -1936,10 +1936,9 @@ class OauthController extends Controller
 				$oidc->addScope('openid');
 				$oidc->addScope('email');
 				$oidc->addScope('profile');
-				$oidc->addScope('address');
-				$oidc->addScope('phone');
 				$oidc->addScope('offline_access');
 				$oidc->addScope('uma_authorization');
+                // $oidc->addScope('uma_protection');
 				$oidc->register(true);
 				$client_id = $oidc->getClientID();
 				$client_secret = $oidc->getClientSecret();
@@ -2008,10 +2007,9 @@ class OauthController extends Controller
 				$oidc->addScope('openid');
 				$oidc->addScope('email');
 				$oidc->addScope('profile');
-				$oidc->addScope('address');
-				$oidc->addScope('phone');
 				$oidc->addScope('offline_access');
 				$oidc->addScope('uma_authorization');
+                // $oidc->addScope('uma_protection');
 				$oidc->register(true);
 				$client_id = $oidc->getClientID();
 				$client_secret = $oidc->getClientSecret();
