@@ -43,7 +43,7 @@ class HomeController extends Controller
                     $client = DB::table('oauth_rp')->where('as_uri', '=', $client_row->as_uri)->first();
     				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
                     if ($client->picture == '' || $client->picture == null) {
-                        $picture = '<i class="fa fa-btn fa-users"></i>';
+                        $picture = '<i class="fa fa-btn fa-user"></i>';
                     } else {
                         $picture = '<img src="' . $client->picture . '" height="30" width="30">';
                     }
@@ -70,16 +70,31 @@ class HomeController extends Controller
 			foreach ($query as $client) {
 				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
                 if ($client->picture == '' || $client->picture == null) {
-                    $picture = '<i class="fa fa-btn fa-users"></i>';
+                    $picture = '<i class="fa fa-btn fa-user"></i>';
                 } else {
                     $picture = '<img src="' . $client->picture . '" height="30" width="30">';
                 }
-            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . '</a>';
+                $add = '<span class="pull-right"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('$as_uri', '=', $client->as_uri)->first();
+                if ($check) {
+                    $add = '';
+                }
+            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . $add . '</a>';
 			}
 			$data['content'] .= '</div>';
 		}
         $data['back'] = '<a href="' . URL::to('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
         return view('home', $data);
+    }
+
+    public function add_patient(Request $request)
+    {
+        $data = [
+            'as_uri' => $request->input('as_uri'),
+            'username' => Session::get('username')
+        ];
+        DB::table('rp_to_users')->insert($data);
+        return 'Patient added to My Patient List';
     }
 
     /**

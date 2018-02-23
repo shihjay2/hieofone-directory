@@ -153,6 +153,21 @@
 			$('#fhir_password').val(password);
 			$('#fhirModal').modal('show');
 		});
+		$(".directory-add").click(function(e){
+			e.preventDefault();
+			var uri = $(this).attr('add-val');
+			$.ajax({
+				type: "POST",
+				url: "{{ route('add_patient') }}",
+				data: 'as_uri=' + uri,
+				beforeSend: function(request) {
+					return request.setRequestHeader("X-CSRF-Token", $("meta[name='csrf-token']").attr('content'));
+				}
+			}).done(function(response) {
+				toastr.success(response);
+				location.reload(true);
+            });
+		});
 		$(document).on('submit', '#fhir_form', function(event) {
             event.preventDefault();
             var formData = $(this).serialize();
