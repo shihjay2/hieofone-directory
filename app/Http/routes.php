@@ -54,6 +54,7 @@ Route::post('login_uport', ['as' => 'login_uport', 'middleware' => 'csrf', 'uses
 Route::any('uport_user_add', ['as' => 'uport_user_add', 'uses' => 'OauthController@uport_user_add']);
 Route::any('remote_logout', ['as' => 'remote_logout', 'uses' => 'OauthController@remote_logout']);
 Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
+Route::get('all_patients', ['as' => 'all_patients', 'uses' => 'HomeController@all_patients']);
 Route::get('resources/{id}', ['as' => 'resources', 'uses' => 'HomeController@resources']);
 Route::get('login_authorize', ['as' => 'login_authorize', 'uses' => 'HomeController@login_authorize']);
 Route::get('login_authorize_action/{type}', ['as' => 'login_authorize_action', 'uses' => 'HomeController@login_authorize_action']);

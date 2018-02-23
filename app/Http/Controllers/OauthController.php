@@ -1826,7 +1826,7 @@ class OauthController extends Controller
 		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
 		$name = $oidc->requestUserInfo('name');
 		$birthday = $oidc->requestUserInfo('birthday');
-		$refresh_data['as_name'] = $name . '(DOB: ' . $birthday . ')';
+		$refresh_data['as_name'] = $name . ' (DOB: ' . $birthday . ')';
 		$refresh_data['picture'] = $oidc->requestUserInfo('picture');
 		DB::table('oauth_rp')->where('id', '=', Session::get('pnosh_id'))->update($refresh_data);
         $owner = DB::table('owner')->first();
@@ -1896,7 +1896,8 @@ class OauthController extends Controller
     {
         $row = DB::table('oauth_rp')->where('id', '=', $id)->first();
         $redirect_uri = rtrim($row->as_uri, '/') . '/directory_remove/remove';
-        $row = DB::table('oauth_rp')->where('id', '=', $id)->delete();
+        DB::table('rp_to_users')->where('as_uri', '=', $row->as_uri)->delete();
+        DB::table('oauth_rp')->where('id', '=', $id)->delete();
         return redirect($redirect_uri);
     }
 

@@ -32,17 +32,53 @@ class HomeController extends Controller
     {
         $data['name'] = Session::get('owner');
         $data['title'] = 'My Patients';
-        $data['content'] = 'No connected patients yet.';
+        $data['content'] = 'No patients yet.';
+        $query = DB::table('oauth_rp')->where('type', '=', 'pnosh')->get();
+		if ($query) {
+            $query1 = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->get();
+            if ($query1) {
+                $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
+    			$data['content'] .= '<div class="list-group searchlist">';
+    			foreach ($query1 as $client_row) {
+                    $client = DB::table('oauth_rp')->where('as_uri', '=', $client_row->as_uri)->first();
+    				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
+                    if ($client->picture == '' || $client->picture == null) {
+                        $picture = '<i class="fa fa-btn fa-users"></i>';
+                    } else {
+                        $picture = '<img src="' . $client->picture . '" height="30" width="30">';
+                    }
+                	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . '</a>';
+    			}
+    			$data['content'] .= '</div>';
+            } else {
+                $data['content'] = 'No connected patients yet.';
+            }
+		}
+        $data['back'] = '<a href="' . URL::to('all_patients') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-users"></i> All Patients</a>';
+        return view('home', $data);
+    }
+
+    public function all_patients(Request $request)
+    {
+        $data['name'] = Session::get('owner');
+        $data['title'] = 'All Patients';
+        $data['content'] = 'No patients yet.';
         $query = DB::table('oauth_rp')->where('type', '=', 'pnosh')->get();
 		if ($query) {
             $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
 			$data['content'] .= '<div class="list-group searchlist">';
 			foreach ($query as $client) {
 				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
-				$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item"><img src="' . $client->picture . '" height="30" width="30"><span style="margin:10px">' . $client->as_name . '</span>' . $link . '</a>';
+                if ($client->picture == '' || $client->picture == null) {
+                    $picture = '<i class="fa fa-btn fa-users"></i>';
+                } else {
+                    $picture = '<img src="' . $client->picture . '" height="30" width="30">';
+                }
+            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . '</a>';
 			}
 			$data['content'] .= '</div>';
 		}
+        $data['back'] = '<a href="' . URL::to('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
         return view('home', $data);
     }
 
