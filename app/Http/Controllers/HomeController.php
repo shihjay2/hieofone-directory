@@ -75,7 +75,7 @@ class HomeController extends Controller
                     $picture = '<img src="' . $client->picture . '" height="30" width="30">';
                 }
                 $add = '<span class="pull-right"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
-                $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('$as_uri', '=', $client->as_uri)->first();
+                $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
                 if ($check) {
                     $add = '';
                 }
