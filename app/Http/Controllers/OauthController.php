@@ -1835,7 +1835,7 @@ class OauthController extends Controller
             'uri' => $request->root(),
             'directory_id' => Session::get('pnosh_id')
         ];
-        $redirect_url = rtrim($open_id_url, '/') . '/directory_add/approve' . http_build_query($params, null, '&');
+        $redirect_url = rtrim($open_id_url, '/') . '/directory_add/approve?' . http_build_query($params, null, '&');
         return redirect($redirect_url);
 	}
 

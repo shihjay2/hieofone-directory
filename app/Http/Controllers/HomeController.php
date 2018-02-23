@@ -39,7 +39,7 @@ class HomeController extends Controller
 			$data['content'] .= '<div class="list-group searchlist">';
 			foreach ($query as $client) {
 				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
-				$data['content'] .= '<a href="' . route('resources') . '/' . $client->id . '" class="list-group-item"><img src="' . $client->picture . '" height="30" width="30"><span style="margin:10px">' . $client->as_name . '</span>' . $link . '</a>';
+				$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item"><img src="' . $client->picture . '" height="30" width="30"><span style="margin:10px">' . $client->as_name . '</span>' . $link . '</a>';
 			}
 			$data['content'] .= '</div>';
 		}
