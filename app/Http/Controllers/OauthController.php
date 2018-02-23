@@ -1940,7 +1940,6 @@ class OauthController extends Controller
 				$oidc->addScope('phone');
 				$oidc->addScope('offline_access');
 				$oidc->addScope('uma_authorization');
-				$oidc->addScope('uma_protection');
 				$oidc->register(true);
 				$client_id = $oidc->getClientID();
 				$client_secret = $oidc->getClientSecret();
@@ -1983,8 +1982,12 @@ class OauthController extends Controller
 			Session::forget('type');
 			Session::forget('client_id');
 			Session::forget('url');
-			// webfinger
 			$url = $request->input('url');
+            if(strpos($url, "https://") !== false) {
+                $url = $url;
+            } else {
+                $url = 'https://' . $url;
+            }
 			$ch = curl_init();
 			curl_setopt($ch,CURLOPT_URL, $url);
 			curl_setopt($ch,CURLOPT_FAILONERROR,1);
@@ -2009,7 +2012,6 @@ class OauthController extends Controller
 				$oidc->addScope('phone');
 				$oidc->addScope('offline_access');
 				$oidc->addScope('uma_authorization');
-				$oidc->addScope('uma_protection');
 				$oidc->register(true);
 				$client_id = $oidc->getClientID();
 				$client_secret = $oidc->getClientSecret();
