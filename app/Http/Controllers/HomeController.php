@@ -47,7 +47,8 @@ class HomeController extends Controller
                     } else {
                         $picture = '<img src="' . $client->picture . '" height="30" width="30">';
                     }
-                	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . '</a>';
+                    $remove = '<span class="pull-right"><span style="margin:10px"></span><i class="fa fa-minus fa-lg directory-remove" remove-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . $remove . '</a>';
     			}
     			$data['content'] .= '</div>';
             } else {
@@ -94,7 +95,13 @@ class HomeController extends Controller
             'username' => Session::get('username')
         ];
         DB::table('rp_to_users')->insert($data);
-        return 'Patient added to My Patient List';
+        return 'Patient added to My Patient list';
+    }
+
+    public function remove_patient(Request $request)
+    {
+        DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $request->input('as_uri'))->delete();
+        return 'Patient removed from My Patient list';
     }
 
     /**

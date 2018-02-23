@@ -168,6 +168,21 @@
 				location.reload(true);
             });
 		});
+		$(".directory-remove").click(function(e){
+			e.preventDefault();
+			var uri = $(this).attr('remove-val');
+			$.ajax({
+				type: "POST",
+				url: "{{ route('remove_patient') }}",
+				data: 'as_uri=' + uri,
+				beforeSend: function(request) {
+					return request.setRequestHeader("X-CSRF-Token", $("meta[name='csrf-token']").attr('content'));
+				}
+			}).done(function(response) {
+				toastr.success(response);
+				location.reload(true);
+            });
+		});
 		$(document).on('submit', '#fhir_form', function(event) {
             event.preventDefault();
             var formData = $(this).serialize();
