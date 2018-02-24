@@ -1578,59 +1578,15 @@ class OauthController extends Controller
 
     public function reset_demo(Request $request)
     {
-        if (route('home') == 'https://shihjay.xyz/home') {
-            if ($request->isMethod('post')) {
-                $this->validate($request, [
-                    'email' => 'required'
-                ]);
-                $client = new Google_Client();
-                putenv("GOOGLE_APPLICATION_CREDENTIALS=" . base_path() . "/.google.json");
-                getenv('GOOGLE_APPLICATION_CREDENTIALS');
-                $client->useApplicationDefaultCredentials();
-                $client->setApplicationName("Sheets API");
-                $client->setScopes(['https://www.googleapis.com/auth/drive', 'https://spreadsheets.google.com/feeds']);
-                $fileId = '1CTTYbiMvR3EdS46-uWXDuRlm__JkUOQdRBCFWCD0QlA';
-                $tokenArray = $client->fetchAccessTokenWithAssertion();
-                $accessToken = $tokenArray["access_token"];
-                $url = "https://sheets.googleapis.com/v4/spreadsheets/" . $fileId . "/values/Resets!A1:B1:append?valueInputOption=USER_ENTERED";
-                $method = 'POST';
-                $headers = ["Authorization" => "Bearer $accessToken", 'Content-Type' => 'application/atom+xml'];
-                $value[] = $request->input('email');
-                $values[] = $value;
-                $post = [
-                    'range' => 'Resets!A1:B1',
-                    'majorDimension' => 'ROWS',
-                    'values' => $values,
-                ];
-                $postBody = json_encode($post);
-                //$postBody = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended"><gsx:email>' . $request->input('email') . '</gsx:email></entry>';
-                $httpClient = new GuzzleHttp\Client(['headers' => $headers]);
-                $resp = $httpClient->request($method, $url, ['body' => $postBody]);
-                $time = time() + 600;
-                $file = $time . ',' . $request->ip();
-                File::put(base_path() . "/.timer", $file);
-                Session::flush();
-                Auth::logout();
-                return redirect('https://shihjay.xyz/nosh/reset_demo');
-            } else {
-                $data = [
-                    'noheader' => true,
-                    'timer' => true
-                ];
-                $file = File::get(base_path() . "/.timer");
-                $arr = explode(',', $file);
-                if (time() > $arr[0]) {
-                    $data['timer'] = false;
-                }
-                if ($data['timer'] == true) {
-                    $left = ($arr[0] - time()) / 60;
-                    $data['timer_val'] = round($left);
-                    $data['timer_val1'] = 10 - $data['timer_val'];
-                    $newfile = $arr[0] . ',' . $request->ip();
-                    File::put(base_path() . "/.timer", $newfile);
-                }
-                return view('reset_demo', $data);
-            }
+        if (route('welcome') == 'https://cloud.noshchartingsystem.com/hiedirectory') {
+            $file = '/opt/hieofone-directory/demo_oidc.sql';
+    		$command = "mysql -u " . env('DB_USERNAME', false) . " -p". env('DB_PASSWORD', false) . " oidc_directory < " . $file;
+    		system($command);
+    		$request->session()->flush();
+    		Auth::logout();
+            Session::flush();
+            $mdnosh_url = 'http://noshchartingsystem.com/oidc/reset_demo';
+            return redirect($mdnosh_url);
         } else {
             return redirect()->route('welcome');
         }

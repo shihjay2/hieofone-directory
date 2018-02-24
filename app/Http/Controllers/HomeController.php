@@ -104,6 +104,14 @@ class HomeController extends Controller
         return 'Patient removed from My Patient list';
     }
 
+    public function reports(Request $request)
+    {
+        $data['name'] = Session::get('owner');
+        $data['title'] = 'Reports';
+        $data['content'] = 'This is where you can generate and review reports of connected patients.  The functionality is pending.';
+        return view('home', $data);
+    }
+
     /**
      * Show the registered resources.
      *
