@@ -33,6 +33,7 @@ class HomeController extends Controller
         $data['name'] = Session::get('owner');
         $data['title'] = 'My Patients';
         $data['content'] = 'No patients yet.';
+        $data['searchbar'] = 'yes';
         $query = DB::table('oauth_rp')->where('type', '=', 'pnosh')->get();
 		if ($query) {
             $query1 = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->get();
@@ -64,6 +65,7 @@ class HomeController extends Controller
         $data['name'] = Session::get('owner');
         $data['title'] = 'All Patients';
         $data['content'] = 'No patients yet.';
+        $data['searchbar'] = 'yes';
         $query = DB::table('oauth_rp')->where('type', '=', 'pnosh')->get();
 		if ($query) {
             $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
@@ -109,6 +111,44 @@ class HomeController extends Controller
         $data['name'] = Session::get('owner');
         $data['title'] = 'Reports';
         $data['content'] = 'This is where you can generate and review reports of connected patients.  The functionality is pending.';
+        $data['searchbar'] = 'yes';
+        return view('home', $data);
+    }
+
+    public function search(Request $request)
+    {
+        $data['name'] = Session::get('owner');
+        $data['title'] = 'Search Results';
+        $data['content'] = '';
+        $data['searchbar'] = 'yes';
+        $q = strtolower($request->input('search_field'));
+        $query = DB::table('oauth_rp')
+            ->where('type', '=', 'pnosh')
+            ->where(function($query_array1) use ($q) {
+                $query_array1->where('as_name', 'LIKE', "%$q%")
+                ->orWhere('as_uri', 'LIKE', "%$q%");
+            })
+            ->get();
+        // Metadata search placeholder
+        if ($query) {
+            $data['content'] .= '<div class="list-group">';
+            foreach ($query as $client) {
+				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
+                if ($client->picture == '' || $client->picture == null) {
+                    $picture = '<i class="fa fa-btn fa-user"></i>';
+                } else {
+                    $picture = '<img src="' . $client->picture . '" height="30" width="30">';
+                }
+                $add = '<span class="pull-right"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
+                if ($check) {
+                    $add = '';
+                }
+            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . $add . '</a>';
+			}
+            $data['content'] .= '</div>';
+        }
+        $data['content'] .= 'Metadata search functionality coming soon...';
         return view('home', $data);
     }
 

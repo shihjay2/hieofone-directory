@@ -90,6 +90,22 @@
 		</div>
 	</nav>
 
+	@if (isset($searchbar))
+	<div class="container">
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<form class="input-group form" border="0" id="search_patient_form" role="search" action="{{ url('/search') }}" method="POST" style="margin-bottom:0px;" data-nosh-target="search_patient_results">
+					<input type="text" class="form-control search" id="search_field" name="search_field" placeholder="Enter search term" style="margin-bottom:0px;" required autocomplete="off">
+					<input type="hidden" name="type" value="div">
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-md" id="search_patient_submit" name="submit" value="Go"><i class="glyphicon glyphicon-search"></i></button>
+					</span>
+				</form>
+				<div class="list-group" id="search_patient_results"></div>
+			</div>
+		</div>
+	</div>
+	@endif
 	@yield('content')
 
 	<!-- JavaScripts -->
