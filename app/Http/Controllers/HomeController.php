@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App;
 use App\Http\Requests;
+use App\Libraries\OpenIDConnectClient;
 use DB;
 use Form;
 use Illuminate\Http\Request;
