@@ -307,7 +307,7 @@ class HomeController extends Controller
 		];
 		$query = DB::table('resource_set')->where('resource_set_id', '=', $id)->first();
 		$data['title'] = $title_array[Session::get('type')] . ' for ' . $client->as_name;
-		$data['back'] = '<a href="' . route('resources') . '/' . Session::get('current_client_id') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+		$data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
 		$data['content'] = 'None.';
 		$pt_name = '';
 		if (isset($result3['total'])) {
