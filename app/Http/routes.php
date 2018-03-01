@@ -78,6 +78,7 @@ Route::get('directory_registration', ['as' => 'directory_registration', 'uses' =
 Route::get('directory_remove/{id}/{client_id}', ['as' => 'directory_remove', 'uses' => 'HomeController@directory_remove']);
 Route::any('signup', ['as' => 'signup', 'uses' => 'OauthController@signup']);
 Route::any('signup_confirmation/{code}', ['as' => 'signup_confirmation', 'uses' => 'OauthController@signup_confirmation']);
+Route::any('signup_hieofone', ['as' => 'signup_hieofone', 'uses' => 'OauthController@signup_hieofone']);
 // Route::get('change_permission/{id}', ['as' => 'change_permission', 'uses' => 'HomeController@change_permission']);
 // Route::get('change_permission_add_edit/{id}', ['as' => 'change_permission_add_edit', 'uses' => 'HomeController@change_permission_add_edit']);
 // Route::get('change_permission_remove_edit/{id}', ['as' => 'change_permission_remove_edit', 'uses' => 'HomeController@change_permission_remove_edit']);

@@ -161,22 +161,17 @@ class HomeController extends Controller
     {
         $client = DB::table('oauth_rp')->where('id', '=', $id)->first();
 		$data['title'] = $client->as_name . "'s Patient Summary";
-		$data['content'] = 'No resources available yet.';
 		$data['message_action'] = $request->session()->get('message_action');
 		$request->session()->forget('message_action');
 		$data['back'] = '<a href="' . route('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> My Patients</a>';
-		// Look for pNOSH link through registered client to mdNOSH Gateway
-		$query = DB::table('oauth_clients')->where('client_uri', '=', $client->as_uri . "/nosh")->first();
-		if ($query) {
-			$data['content'] = '<div class="list-group">';
-			$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
-			$data['content'] .= '<a href="' . $client->as_uri . '/nosh/uma_auth" target="_blank" class="list-group-item"><span style="margin:10px;">Patient Centered Health Record (pNOSH) for ' . $client->as_name . '</span>' . $link . '</a>';
-			$data['content'] .= '<a href="' . route('resource_view') . '/Condition" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-condition.png" height="20" width="20"><span style="margin:10px;">Conditions</span></a>';
-			$data['content'] .= '<a href="' . route('resource_view') . '/MedicationStatement" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-pharmacy.png" height="20" width="20"><span style="margin:10px;">Medication List</span></a>';
-			$data['content'] .= '<a href="' . route('resource_view') . '/AllergyIntolerance" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-allergy.png" height="20" width="20"><span style="margin:10px;">Allergy List</span></a>';
-			$data['content'] .= '<a href="' . route('resource_view') . '/Immunization" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-immunizations.png" height="20" width="20"><span style="margin:10px;">Immunizations</span></a>';
-			$data['content'] .= '</div>';
-		}
+		$data['content'] = '<div class="list-group">';
+		$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
+		$data['content'] .= '<a href="' . $client->as_uri . '/nosh/uma_auth" target="_blank" class="list-group-item"><span style="margin:10px;">Patient Centered Health Record (pNOSH) for ' . $client->as_name . '</span>' . $link . '</a>';
+		$data['content'] .= '<a href="' . route('resource_view') . '/Condition" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-condition.png" height="20" width="20"><span style="margin:10px;">Conditions</span></a>';
+		$data['content'] .= '<a href="' . route('resource_view') . '/MedicationStatement" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-pharmacy.png" height="20" width="20"><span style="margin:10px;">Medication List</span></a>';
+		$data['content'] .= '<a href="' . route('resource_view') . '/AllergyIntolerance" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-allergy.png" height="20" width="20"><span style="margin:10px;">Allergy List</span></a>';
+		$data['content'] .= '<a href="' . route('resource_view') . '/Immunization" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-immunizations.png" height="20" width="20"><span style="margin:10px;">Immunizations</span></a>';
+		$data['content'] .= '</div>';
 		Session::put('current_client_id', $id);
 		return view('home', $data);
     }

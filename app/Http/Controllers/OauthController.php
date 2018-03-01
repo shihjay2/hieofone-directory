@@ -1737,6 +1737,13 @@ class OauthController extends Controller
 		return view('home', $data1);
 	}
 
+    public function signup_hieofone(Request $request)
+    {
+        $data['title'] = 'Signup for HIE of One';
+        $data['content'] = 'This is a placeholder page for deploying a new HIE of One container instances for a patient.  This will be installed as a subdomain of the directory root domain.';
+        return view('home', $data);
+    }
+
     public function uma_auth(Request $request)
 	{
 		$url = route('uma_auth');
