@@ -66,7 +66,7 @@ Route::any('client_register', ['as' => 'client_register', 'uses' => 'OauthContro
 Route::any('oauth_login', ['as' => 'oauth_login', 'uses' => 'OauthController@oauth_login']);
 Route::get('clients', ['as' => 'clients', 'uses' => 'HomeController@clients']);
 Route::get('users', ['as' => 'users', 'uses' => 'HomeController@users']);
-Route::get('resource_view/{id}', ['as' => 'resource_view', 'uses' => 'HomeController@resource_view']);
+Route::get('resource_view/{type}', ['as' => 'resource_view', 'uses' => 'HomeController@resource_view']);
 Route::any('uma_aat', ['as' => 'uma_aat', 'uses' => 'HomeController@uma_aat']);
 Route::any('uma_api', ['as' => 'uma_api', 'uses' => 'HomeController@uma_api']);
 Route::any('uma_auth', ['as' => 'uma_auth', 'uses' => 'OauthController@uma_auth']);
