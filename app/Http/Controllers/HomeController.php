@@ -144,14 +144,6 @@ class HomeController extends Controller
                     Session::forget('uma_search_arr');
                     Session::put('uma_search_count', $uma_search_count);
                     return redirect()->route('uma_aat_search');
-                    foreach ($resource_query as $resource_row) {
-                        $client = DB::table('oauth_rp')->where('as_uri', '=', $resource_row->as_uri)->first();
-                        Session::put('uma_uri', $client->as_uri);
-                		Session::put('uma_client_id', $client->client_id);
-                		Session::put('uma_client_secret', $client->client_secret);
-                		Session::save();
-                        return redirect()->route('uma_aat_search');
-                    }
                 }
             }
         }
