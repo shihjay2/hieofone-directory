@@ -829,7 +829,7 @@ class OpenIDConnectClient
 					),
 					'client_name' => $this->getClientName(),
 					'logo_uri' => 'https://cloud.noshchartingsystem.com/SAAS-Logo.jpg',
-					'claims_redirect_uris' => array($this->getRedirectURL(), str_replace('uma_auth', 'uma_aat', $this->getRedirectURL())),
+					'claims_redirect_uris' => array($this->getRedirectURL(), str_replace('uma_auth', 'uma_aat', $this->getRedirectURL()), str_replace('uma_auth', 'uma_aat_search', $this->getRedirectURL())),
 					'client_uri' => str_replace('/uma_auth', '', $this->getRedirectURL())
 				);
 			}

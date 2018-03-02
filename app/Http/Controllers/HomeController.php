@@ -439,11 +439,11 @@ class HomeController extends Controller
         Session::put('uma_client_id', $client->client_id);
         Session::put('uma_client_secret', $client->client_secret);
         Session::save();
-		$oidc = new OpenIDConnectClient($client->as_uri, $client->$client_id, $client->$client_secret);
+		$oidc = new OpenIDConnectClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
 		$oidc->requestAAT();
 		Session::put('uma_aat', $oidc->getAccessToken());
 		// Get permission ticket
-        $urlinit = $as_uri . '/nosh/fhir/Patient?subject:Patient=1';
+        $urlinit = Session::get('uma_uri') . '/nosh/fhir/Patient?subject:Patient=1';
 		$result = $this->fhir_request($urlinit,true);
 		if (isset($result['error'])) {
 			// error - return something
