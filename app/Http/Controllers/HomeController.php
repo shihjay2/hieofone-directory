@@ -161,6 +161,7 @@ class HomeController extends Controller
             }
             Session::forget('uma_search_arr');
         }
+        $q = Session::get('search_term');
         $query = DB::table('oauth_rp')
             ->where('type', '=', 'pnosh')
             ->where(function($query_array1) use ($q) {
