@@ -156,7 +156,7 @@ class HomeController extends Controller
                     foreach ($uma_search_v as $uma_search_v_row) {
                         $data['content'] .= '<li class="list-group-item">' . $uma_search_v_row . '</li>';
                     }
-                    $data['content'] .= '</div></div>';
+                    $data['content'] .= '</div></div></div>';
                 }
             }
             Session::forget('uma_search_arr');
@@ -186,7 +186,7 @@ class HomeController extends Controller
                 }
             	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . $add . '</a>';
 			}
-            $data['content'] .= '</div></div>';
+            $data['content'] .= '</div></div></div>';
         }
         $data['content'] .= '<div class="alert alert-warning">Metadata search functionality coming soon...</div>';
         if (Session::has('uma_errors')) {
