@@ -152,7 +152,7 @@ class HomeController extends Controller
             if (count($uma_search_arr) > 0) {
                 foreach ($uma_search_arr as $uma_search_k => $uma_search_v) {
                     $patient = DB::table('oauth_rp')->where('id', '=', $uma_search_k)->first();
-                    $data['content'] .= '<div class="panel panel-default"><div class="panel-heading"></div>Resources from ' . $patient->as_name . ' <div class="panel-body"><div class="list-group">';
+                    $data['content'] .= '<div class="panel panel-default"><div class="panel-heading">Resources from ' . $patient->as_name . '</div><div class="panel-body"><div class="list-group">';
                     foreach ($uma_search_v as $uma_search_v_row) {
                         $data['content'] .= '<li class="list-group-item">' . $uma_search_v_row . '</li>';
                     }
@@ -171,7 +171,7 @@ class HomeController extends Controller
             ->get();
         // Metadata search placeholder
         if ($query) {
-            $data['content'] .= '<div class="panel panel-default"><div class="panel-heading"></div>Connected Patients<div class="panel-body"><div class="list-group">';
+            $data['content'] .= '<div class="panel panel-default"><div class="panel-heading">Connected Patients</div><div class="panel-body"><div class="list-group">';
             foreach ($query as $client) {
 				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
                 if ($client->picture == '' || $client->picture == null) {
