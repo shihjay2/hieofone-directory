@@ -108,7 +108,7 @@ Route::any('my_info_edit', ['as' => 'my_info_edit', 'uses' => 'HomeController@my
 // Route::post('change_policy', ['as' => 'change_policy', 'uses' => 'HomeController@change_policy']);
 Route::post('fhir_edit', ['as' => 'fhir_edit', 'middleware' => 'csrf', 'uses' => 'HomeController@fhir_edit']);
 // Route::post('pnosh_sync', ['as' => 'pnosh_sync', 'uses' => 'OauthController@pnosh_sync']);
-// Route::any('reset_demo', ['as' => 'reset_demo', 'uses' => 'OauthController@reset_demo']);
+Route::any('reset_demo', ['as' => 'reset_demo', 'uses' => 'OauthController@reset_demo']);
 // Route::any('invite_demo', ['as' => 'invite_demo', 'uses' => 'OauthController@invite_demo']);
 // Route::get('check_demo', ['as' => 'check_demo', 'uses' => 'OauthController@check_demo']);
 // Route::get('check_demo_self', ['as' => 'check_demo_self', 'middleware' => 'csrf', 'uses' => 'OauthController@check_demo_self']);
