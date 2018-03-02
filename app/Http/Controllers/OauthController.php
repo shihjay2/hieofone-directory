@@ -1762,7 +1762,7 @@ class OauthController extends Controller
 		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
 		$name = $oidc->requestUserInfo('name');
 		$birthday = $oidc->requestUserInfo('birthday');
-		$refresh_data['as_name'] = $name . '(DOB: ' . $birthday . ')';
+		$refresh_data['as_name'] = $name . ' (DOB: ' . $birthday . ')';
 		$refresh_data['picture'] = $oidc->requestUserInfo('picture');
 		DB::table('oauth_rp')->where('id', '=', Session::get('pnosh_id'))->update($refresh_data);
 		$access_token = $oidc->getAccessToken();

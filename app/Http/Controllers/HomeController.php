@@ -216,6 +216,7 @@ class HomeController extends Controller
 		$data['content'] .= '<a href="' . route('resource_view', ['AllergyIntolerance']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-allergy.png" height="20" width="20"><span style="margin:10px;">Allergy List</span></a>';
 		$data['content'] .= '<a href="' . route('resource_view', ['Immunization']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-immunizations.png" height="20" width="20"><span style="margin:10px;">Immunizations</span></a>';
 		$data['content'] .= '</div>';
+        $data['searchbar'] = 'yes';
 		Session::put('current_client_id', $id);
 		return view('home', $data);
     }
@@ -394,6 +395,7 @@ class HomeController extends Controller
 				$data['content'] .= '</ul>';
 			}
 		}
+        $data['searchbar'] = 'yes';
 		return view('home', $data);
 	}
 
