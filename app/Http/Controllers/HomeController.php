@@ -122,7 +122,53 @@ class HomeController extends Controller
         $data['title'] = 'Search Results';
         $data['content'] = '';
         $data['searchbar'] = 'yes';
-        $q = strtolower($request->input('search_field'));
+        if ($request->isMethod('post')) {
+            $q = strtolower($request->input('search_field'));
+            Session::put('search_term', $q);
+        }
+        $proceed = false;
+        // Check all registered resources
+        if (Session::has('uma_search_complete')) {
+            $proceed = true;
+            Session::forget('uma_search_complete');
+        }
+        if ($proceed == false) {
+            if (Session::has('uma_search_count')) {
+                return redirect()->route('uma_aat_search');
+            } else {
+                $resource_query = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->whereNotNull('rpt')->get();
+                if ($resource_query) {
+                    foreach ($resource_query as $resource_row) {
+                        $uma_search_count[] = $resource_row->as_uri;
+                    }
+                    Session::forget('uma_search_arr');
+                    Session::put('uma_search_count', $uma_search_count);
+                    return redirect()->route('uma_aat_search');
+                    foreach ($resource_query as $resource_row) {
+                        $client = DB::table('oauth_rp')->where('as_uri', '=', $resource_row->as_uri)->first();
+                        Session::put('uma_uri', $client->as_uri);
+                		Session::put('uma_client_id', $client->client_id);
+                		Session::put('uma_client_secret', $client->client_secret);
+                		Session::save();
+                        return redirect()->route('uma_aat_search');
+                    }
+                }
+            }
+        }
+        if (Session::has('uma_search_arr')) {
+            $uma_search_arr = Session::get('uma_search_arr');
+            if (count($uma_search_arr) > 0) {
+                foreach ($uma_search_arr as $uma_search_k => $uma_search_v) {
+                    $patient = DB::table('oauth_rp')->where('id', '=', $uma_search_k)->first();
+                    $data['content'] .= '<div class="panel panel-default"><div class="panel-heading"></div>Resources from ' . $patient->as_name . ' <div class="panel-body"><div class="list-group">';
+                    foreach ($uma_search_v as $uma_search_v_row) {
+                        $data['content'] .= '<li class="list-group-item">' . $uma_search_v_row . '</li>';
+                    }
+                    $data['content'] .= '</div></div>';
+                }
+            }
+            Session::forget('uma_search_arr');
+        }
         $query = DB::table('oauth_rp')
             ->where('type', '=', 'pnosh')
             ->where(function($query_array1) use ($q) {
@@ -132,7 +178,7 @@ class HomeController extends Controller
             ->get();
         // Metadata search placeholder
         if ($query) {
-            $data['content'] .= '<div class="list-group">';
+            $data['content'] .= '<div class="panel panel-default"><div class="panel-heading"></div>Connected Patients<div class="panel-body"><div class="list-group">';
             foreach ($query as $client) {
 				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
                 if ($client->picture == '' || $client->picture == null) {
@@ -147,9 +193,13 @@ class HomeController extends Controller
                 }
             	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . $add . '</a>';
 			}
-            $data['content'] .= '</div>';
+            $data['content'] .= '</div></div>';
         }
-        $data['content'] .= 'Metadata search functionality coming soon...';
+        $data['content'] .= '<div class="alert alert-warning">Metadata search functionality coming soon...</div>';
+        if (Session::has('uma_errors')) {
+            $data['content'] .= '<div class="alert alert-danger">Errors: ' . Session::get('uma_errors') . '</div>';
+            Session::forget('uma_errors');
+        }
         return view('home', $data);
     }
 
@@ -187,12 +237,12 @@ class HomeController extends Controller
     public function resource_view(Request $request, $type)
     {
         $client = DB::table('oauth_rp')->where('id', '=', Session::get('current_client_id'))->first();
-		$request->session()->put('uma_uri', $client->as_uri);
-		$request->session()->put('uma_client_id', $client->client_id);
-		$request->session()->put('uma_client_secret', $client->client_secret);
-		$request->session()->put('type', $type);
-		$request->session()->save();
-		if ($request->session()->has('rpt')) {
+		Session::put('uma_uri', $client->as_uri);
+		Session::put('uma_client_id', $client->client_id);
+		Session::put('uma_client_secret', $client->client_secret);
+		Session::put('type', $type);
+		Session::save();
+		if (Session::has('rpt')) {
 			return redirect()->route('uma_api');
 		} else {
 			return redirect()->route('uma_aat');
@@ -220,8 +270,8 @@ class HomeController extends Controller
 					return redirect()->route('uma_api');
 				}
 			} else {
-				$request->session()->forget('uma_aat');
-				$request->session()->forget('uma_permission_ticket');
+				Session::forget('uma_aat');
+				Session::forget('uma_permission_ticket');
 			}
 		}
 		// Get AAT
@@ -270,7 +320,7 @@ class HomeController extends Controller
 					return redirect()->route('uma_aat');
 				} else {
 					$data['title'] = 'Error getting data';
-					$data['back'] = '<a href="' . route('resources') . '/' . Session::get('current_client_id') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+					$data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
 					$data['content'] = 'Description:<br>' . $result1['error'];
 					return view('home', $data);
 				}
@@ -282,6 +332,17 @@ class HomeController extends Controller
 		} else {
 			$rpt = Session::get('rpt');
 		}
+        // Save RPT to indicate successful connection by user for future use
+        $rpt_data['rpt'] = $rpt;
+        $rpt_query = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', Session::get('uma_uri'))->first();
+        if ($rpt_query) {
+            DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', Session::get('uma_uri'))->update($rpt_data);
+        } else {
+            $rpt_data['username'] = Session::get('username');
+            $rpt_data['as_uri'] = Session::get('uma_uri');
+            DB::table('rp_to_users')->insert($rpt_data);
+        }
+        DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', Session::get('uma_uri'))->update($rpt_data);
 		// Contact pNOSH again, now with RPT
 		$urlinit = $as_uri . '/nosh/fhir/' . Session::get('type') . '?subject:Patient=1';
 		$result3 = $this->fhir_request($urlinit,false,$rpt);
@@ -341,6 +402,153 @@ class HomeController extends Controller
 			}
 		}
 		return view('home', $data);
+	}
+
+    public function uma_aat_search(Request $request)
+	{
+		// Check if call comes from rqp_claims redirect
+		if (Session::has('uma_aat') && Session::has('uma_permission_ticket')) {
+			if (isset($_REQUEST["authorization_state"])) {
+				if ($_REQUEST["authorization_state"] != 'claims_submitted') {
+					if ($_REQUEST["authorization_state"] == 'not_authorized') {
+						$text = 'You are not authorized to have the desired authorization data added.';
+					}
+					if ($_REQUEST["authorization_state"] == 'request_submitted') {
+						$text = 'The authorization server needs additional information in order to determine whether you are authorized to have this authorization data.';
+					}
+					if ($_REQUEST["authorization_state"] == 'need_info') {
+						$text = 'The authorization server requires intervention by the patient to determine whether authorization data can be added. Try again later after receiving any information from the patient regarding updates on your access status.';
+					}
+					return $text;
+				} else {
+					// Great - move on!
+					return redirect()->route('uma_api_search');
+				}
+			} else {
+				Session::forget('uma_aat');
+				Session::forget('uma_permission_ticket');
+			}
+		}
+		// Get AAT
+		$url_array = ['/nosh/oidc','/nosh/fhir/oidc'];
+        $uma_search_count = Session::get('uma_search_count');
+        if (count($uma_search_count) == 0) {
+            Session::put('uma_search_complete', 'true');
+            Session::forget('uma_search_count');
+            return redirect()->route('search');
+        }
+        $uma_as_uri = $uma_search_count[0];
+        $client = DB::table('oauth_rp')->where('as_uri', '=', $uma_search_count[0])->first();
+        unset($uma_search_count[0]);
+        Session::put('uma_search_count', $uma_search_count);
+        Session::put('current_client_id', $client->id);
+        Session::put('uma_uri', $client->as_uri);
+        Session::put('uma_client_id', $client->client_id);
+        Session::put('uma_client_secret', $client->client_secret);
+        Session::save();
+		$oidc = new OpenIDConnectClient($client->as_uri, $client->$client_id, $client->$client_secret);
+		$oidc->requestAAT();
+		Session::put('uma_aat', $oidc->getAccessToken());
+		// Get permission ticket
+        $urlinit = $as_uri . '/nosh/fhir/Patient?subject:Patient=1';
+		$result = $this->fhir_request($urlinit,true);
+		if (isset($result['error'])) {
+			// error - return something
+			return $result;
+		}
+		$permission_ticket = $result['ticket'];
+		Session::put('uma_permission_ticket', $permission_ticket);
+		Session::save();
+		$as_uri = $result['as_uri'];
+		$url = route('uma_aat_search');
+		// Requesting party claims
+		$oidc->setRedirectURL($url);
+		$oidc->rqp_claims($permission_ticket);
+	}
+
+    public function uma_api_search(Request $request)
+	{
+		$as_uri = Session::get('uma_uri');
+		if (!Session::has('rpt')) {
+			// Send permission ticket + AAT to Authorization Server to get RPT
+			$permission_ticket = Session::get('uma_permission_ticket');
+			$client_id = Session::get('uma_client_id');
+			$client_secret = Session::get('uma_client_secret');
+			$url = route('uma_api_search');
+			$oidc = new OpenIDConnectClient($as_uri, $client_id, $client_secret);
+			$oidc->setAccessToken(Session::get('uma_aat'));
+			$oidc->setRedirectURL($url);
+			$result1 = $oidc->rpt_request($permission_ticket);
+			if (isset($result1['error'])) {
+				// error - return something
+				if ($result1['error'] == 'expired_ticket') {
+				    Session::forget('uma_aat');
+					Session::forget('uma_permission_ticket');
+					return redirect()->route('uma_aat_search');
+				} else {
+                    if (Session::has('uma_errors')) {
+                        $uma_errors = Session::get('uma_errors') . 'Error getting data from ' . $as_uri;
+                        Session::put('uma_error', $uma_errors);
+                    } else {
+                        $uma_errors = 'Error getting data from ' . $as_uri;
+                        Session::put('uma_error', $uma_errors);
+                    }
+					return redirect()->route('uma_aat_search');
+				}
+			}
+			$rpt = $result1['rpt'];
+			// Save RPT in session in case for future calls in same session
+			Session::put('rpt', $rpt);
+			Session::save();
+		} else {
+			$rpt = Session::get('rpt');
+		}
+        // Save RPT to indicate successful connection by user for future use
+        $rpt_data['rpt'] = $rpt;
+        $rpt_query = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', Session::get('uma_uri'))->first();
+        if ($rpt_query) {
+            DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', Session::get('uma_uri'))->update($rpt_data);
+        } else {
+            $rpt_data['username'] = Session::get('username');
+            $rpt_data['as_uri'] = Session::get('uma_uri');
+            DB::table('rp_to_users')->insert($rpt_data);
+        }
+        DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', Session::get('uma_uri'))->update($rpt_data);
+		// Contact pNOSH again, now with RPT
+        $query_types = [
+            'Condition?subject:Patient=1&code=~',
+            'MedicationStatement?subject:Patient=1&medication=~',
+            'AllergyIntolerance?subject:Patient=1&substance=~',
+            'Immunization?subject:Patient=1&vaccineCode=~'
+        ];
+        foreach ($query_types as $query_type) {
+            $urlinit = $as_uri . '/nosh/fhir/' . $query_type . urlencode(Session::get('search_term'));
+    		$result3 = $this->fhir_request($urlinit,false,$rpt);
+            if (isset($result3['ticket'])) {
+    			// New permission ticket issued, expire rpt session
+    			Session::forget('rpt');
+    			Session::put('uma_permission_ticket', $result3['ticket']);
+    			Session::save();
+    			// Get new RPT and start over
+    			return redirect()->route('uma_api_search');
+    		}
+            // Save results in session
+            $id = Session::get('current_client_id');
+            if (isset($result3['total'])) {
+                if ($result3['total'] != '0') {
+                    if (Session::has('uma_search_arr')) {
+                        $uma_search_arr = Session::get('uma_search_arr');
+                    } else {
+                        $uma_search_arr[$id] = [];
+                    }
+                    foreach ($result3['entry'] as $entry) {
+                        $uma_search_arr[$id][] = $entry['resource']['text']['div'];
+                    }
+                    Session::put('uma_search_arr', $uma_search_arr);
+                }
+            }
+        }
+        return redirect()->route('search');
 	}
 
     /**
