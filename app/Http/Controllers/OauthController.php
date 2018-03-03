@@ -268,20 +268,106 @@ class OauthController extends Controller
     {
         $query = DB::table('owner')->first();
         if ($query) {
-            if (Auth::check() && Session::get('is_owner') == 'yes') {
-                $data = [
-                    'name' => $query->lastname
-                ];
-                $data['text'] = '';
-                return view('welcome', $data);
+            if ($query->homepage == '0') {
+                return redirect()->route('welcome0');
             }
-            $data['name'] = $query->lastname;
-            $data['text'] = 'This is some test text you can enter';
+            if ($query->homepage == '1') {
+                return redirect()->route('welcome1');
+            }
+        } else {
+            return redirect()->route('install');
+        }
+    }
+
+    public function welcome0(Request $request)
+    {
+        $query = DB::table('owner')->first();
+        if ($query) {
+            $description = $query->description;
+            if ($query->description == '') {
+                $description = 'This is some test text you can enter';
+            }
+            $data = [
+                'name' => $query->lastname,
+                'text' => $description
+            ];
             return view('welcome', $data);
+        } else {
+            return redirect()->route('install');
+        }
+    }
+
+    public function welcome1(Request $request)
+    {
+        $query = DB::table('owner')->first();
+        if ($query) {
+            $description = $query->description;
+            if ($query->description == '') {
+                $description = 'This is some test text you can enter';
+            }
+            $data = [
+                'name' => $query->lastname,
+                'text' => $description,
+                'search' => ''
+            ];
+            return view('welcome1', $data);
             // return redirect()->route('login');
         } else {
             return redirect()->route('install');
         }
+    }
+
+    public function search_welcome(Request $request)
+    {
+        // Demo
+        $query = DB::table('owner')->first();
+        $search = '';
+        if ($request->isMethod('post')) {
+            // $rp_count = '0';
+            $rp_count = '7532';
+            $condition = '.';
+            $rp = DB::table('oauth_rp')->where('type', '=', 'pnosh')->get();
+            if ($rp) {
+                $rp_count = '7532'; // Demo
+                // $rp_count = $rp->count();
+            }
+            if ($query->condition !== '') {
+                $condition = ', each belonging to a patient with ' . $query->condition;
+            }
+            $search = '<p>The ' . $query->lastname . ' Directory is linked to ' . $rp_count . ' individual HIE of One accounts' . $condition . '</p>';
+            if ($request->input('search_field') !== '') {
+                $search_count = '10';
+                $search .= '<p>The search term ' . $request->input('search_field') . ' appears in the notes for ' . $search_count .  ' patients</p>';
+            }
+        }
+        $description = $query->description;
+        if ($query->description == '') {
+            $description = 'This is some test text you can enter';
+        }
+        $data = [
+            'name' => $query->lastname,
+            'text' => $description,
+            'search' => $search
+        ];
+        return view('welcome1', $data);
+    }
+
+    public function metadata(Request $request, $type)
+    {
+        // Demo
+        $query = DB::table('owner')->first();
+        if ($type == 'medication') {
+            $data['title'] = 'Linked medication data';
+            $count = '1577';
+            $no_count = '2409';
+            $privacy_count = '4412';
+            $last_update = '38 minutes ago';
+            $data['content'] = '<p>The ' . $query->lastname . ' Directory is linked to ' . $count . ' individual patients who have recorded medication use data,</p><p>';
+            $data['content'] .= $no_count . ' patients who have no data matching this criterion, and </p><p>';
+            $data['content'] .= $privacy_count . ' patients whose privacy settings are too strict for us to include them in the calculation for anonymous users to see, but they may have additional data for you to use depending on the terms you propose.</p>';
+            $data['content'] .= '<div class="alert alert-warning">Last update: ' . $last_update . '</div>';
+        }
+        return view('home', $data);
     }
 
     /**
@@ -1669,9 +1755,12 @@ class OauthController extends Controller
 
     public function test1(Request $request)
     {
-        $arr = ['MAILGUN_DOMAIN' => 'test1'];
-        $this->changeEnv($arr);
-        return 'OK';
+        $query = DB::table('owner')->first();
+        if ($query->description == '') {
+            return 'Empty';
+        } else {
+            return $query->description;
+        };
     }
 
     public function signup(Request $request)

@@ -47,6 +47,10 @@ App::singleton('oauth2', function () {
 Route::any('install', ['as' => 'install', 'uses' => 'OauthController@install']);
 Route::any('setup_mail', ['as' => 'setup_mail', 'uses' => 'OauthController@setup_mail']);
 Route::get('/', ['as' => 'welcome', 'uses' => 'OauthController@welcome']);
+Route::get('welcome0', ['as' => 'welcome0', 'uses' => 'OauthController@welcome0']);
+Route::get('welcome1', ['as' => 'welcome1', 'uses' => 'OauthController@welcome1']);
+Route::any('search_welcome', ['as' => 'search_welcome', 'uses' => 'OauthController@search_welcome']);
+Route::any('metadata/{type}', ['as' => 'metadata', 'uses' => 'OauthController@metadata']);
 Route::get('check', ['as' => 'check', 'uses' => 'OauthController@check']);
 Route::any('login', ['as' => 'login', 'uses' => 'OauthController@login']);
 Route::any('logout', ['as' => 'logout', 'uses' => 'OauthController@logout']);
@@ -67,6 +71,7 @@ Route::any('oauth_login', ['as' => 'oauth_login', 'uses' => 'OauthController@oau
 Route::get('clients', ['as' => 'clients', 'uses' => 'HomeController@clients']);
 Route::get('users', ['as' => 'users', 'uses' => 'HomeController@users']);
 Route::get('resource_view/{type}', ['as' => 'resource_view', 'uses' => 'HomeController@resource_view']);
+Route::any('settings', ['as' => 'settings', 'uses' => 'HomeController@settings']);
 Route::any('uma_aat', ['as' => 'uma_aat', 'uses' => 'HomeController@uma_aat']);
 Route::any('uma_api', ['as' => 'uma_api', 'uses' => 'HomeController@uma_api']);
 Route::any('uma_aat_search', ['as' => 'uma_aat_search', 'uses' => 'HomeController@uma_aat_search']);

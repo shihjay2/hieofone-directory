@@ -1209,4 +1209,36 @@ class HomeController extends Controller
         DB::table('fhir_clients')->where('endpoint_uri', '=', $request->input('endpoint_uri'))->update($data);
         return 'Username and password saved';
     }
+
+    public function settings(Request $request)
+    {
+        if (Session::get('is_owner') == 'yes') {
+            if ($request->isMethod('post')) {
+                $this->validate($request, [
+                    'last_name' => 'required'
+                ]);
+                $user_data['last_name'] = $request->input('last_name');
+                DB::table('oauth_users')->where('username', '=', Session::get('username'))->update($user_data);
+                $owner_data = [
+                    'lastname' => $request->input('last_name'),
+                    'homepage' => $request->input('homepage'),
+                    'description' => $request->input('description'),
+                    'condition' => $request->input('condition')
+                ];
+                DB::table('owner')->update($owner_data);
+                Session::put('message_action', 'Settings saved');
+                return redirect()->route('home');
+            } else {
+                $query = DB::table('owner')->first();
+                $data['noheader'] = true;
+                $data['last_name'] = $query->lastname;
+                $data['homepage'] = $query->homepage;
+                $data['description'] = $query->description;
+                $data['condition'] = $query->condition;
+                return view('settings', $data);
+            }
+        } else {
+            return redirect()->route('home');
+        }
+    }
 }
