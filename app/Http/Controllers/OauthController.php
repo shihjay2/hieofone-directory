@@ -366,6 +366,7 @@ class OauthController extends Controller
             $data['content'] .= $no_count . ' patients who have no data matching this criterion, and </p><p>';
             $data['content'] .= $privacy_count . ' patients whose privacy settings are too strict for us to include them in the calculation for anonymous users to see, but they may have additional data for you to use depending on the terms you propose.</p>';
             $data['content'] .= '<div class="alert alert-warning">Last update: ' . $last_update . '</div>';
+            $data['back'] = '<a href="' . route('welcome1') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Back</a>';
         }
         return view('home', $data);
     }
