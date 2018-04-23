@@ -132,10 +132,10 @@ php artisan migrate:install
 php artisan migrate
 a2enmod rewrite
 a2enmod ssl
-if [ -e "$WEB_CONF"/hie.conf ]; then
-	rm "$WEB_CONF"/hie.conf
+if [ -e "$WEB_CONF"/hie_directory.conf ]; then
+	rm "$WEB_CONF"/hie_directory.conf
 fi
-touch "$WEB_CONF"/hie.conf
+touch "$WEB_CONF"/hie_directory.conf
 APACHE_CONF="<VirtualHost _default_:80>
 	DocumentRoot $HIE/public/
 	ErrorLog ${APACHE_LOG_DIR}/error.log
