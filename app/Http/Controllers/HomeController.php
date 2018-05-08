@@ -149,7 +149,7 @@ class HomeController extends Controller
         }
         if (Session::has('uma_search_arr')) {
             $uma_search_arr = Session::get('uma_search_arr');
-            if (count($uma_search_arr) > 0) {
+            if (! empty($uma_search_arr)) {
                 foreach ($uma_search_arr as $uma_search_k => $uma_search_v) {
                     $patient = DB::table('oauth_rp')->where('id', '=', $uma_search_k)->first();
                     $data['content'] .= '<div class="panel panel-default"><div class="panel-heading">Resources from ' . $patient->as_name . '</div><div class="panel-body"><div class="list-group">';
@@ -427,7 +427,7 @@ class HomeController extends Controller
 		// Get AAT
 		$url_array = ['/nosh/oidc','/nosh/fhir/oidc'];
         $uma_search_count = Session::get('uma_search_count');
-        if (count($uma_search_count) == 0) {
+        if (empty($uma_search_count)) {
             Session::put('uma_search_complete', 'true');
             Session::forget('uma_search_count');
             return redirect()->route('search');

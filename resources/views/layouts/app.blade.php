@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
 	{{-- <link href="{{ elixir('css/app.css') }}" rel="stylesheet"> --}}
 	@yield('view.stylesheet')
+	@yield('css')
 	<style>
 		body {
 			font-family: 'Lato';
@@ -61,6 +62,7 @@
 						@else
 							<li><a href="{{ url('/home') }}">My Patients</a></li>
 						@endif
+						<li><a href="{{ url('/forums') }}">Forum</a></li>
 						<li><a href="{{ url('/reports') }}">Reports</a></li>
 					@endif
 				</ul>
@@ -70,8 +72,8 @@
 					<!-- Authentication Links -->
 					@if (Auth::guest())
 						@if (!isset($noheader))
-							<li><a href="{{ url('/login') }}">Physician Login</a></li>
-							<li><a href="{{ url('/signup') }}">Physician Sign Up</a></li>
+							<li><a href="{{ url('/login') }}">Login</a></li>
+							<li><a href="{{ url('/signup') }}">Sign Up</a></li>
 						@endif
 					@else
 						<li class="dropdown">
@@ -135,5 +137,6 @@
 		// 	});
 		// }, 3000);
 	</script>
+	@yield('js')
 </body>
 </html>

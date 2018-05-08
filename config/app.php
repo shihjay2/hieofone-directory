@@ -157,7 +157,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
-		SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class
+		SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
+        DevDojo\Chatter\ChatterServiceProvider::class
     ],
 
     /*

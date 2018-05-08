@@ -81,7 +81,7 @@ class OauthController extends Controller
     *
     */
 
-        public function install(Request $request)
+    public function install(Request $request)
     {
         // Check if already installed, if so, go back to home page
         $query = DB::table('owner')->first();
@@ -1756,12 +1756,6 @@ class OauthController extends Controller
 
     public function test1(Request $request)
     {
-        $query = DB::table('owner')->first();
-        if ($query->description == '') {
-            return 'Empty';
-        } else {
-            return $query->description;
-        };
     }
 
     public function signup(Request $request)
@@ -1793,7 +1787,7 @@ class OauthController extends Controller
 				'email' => $request->input('email')
 			];
 			DB::table('users')->insert($user_data1);
-			$url = route('signup_confirmation') . '/' . $user_data['username'];
+			$url = route('signup_confirmation', [$user_data['username']]);
 			$data2['message_data'] = 'This message is to notify you that you have registered for an account with the HIE of One Directory.<br>';
 			$data2['message_data'] .= 'To complete your registration, please click on the following link or point your web browser to:<br>';
 			$data2['message_data'] .= $url;

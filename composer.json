@@ -24,7 +24,8 @@
         "laravel/socialite": "~2.0",
         "google/apiclient": "~2.0",
         "simplesoftwareio/simple-qrcode": "~1.4",
-        "naviocean/laravel-nameparser": "dev-master"
+        "naviocean/laravel-nameparser": "dev-master",
+        "devdojo/chatter": "0.2.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
