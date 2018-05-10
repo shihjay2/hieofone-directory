@@ -252,6 +252,11 @@
 			$('#title').focus();
 		@endif
 
+        $(".chatter_sidebar ul").removeClass('nav-pills');
+        $(".chatter_sidebar li a").each(function(){
+            var url = this.href;
+            $(this).attr('href', '{{ url('/')}}' + this.href)
+        }));
 
 	});
 </script>
