@@ -252,9 +252,8 @@
 			$('#title').focus();
 		@endif
 
-        $(".chatter_sidebar ul").removeClass('nav-pills');
-        $(".chatter_sidebar li a").each(function(){
-            var url = this.href;
+        $(".chatter_sidebar").find('ul').removeClass('nav-pills');
+        $(".chatter_sidebar").find('li').find('a').each(function(){
             $(this).attr('href', '{{ url('/')}}' + this.href)
         }));
 
