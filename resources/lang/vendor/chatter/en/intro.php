@@ -32,6 +32,6 @@ return [
     */
 
     'headline'      => 'Directory Forum',
-    'description'   => 'A place to chat with directory users',
+    'description'   => 'Powered by Chatter',
 
 ];
