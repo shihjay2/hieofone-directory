@@ -54,6 +54,9 @@ Route::any('setup_mail', ['as' => 'setup_mail', 'uses' => 'OauthController@setup
 Route::get('/', ['as' => 'welcome', 'uses' => 'OauthController@welcome']);
 Route::get('welcome0', ['as' => 'welcome0', 'uses' => 'OauthController@welcome0']);
 Route::get('welcome1', ['as' => 'welcome1', 'uses' => 'OauthController@welcome1']);
+Route::get('patients/{create?}', ['as' => 'patients', 'uses' => 'OauthController@patients']);
+Route::get('providers', ['as' => 'providers', 'uses' => 'OauthController@providers']);
+Route::any('container_create/{code?}', ['as' => 'container_create', 'uses' => 'OauthController@container_create']);
 Route::any('search_welcome', ['as' => 'search_welcome', 'uses' => 'OauthController@search_welcome']);
 Route::any('metadata/{type}', ['as' => 'metadata', 'uses' => 'OauthController@metadata']);
 Route::get('check', ['as' => 'check', 'uses' => 'OauthController@check']);

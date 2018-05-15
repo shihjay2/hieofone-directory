@@ -264,6 +264,11 @@ class OauthController extends Controller
         }
     }
 
+    /**
+    * Welcome page functions
+    *
+    */
+
     public function welcome(Request $request)
     {
         $query = DB::table('owner')->first();
@@ -455,6 +460,118 @@ class OauthController extends Controller
             $data['back'] = '<a href="' . route('welcome1') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Back</a>';
         }
         return view('home', $data);
+    }
+
+    public function patients(Request $request, $create='')
+    {
+        $query = DB::table('owner')->first();
+        if ($query) {
+            $description = $query->description;
+            if ($query->description == '') {
+                $description = 'This is some test text you can enter';
+            }
+            $data = [
+                'name' => $query->lastname,
+                'text' => $description,
+                'create' => 'no'
+            ];
+            if ($create !== '') {
+                $data['create'] = 'yes';
+            }
+            return view('patients', $data);
+        } else {
+            return redirect()->route('install');
+        }
+    }
+
+    public function container_create(Request $request, $code='')
+    {
+        $owner = DB::table('owner')->first();
+        if ($request->isMethod('post')) {
+            if ($code !== 'complete') {
+                $this->validate($request, [
+                    'email' => 'required'
+                ]);
+                $data['code'] = $this->gen_uuid();
+                $data['email'] = $request->input('email');
+                DB::table('invitation')->insert($data);
+                $url = route('container_create', [$data['code']]);
+                $data1['message_data'] = "This is message from the Trustee Directory for " . $owner->lastname . ".</br>";
+                $data1['message_data'] .= "Please confirm your e-mail so we know you're a real human";
+                $data1['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
+                $data1['message_data'] .= $url;
+                $title1 = 'Complete your Trustee Patient Container creation from the Directory for ' . $owner->lastname;
+                $to1 = $request->input('email');
+                $this->send_mail('auth.emails.generic', $data1, $title1, $to1);
+                $data6 = [
+                    'name' => $owner->lastname,
+                    'text' => 'Your request for a patient container has been received.  You will be receiving a confirmation e-mail to verify if you hare a human.  Thank you.'
+                ];
+                return view('welcome', $data6);
+            } else {
+                $this->validate($request, [
+                    'email' => 'required'
+                ]);
+                $url7 = route('container_create', [$data['code']]);
+                $data7['message_data'] = "This is message from the Trustee Directory for " . $owner->lastname . ".</br>";
+                $data7['message_data'] .= "Your Trustee Patient Container is ready for use!";
+                $data7['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
+                $data1['message_data'] .= $url;
+                $title7 = 'Your Trustee Patient Container has been created!';
+                $to7 = $request->input('email');
+                $this->send_mail('auth.emails.generic', $data7, $title7, $to7);
+                $data8 = [
+                    'name' => $owner->lastname,
+                    'text' => 'Message has been sent to the patient.'
+                ];
+                return view('welcome', $data8);
+            }
+        } else {
+            if ($code == '') {
+                if (Session::get('is_owner') == 'yes') {
+                    // This is a placeholder for automated droplet creation is handled; right now, it is manually entered
+                    return view('container_create');
+                }
+            } else {
+                // Check code
+                $query = DB::table('invitation')->where('code', '=', $code)->first();
+                if ($query) {
+                    $url2 = route('container_create', [$data['code']]);
+                    $data3['message_data'] = "This is message from the Trustee Directory for " . $owner->lastname . ".</br>";
+                    $data3['message_data'] .= "Please create a container for " . $query->email;
+                    $data3['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
+                    $data3['message_data'] .= $url;
+                    $title3 = 'Create a Trustee container under the Directory for ' . $owner->lastname;
+                    $to3 = $owner->email;
+                    $this->send_mail('auth.emails.generic', $data3, $title3, $to3);
+                    $data4['code'] = 'Pending';
+                    DB::table('invitation')->where('id', '=', $query->id)->update($data4);
+                    $data5 = [
+                        'name' => $owner->lastname,
+                        'text' => 'You are verfied to be a human and we will be creating your patient container shortly.  Please await an email response when your container is ready for use.  Thank you.'
+                    ];
+                    return view('welcome', $data5);
+                }
+            }
+        }
+    }
+
+    public function providers(Request $request)
+    {
+        $query = DB::table('owner')->first();
+        if ($query) {
+            $description = $query->description;
+            if ($query->description == '') {
+                $description = 'This is some test text you can enter';
+            }
+            $data = [
+                'name' => $query->lastname,
+                'text' => $description
+            ];
+            return view('providers', $data);
+        } else {
+            return redirect()->route('install');
+        }
     }
 
     /**

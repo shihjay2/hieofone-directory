@@ -31,10 +31,10 @@
 						{!! $search !!}
 					</div>
 				</div>
-				<div class="panel-heading">Get your own HIE of One patient-controlled independent health record</div>
+				<div class="panel-heading">Get your own Trustee Patient Container</div>
 				<div class="panel-body">
 					<div class="col-md-8 col-md-offset-2">
-						<a href="{{ url('/signup_hieofone') }}" class="btn btn-primary btn-block">Get Started!</a>
+						<a href="{{ route('patients', ['yes']) }}" class="btn btn-primary btn-block">Get Started!</a>
 					</div>
 				</div>
 			</div>

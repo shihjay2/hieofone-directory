@@ -5,7 +5,7 @@
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading">Sign up to Directory for {{ $name }}</div>
+				<div class="panel-heading">Sign up to the Directory for {{ $name }}</div>
 				<div class="panel-body">
 					<div style="text-align: center;">
 					  <i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>
@@ -18,7 +18,7 @@
                                 <button type="button" class="btn btn-primary btn-block" id="connectUportBtn" onclick="loginBtnClick()">
                                     <img src="{{ asset('assets/uport-logo-white.svg') }}" height="25" width="25" style="margin-right:5px"></img> Obtain credentials with uPort
                                 </button>
-                                <button type="button" class="btn btn-primary btn-block" id="connectUportBtn1">Add NPI credential to uPort using Doximity Verification</button>
+                                <button type="button" class="btn btn-primary btn-block" id="connectUportBtn1"><i class="fa fa-btn fa-plus"></i> Add NPI credential to uPort using Doximity Verification</button>
                             </div>
                         </div>
 
