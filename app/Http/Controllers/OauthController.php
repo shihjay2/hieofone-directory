@@ -384,7 +384,7 @@ class OauthController extends Controller
                 $description = 'This is some test text you can enter';
             }
             $data = [
-                'name' => $query->lastname,
+                'name' => $query->org_name,
                 'text' => $description
             ];
             return view('welcome', $data);
@@ -402,7 +402,7 @@ class OauthController extends Controller
                 $description = 'This is some test text you can enter';
             }
             $data = [
-                'name' => $query->lastname,
+                'name' => $query->org_name,
                 'text' => $description,
                 'search' => ''
             ];
@@ -436,7 +436,7 @@ class OauthController extends Controller
             if ($query->condition !== '') {
                 $condition = ', each belonging to a patient with ' . $query->condition;
             }
-            $search = '<p>The ' . $query->lastname . ' Directory is linked to ' . $rp_count . ' individual HIE of One accounts' . $condition . '</p>';
+            $search = '<p>The ' . $query->org_name . ' Trustee Directory is linked to ' . $rp_count . ' individual HIE of One accounts' . $condition . '</p>';
             if ($request->input('search_field') !== '') {
                 $search_count = '10';
                 $search .= '<p>The search term ' . $request->input('search_field') . ' appears in the notes for ' . $search_count .  ' patients</p>';
@@ -447,7 +447,7 @@ class OauthController extends Controller
             $description = 'This is some test text you can enter';
         }
         $data = [
-            'name' => $query->lastname,
+            'name' => $query->org_name,
             'text' => $description,
             'search' => $search
         ];
@@ -464,7 +464,7 @@ class OauthController extends Controller
             $no_count = '2409';
             $privacy_count = '4412';
             $last_update = '38 minutes ago';
-            $data['content'] = '<p>The ' . $query->lastname . ' Directory is linked to ' . $count . ' individual patients who have recorded medication use data,</p><p>';
+            $data['content'] = '<p>The ' . $query->org_name . ' Trustee Directory is linked to ' . $count . ' individual patients who have recorded medication use data,</p><p>';
             $data['content'] .= $no_count . ' patients who have no data matching this criterion, and </p><p>';
             $data['content'] .= $privacy_count . ' patients whose privacy settings are too strict for us to include them in the calculation for anonymous users to see, but they may have additional data for you to use depending on the terms you propose.</p>';
             $data['content'] .= '<div class="alert alert-warning">Last update: ' . $last_update . '</div>';
@@ -482,7 +482,7 @@ class OauthController extends Controller
                 $description = 'This is some test text you can enter';
             }
             $data = [
-                'name' => $query->lastname,
+                'name' => $query->org_name,
                 'text' => $description,
                 'create' => 'no'
             ];
@@ -576,7 +576,7 @@ class OauthController extends Controller
                 $description = 'This is some test text you can enter';
             }
             $data = [
-                'name' => $query->lastname,
+                'name' => $query->org_name,
                 'text' => $description
             ];
             return view('providers', $data);
@@ -702,7 +702,7 @@ class OauthController extends Controller
                 $query = DB::table('owner')->first();
                 if ($query) {
                     // Show login form
-                    $data['name'] = $query->lastname;
+                    $data['name'] = $query->org_name;
                     $data['noheader'] = true;
                     if (Session::get('oauth_response_type') == 'code') {
                         // Check if owner has set default policies and show other OIDC IDP's to relay information with HIE of One AS as relaying IDP
@@ -2089,7 +2089,7 @@ class OauthController extends Controller
             $query = DB::table('owner')->first();
 			$data2 = [
 				'noheader' => true,
-                'name' => $query->lastname
+                'name' => $query->org_name
 			];
 			return view('signup', $data2);
 		}
@@ -2323,7 +2323,7 @@ class OauthController extends Controller
 			if (isset($result_array['subject'])) {
 				$as_uri = $result_array['links'][0]['href'];
                 $owner_query = DB::table('owner')->first();
-				$client_name = $owner_query->lastname . " Directory";
+				$client_name = $owner_query->org_name . " Trustee Directory";
 				$url1 = route('uma_auth');
 				$oidc = new OpenIDConnectClient($as_uri);
 				$oidc->setClientName($client_name);
@@ -2394,7 +2394,7 @@ class OauthController extends Controller
 			curl_close($ch);
             if ($httpCode !== 404) {
                 $owner_query = DB::table('owner')->first();
-				$client_name = $owner_query->lastname . " Directory";
+				$client_name = $owner_query->org_name . " Trustee Directory";
 				$url1 = route('uma_auth');
 				$oidc = new OpenIDConnectClient($url);
 				$oidc->setClientName($client_name);
@@ -2441,6 +2441,6 @@ class OauthController extends Controller
     public function check(Request $request)
     {
         $query = DB::table('owner')->first();
-        return $query->lastname;
+        return $query->org_name;
     }
 }

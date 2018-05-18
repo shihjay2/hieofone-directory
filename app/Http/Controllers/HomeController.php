@@ -1308,7 +1308,7 @@ class HomeController extends Controller
             } else {
                 $query = DB::table('owner')->first();
                 $data['noheader'] = true;
-                $data['last_name'] = $query->lastname;
+                $data['last_name'] = $query->org_name;
                 $data['homepage'] = $query->homepage;
                 $data['description'] = $query->description;
                 $data['condition'] = $query->condition;
