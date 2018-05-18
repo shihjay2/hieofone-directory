@@ -982,6 +982,7 @@ class HomeController extends Controller
             return view('home', $data3);
         } else {
             $data['title'] = 'Invite an administrative user to the Directory';
+            $data['post'] = route('add_owner');
             return view('invite', $data);
         }
     }
@@ -1028,6 +1029,7 @@ class HomeController extends Controller
             return view('home', $data3);
         } else {
             $data['title'] = 'Invite a user to the Directory';
+            $data['post'] = route('make_invitation');
             return view('invite', $data);
         }
     }

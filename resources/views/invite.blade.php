@@ -11,7 +11,7 @@
 					<div style="text-align: center;">
 					  <i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>
 					</div>
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/make_invitation') }}">
+					<form class="form-horizontal" role="form" method="POST" action="{!! $post !!}">
 						{{ csrf_field() }}
 
 						<div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">

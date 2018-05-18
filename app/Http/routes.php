@@ -111,6 +111,7 @@ Route::any('signup_hieofone', ['as' => 'signup_hieofone', 'uses' => 'OauthContro
 // Route::get('authorize_user_disable/{id}', ['as' => 'authorize_user_disable', 'uses' => 'HomeController@authorize_user_disable']);
 // Route::get('proxy_add/{sub}', ['as' => 'proxy_add', 'uses' => 'HomeController@proxy_add']);
 // Route::get('proxy_remove/{sub}', ['as' => 'proxy_remove', 'uses' => 'HomeController@proxy_remove']);
+Route::any('add_owner', ['as' => 'add_owner', 'uses' => 'HomeController@add_owner']);
 Route::any('make_invitation', ['as' => 'make_invitation', 'uses' => 'HomeController@make_invitation']);
 Route::any('accept_invitation/{id}', ['as' => 'accept_invitation', 'uses' => 'OauthController@accept_invitation']);
 Route::any('process_invitation', ['as' => 'process_invitation', 'uses' => 'HomeController@process_invitation']);
