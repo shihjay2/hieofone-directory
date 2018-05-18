@@ -125,7 +125,7 @@ class OauthController extends Controller
                 $clientSecret = $this->gen_secret();
                 $owner_data = [
                     'lastname' => $request->input('last_name'),
-                    'firstname' => $reuqest->input('first_name'),
+                    'firstname' => $request->input('first_name'),
                     'email' => $request->input('email'),
                     'org_name' => $request->input('org_name'),
                     'client_id' => $clientId,
