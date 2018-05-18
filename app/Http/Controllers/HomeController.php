@@ -35,22 +35,42 @@ class HomeController extends Controller
         $data['title'] = 'My Patients';
         $data['content'] = 'No patients yet.';
         $data['searchbar'] = 'yes';
-        $query = DB::table('oauth_rp')->where('type', '=', 'pnosh')->get();
+        $query = DB::table('oauth_rp')->where('type', '=', 'as')->get();
 		if ($query) {
             $query1 = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->get();
             if ($query1) {
                 $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
     			$data['content'] .= '<div class="list-group searchlist">';
-    			foreach ($query1 as $client_row) {
+                $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span><span class="col-sm-1"><strong>Actions</strong></span></a>';
+                foreach ($query1 as $client_row) {
                     $client = DB::table('oauth_rp')->where('as_uri', '=', $client_row->as_uri)->first();
-    				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
+                    $link = '<span class="col-sm-5">';
+                    $rs = DB::table('as_to_rs')->where('as_id', '=', $client_row->id)->get();
+                    $rs_count=0;
+                    if ($rs) {
+                        foreach ($rs as $rs_row) {
+                            $rs_uri = $rs_row->rs_uri;
+                            if (strpos($rs_row->rs_uri, "/nosh") !== false) {
+                                $rs_uri . '/uma_auth';
+                            }
+                            if ($rs_count > 0) {
+                                $link .= '<br>';
+                            }
+                            $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></h4>';
+                            $rs_count++;
+                        }
+                    }
+                    $link .= '</span>';
+    				// $link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
                     if ($client->picture == '' || $client->picture == null) {
                         $picture = '<i class="fa fa-btn fa-user"></i>';
                     } else {
                         $picture = '<img src="' . $client->picture . '" height="30" width="30">';
                     }
-                    $remove = '<span class="pull-right"><span style="margin:10px"></span><i class="fa fa-minus fa-lg directory-remove" remove-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
-                	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . $remove . '</a>';
+                    $timestamp = mt_rand(1, time());
+                    $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
+                    $remove = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-minus fa-lg directory-remove" remove-val="' . $client->as_uri . '" title="Remove from My Patient List" style="cursor:pointer;"></i></span>';
+                    $data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span style="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . $remove . '</a>';
     			}
     			$data['content'] .= '</div>';
             } else {
@@ -67,23 +87,43 @@ class HomeController extends Controller
         $data['title'] = 'All Patients';
         $data['content'] = 'No patients yet.';
         $data['searchbar'] = 'yes';
-        $query = DB::table('oauth_rp')->where('type', '=', 'pnosh')->get();
+        $query = DB::table('oauth_rp')->where('type', '=', 'as')->get();
 		if ($query) {
             $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
 			$data['content'] .= '<div class="list-group searchlist">';
-			foreach ($query as $client) {
-				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
+            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span><span class="col-sm-1"><strong>Actions</strong></span></a>';
+            foreach ($query as $client) {
+                $link = '<span class="col-sm-5">';
+                $rs = DB::table('as_to_rs')->where('as_id', '=', $client_row->id)->get();
+                $rs_count=0;
+                if ($rs) {
+                    foreach ($rs as $rs_row) {
+                        $rs_uri = $rs_row->rs_uri;
+                        if (strpos($rs_row->rs_uri, "/nosh") !== false) {
+                            $rs_uri . '/uma_auth';
+                        }
+                        if ($rs_count > 0) {
+                            $link .= '<br>';
+                        }
+                        $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></h4>';
+                        $rs_count++;
+                    }
+                }
+                $link .= '</span>';
+				// $link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
                 if ($client->picture == '' || $client->picture == null) {
                     $picture = '<i class="fa fa-btn fa-user"></i>';
                 } else {
                     $picture = '<img src="' . $client->picture . '" height="30" width="30">';
                 }
-                $add = '<span class="pull-right"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                $timestamp = mt_rand(1, time());
+                $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
+                $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
                 $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
                 if ($check) {
                     $add = '';
                 }
-            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . $add . '</a>';
+            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span style="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . $add . '</a>';
 			}
 			$data['content'] .= '</div>';
 		}
@@ -900,6 +940,52 @@ class HomeController extends Controller
         return redirect()->route('users');
     }
 
+    public function add_owner(Request $request)
+    {
+        $owner = DB::table('owner')->first();
+        $data['name'] = Session::get('owner');
+        if ($request->isMethod('post')) {
+            $this->validate($request, [
+                'email' => 'required|unique:users,email',
+                'first_name' => 'required',
+                'last_name' => 'required'
+            ]);
+            // Check if
+            $access_lifetime = App::make('oauth2')->getConfig('access_lifetime');
+            $code = $this->gen_secret();
+            $data1 = [
+                'email' => $request->input('email'),
+                'expires' => date('Y-m-d H:i:s', time() + $access_lifetime),
+                'code' => $code,
+                'first_name' => $request->input('first_name'),
+                'last_name' => $request->input('last_name'),
+                'owner' => 'yes'
+            ];
+            if ($request->has('client_id')) {
+                $data1['client_ids'] = implode(',', $request->input('client_id'));
+            }
+            DB::table('invitation')->insert($data1);
+            // Send email to invitee
+            $url = URL::to('accept_invitation') . '/' . $code;
+            $query0 = DB::table('oauth_rp')->where('type', '=', 'google')->first();
+            $data2['message_data'] = 'You are added as an administrator to the ' . $owner->org_name . ' Trustee Directory.<br>';
+            $data2['message_data'] .= 'Go to ' . $url . ' to get registered.';
+            $title = 'Invitation to ' . $owner->firstname . ' ' . $owner->lastname  . "'s Authorization Server";
+            $to = $request->input('email');
+            $this->send_mail('auth.emails.generic', $data2, $title, $to);
+            $data3['name'] = Session::get('owner');
+            $data3['title'] = 'Invitation Code';
+            $data3['content'] = '<p>Invitation sent to ' . $request->input('first_name') . ' ' . $request->input('last_name') . ' (' . $to . ')</p>';
+            $data3['content'] .= '<p>Alternatively, show the recently invited guest your QR code:</p><div style="text-align: center;">';
+            $data3['content'] .= QrCode::size(300)->generate($url);
+            $data3['content'] .= '</div>';
+            return view('home', $data3);
+        } else {
+            $data['title'] = 'Invite an administrative user to the Directory';
+            return view('invite', $data);
+        }
+    }
+
     public function make_invitation(Request $request)
     {
         $owner = DB::table('owner')->first();
@@ -918,7 +1004,8 @@ class HomeController extends Controller
                 'expires' => date('Y-m-d H:i:s', time() + $access_lifetime),
                 'code' => $code,
                 'first_name' => $request->input('first_name'),
-                'last_name' => $request->input('last_name')
+                'last_name' => $request->input('last_name'),
+                'owner' => 'no'
             ];
             if ($request->has('client_id')) {
                 $data1['client_ids'] = implode(',', $request->input('client_id'));
@@ -940,17 +1027,7 @@ class HomeController extends Controller
             $data3['content'] .= '</div>';
             return view('home', $data3);
         } else {
-            if ($owner->login_direct == 0) {
-                $query = DB::table('oauth_clients')->where('authorized', '=', 1)->where('scope', 'LIKE', "%uma_protection%")->get();
-                if ($query) {
-                    $data['rs'] = '<ul class="list-group checked-list-box">';
-                    $data['rs'] .= '<li class="list-group-item"><input type="checkbox" id="all_resources" style="margin:10px;"/>All Resources</li>';
-                    foreach ($query as $client) {
-                        $data['rs'] .= '<li class="list-group-item"><input type="checkbox" name="client_id[]" class="client_ids" value="' . $client->client_id . '" style="margin:10px;"/><img src="' . $client->logo_uri . '" style="max-height: 30px;width: auto;"><span style="margin:10px">' . $client->client_name . '</span></li>';
-                    }
-                    $data['rs'] .= '</ul>';
-                }
-            }
+            $data['title'] = 'Invite a user to the Directory';
             return view('invite', $data);
         }
     }

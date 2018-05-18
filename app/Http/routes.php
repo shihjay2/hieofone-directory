@@ -54,6 +54,7 @@ Route::any('setup_mail', ['as' => 'setup_mail', 'uses' => 'OauthController@setup
 Route::get('/', ['as' => 'welcome', 'uses' => 'OauthController@welcome']);
 Route::get('welcome0', ['as' => 'welcome0', 'uses' => 'OauthController@welcome0']);
 Route::get('welcome1', ['as' => 'welcome1', 'uses' => 'OauthController@welcome1']);
+Route::get('privacy_policy', ['as' => 'privacy_policy', 'uses' => 'OauthController@privacy_policy']);
 Route::get('patients/{create?}', ['as' => 'patients', 'uses' => 'OauthController@patients']);
 Route::get('providers', ['as' => 'providers', 'uses' => 'OauthController@providers']);
 Route::any('container_create/{code?}', ['as' => 'container_create', 'uses' => 'OauthController@container_create']);
@@ -89,8 +90,9 @@ Route::any('uma_register', ['as' => 'uma_register', 'uses' => 'OauthController@u
 Route::any('uma_register_url', ['as' => 'uma_register_url', 'uses' => 'OauthController@uma_register_url']);
 Route::any('directory_auth', ['as' => 'directory_auth', 'uses' => 'OauthController@directory_auth']);
 Route::get('directory_check/{id}', ['as' => 'directory_check', 'uses' => 'HomeController@directory_check']);
-Route::get('directory_registration', ['as' => 'directory_registration', 'uses' => 'OauthController@directory_registration']);
-Route::get('directory_remove/{id}/{client_id}', ['as' => 'directory_remove', 'uses' => 'HomeController@directory_remove']);
+Route::any('directory_registration/{id?}', ['as' => 'directory_registration', 'uses' => 'OauthController@directory_registration']);
+Route::post('directory_remove/{id}', ['as' => 'directory_remove', 'uses' => 'HomeController@directory_remove']);
+Route::post('directory_update/{id}', ['as' => 'directory_update', 'uses' => 'HomeController@directory_update']);
 Route::any('signup', ['as' => 'signup', 'uses' => 'OauthController@signup']);
 Route::any('signup_confirmation/{code}', ['as' => 'signup_confirmation', 'uses' => 'OauthController@signup_confirmation']);
 Route::any('signup_hieofone', ['as' => 'signup_hieofone', 'uses' => 'OauthController@signup_hieofone']);
@@ -251,5 +253,6 @@ Route::get('.well-known/uma-configuration', function () {
 // Update system call
 Route::get('update_system', ['as' => 'update_system', 'uses' => 'OauthController@update_system']);
 
-// test
+// test and demo pages
 Route::any('test1', ['as' => 'test1', 'uses' => 'OauthController@test1']);
+Route::any('demo_patient_list', ['as' => 'demo_patient_list', 'uses' => 'OauthController@demo_patient_list']);

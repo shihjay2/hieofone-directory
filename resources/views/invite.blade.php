@@ -5,7 +5,7 @@
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading">Invite a user to access your resources</div>
+				<div class="panel-heading">{!! $title !!}</div>
 				<div class="panel-body">
 
 					<div style="text-align: center;">
@@ -55,10 +55,6 @@
 								@endif
 							</div>
 						</div>
-
-						@if (isset($rs))
-							{!! $rs !!}
-						@endif
 
 						<div class="form-group">
 							<div class="col-md-6 col-md-offset-4">

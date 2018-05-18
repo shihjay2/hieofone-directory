@@ -55,6 +55,7 @@
 							<li><a href="{{ url('/settings') }}">Settings</a></li>
 							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"> Users <span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
+									<li><a href="{{ url('/add_owner') }}">Add Administrative User</a></li>
 									<li><a href="{{ url('/users') }}">Authorized</a></li>
 									<li><a href="{{ url('/authorize_user') }}">Pending Authorization</a></li>
 								</ul>
@@ -64,6 +65,7 @@
 						@endif
 						<li><a href="{{ url('/forums') }}">Forum</a></li>
 						<li><a href="{{ url('/reports') }}">Reports</a></li>
+						<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
 					@endif
 				</ul>
 
@@ -75,8 +77,31 @@
 							<li><a href="{{ url('/patients') }}">Patients</a></li>
 							<li><a href="{{ url('/providers') }}">Providers</a></li>
 							<li><a href="{{ url('/others') }}">Others</a></li>
+							<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
 							<li><a href="{{ url('/login') }}">Login</a></li>
 							<li><a href="{{ url('/signup') }}">Sign Up</a></li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+									Demo Pages <span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Patient List</a></li>
+									<li><a href="{{ url('/change_password') }}"><i class="fa fa-btn fa-cog"></i>Change Password</a></li>
+									<li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+								</ul>
+							</li>
+						@endif
+						@if (isset($demo))
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+									Demo User <span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href=""><i class="fa fa-btn fa-cogs"></i>My Information</a></li>
+									<li><a href=""><i class="fa fa-btn fa-cog"></i>Change Password</a></li>
+									<li><a href=""><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+								</ul>
+							</li>
 						@endif
 					@else
 						<li class="dropdown">
