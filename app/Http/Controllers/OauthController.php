@@ -2452,7 +2452,7 @@ class OauthController extends Controller
 			$result = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			curl_close($ch);
-            if ($httpCode !== 404) {
+            if ($httpCode !== 404 && $httpCode !== 0) {
                 $owner_query = DB::table('owner')->first();
 				$client_name = $owner_query->org_name . " Trustee Directory";
 				$url1 = route('uma_auth');
