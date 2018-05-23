@@ -85,7 +85,8 @@
 									Demo Pages <span class="caret"></span>
 								</a>
 								<ul class="dropdown-menu" role="menu">
-									<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Patient List</a></li>
+									<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Default Patient List</a></li>
+									<li><a href="{{ url('/demo_patient_list/yes') }}"><i class="fa fa-btn fa-list"></i>Patient List after Login</a></li>
 									<li><a href="{{ url('/change_password') }}"><i class="fa fa-btn fa-cog"></i>Change Password</a></li>
 									<li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
 								</ul>

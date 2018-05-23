@@ -377,6 +377,60 @@ class OauthController extends Controller
 
     public function welcome0(Request $request)
     {
+        $data['name'] = Session::get('owner');
+        $data['title'] = 'Patient List';
+        $data['content'] = 'No patients yet.';
+        $data['searchbar'] = 'yes';
+        $query = DB::table('oauth_rp')->where('type', '=', 'as')->get();
+		if ($query) {
+            $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
+			$data['content'] .= '<div class="list-group searchlist">';
+            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span></a>';
+            foreach ($query as $client) {
+                $link = '<span class="col-sm-5">';
+                $rs = DB::table('as_to_rs')->where('as_id', '=', $client_row->id)->get();
+                $rs_count=0;
+                if ($rs) {
+                    foreach ($rs as $rs_row) {
+                        if ($rs_row->rs_public == 0) {
+                            $link .= '<h4><span class="label label-danger">Please Sign-In</span></h4>';
+                        } else {
+                            $rs_uri = $rs_row->rs_uri;
+                            if (strpos($rs_row->rs_uri, "/nosh") !== false) {
+                                $rs_uri . '/uma_auth';
+                            }
+                            if ($rs_count > 0) {
+                                $link .= '<br>';
+                            }
+                            $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></h4>';
+                            $rs_count++;
+                        }
+                    }
+                }
+                $link .= '</span>';
+				// $link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
+                if ($client->picture == '' || $client->picture == null) {
+                    $picture = '<i class="fa fa-btn fa-user"></i>';
+                } else {
+                    $picture = '<img src="' . $client->picture . '" height="30" width="30">';
+                }
+                $timestamp = mt_rand(1, time());
+                $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
+                // $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                // $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
+                // if ($check) {
+                //     $add = '';
+                // }
+            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span style="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+			}
+			$data['content'] .= '</div>';
+		}
+        // $data['back'] = '<a href="' . URL::to('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
+        return view('home', $data);
+    }
+
+    public function welcome0_old(Request $request)
+    {
         $query = DB::table('owner')->first();
         if ($query) {
             $description = $query->description;
@@ -1767,6 +1821,12 @@ class OauthController extends Controller
         $query = DB::table('invitation')->where('code', '=', $id)->first();
         if ($query) {
             $expires = strtotime($query->expires);
+            $username = '';
+            $password = '';
+            $owner_status = false;
+            if ($query->owner == 'yes') {
+                $owner_status = true;
+            }
             if ($expires > time()) {
                 if ($request->isMethod('post')) {
                     $this->validate($request, [
@@ -1774,37 +1834,11 @@ class OauthController extends Controller
                         'password' => 'min:7',
                         'confirm_password' => 'min:7|same:password'
                     ]);
-                    if ($request->input('username') == '') {
-                        $username = $this->gen_uuid();
-                        $password = sha1($username);
-                    } else {
+                    if ($request->input('username') !== '') {
                         $username = $request->input('username');
                         $password = sha1($request->input('password'));
                     }
-                    // Add user
-                    $sub = $this->gen_uuid();
-                    $data = [
-                        'username' => $username,
-                        'first_name' => $query->first_name,
-                        'last_name' => $query->last_name,
-                        'password' => $password,
-                        'email' => $query->email,
-                        'sub' => $sub
-                    ];
-                    DB::table('oauth_users')->insert($data);
-                    $data1 = [
-                        'email' => $query->email,
-                        'name' => $username
-                    ];
-                    DB::table('users')->insert($data1);
-                    if ($query->owner == 'yes') {
-                        $data1 = [
-                            'lastname' => $query->last_name,
-                            'firstname' => $query->first_name,
-                            'sub' => $sub
-                        ];
-                        DB::table('owner')->insert($data1);
-                    }
+                    $this->add_user($id, $username, $password, $owner_status);
                     // if ($query->client_ids !== null) {
                     //     // Add policies to individual client resources
                     //     $client_ids = explode(',', $query->client_ids);
@@ -1842,11 +1876,15 @@ class OauthController extends Controller
                     DB::table('invitation')->where('code', '=', $id)->delete();
                     return redirect()->route('home');
                 } else {
-                    $data['noheader'] = true;
-                    $owner = DB::table('owner')->first();
-                    $data['code'] = $id;
-                    $data['owner'] = $owner->org_name  . " Trustee Directory";
-                    return view('accept_invite', $data);
+                    if ($query->owner == 'yes') {
+                        $data['noheader'] = true;
+                        $owner = DB::table('owner')->first();
+                        $data['code'] = $id;
+                        $data['owner'] = $owner->org_name  . " Trustee Directory";
+                        return view('accept_invite', $data);
+                    } else {
+                        $this->add_user($id, $username, $password, $owner_status);
+                    }
                 }
             } else {
                 $error = 'Your invitation code expired.';
@@ -1978,9 +2016,14 @@ class OauthController extends Controller
 
     public function test1(Request $request)
     {
+        $data2['message_data'] = 'Congratulations Michael Chen, you just sent an email with Mailgun!  You are truly awesome!';
+        $title = 'Hello Michael Chen';
+        $to = 'shihjay2@gmail.com';
+        $this->send_mail('auth.emails.generic', $data2, $title, $to);
+        return 'OK';
     }
 
-    public function demo_patient_list(Request $request)
+    public function demo_patient_list(Request $request, $login='no')
     {
         $data['name'] = Session::get('owner');
         $data['title'] = 'All Patients';
@@ -2023,27 +2066,42 @@ class OauthController extends Controller
 		if ($query) {
             $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
 			$data['content'] .= '<div class="list-group searchlist">';
-            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span><span class="col-sm-1"><strong>Actions</strong></span></a>';
+            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span>';
+            if ($login == 'yes') {
+                $data['content'] .= '<span class="col-sm-1"><strong>Actions</strong></span>';
+            }
+            $data['content'] .= '</a>';
 			foreach ($query as $client) {
-				$link = '<span class="col-sm-5"><h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri'] . '">Patient Centered Health Record</span></h4>';
-                $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri2'] . '">' . $client['as_name2'] . '</span></h4></span>';
+                if ($login == 'yes') {
+    				$link = '<span class="col-sm-5"><h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri'] . '">Patient Centered Health Record</span></h4>';
+                    $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri2'] . '">' . $client['as_name2'] . '</span></h4></span>';
+                } else {
+                    $link = '<span class="col-sm-5"><h4><span class="label label-danger">Please Sign-In</span></h4></span>';
+                }
                 if ($client['picture'] == '' || $client['picture'] == null) {
                     $picture = '<i class="fa fa-btn fa-user"></i>';
                 } else {
                     $picture = '<img src="' . $client['picture'] . '" height="30" width="30">';
                 }
-                $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client['as_uri'] . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
-                $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client['as_uri'])->first();
-                if ($check) {
-                    $add = '';
-                }
+
                 $timestamp = mt_rand(1, time());
                 $act = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
-            	$data['content'] .= '<a href="' . route('resources', [$client['id']]) . '" class="list-group-item row">' . '<span class="col-sm-3">' . $picture . $client['as_name'] . '</span>' . $link . $act . $add . '</a>';
-			}
+            	$data['content'] .= '<a href="' . route('resources', [$client['id']]) . '" class="list-group-item row">' . '<span class="col-sm-3">' . $picture . $client['as_name'] . '</span>' . $link . $act;
+                if ($login == 'yes') {
+                    $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client['as_uri'] . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                    $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client['as_uri'])->first();
+                    if ($check) {
+                        $add = '';
+                    }
+                    $data['content'] .=  $add;
+                }
+                $data['content'] .= '</a>';
+            }
 			$data['content'] .= '</ul>';
 		}
-        $data['back'] = '<a href="" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
+        if ($login == 'yes') {
+            $data['back'] = '<a href="" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
+        }
         $data['demo'] = 'true';
         // $data['noheader'] = 'true';
         return view('home', $data);
@@ -2208,7 +2266,8 @@ class OauthController extends Controller
                 $data = [
                     'as_id' => $id,
                     'rs_uri' => $rs_row['uri'],
-                    'rs_name' => $rs_row['name']
+                    'rs_name' => $rs_row['name'],
+                    'rs_public' => $rs_row['public']
                 ];
                 DB::table('as_to_rs')->insert($data);
             }
@@ -2280,7 +2339,8 @@ class OauthController extends Controller
                 $data = [
                     'as_id' => $id,
                     'rs_uri' => $rs_row['uri'],
-                    'rs_name' => $rs_row['name']
+                    'rs_name' => $rs_row['name'],
+                    'rs_public' => $rs_row['public']
                 ];
                 DB::table('as_to_rs')->insert($data);
             }

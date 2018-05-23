@@ -51,7 +51,7 @@
 					<form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">
 						{{ csrf_field() }}
 
-						<div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
+						<div class="admin_form form-group{{ $errors->has('username') ? ' has-error' : '' }}">
 							<label for="username" class="col-md-4 control-label">Username </label>
 
 							<div class="col-md-6">
@@ -65,7 +65,7 @@
 							</div>
 						</div>
 
-						<div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+						<div class="admin_form form-group{{ $errors->has('password') ? ' has-error' : '' }}">
 							<label for="password" class="col-md-4 control-label">Password</label>
 
 							<div class="col-md-6">
@@ -79,7 +79,7 @@
 							</div>
 						</div>
 
-						<div class="form-group">
+						<div class="admin_form form-group">
 							<div class="col-md-6 col-md-offset-4">
 								<div class="checkbox">
 									<label>
@@ -89,7 +89,7 @@
 							</div>
 						</div>
 
-						<div class="form-group">
+						<div class="admin_form form-group">
 							<div class="col-md-6 col-md-offset-4">
 								<button type="submit" class="btn btn-primary">
 									<i class="fa fa-btn fa-sign-in"></i> Login
@@ -105,9 +105,10 @@
 									<img src="{{ asset('assets/uport-logo-white.svg') }}" height="25" width="25" style="margin-right:5px"></img> Login with uPort
 								</button>
 								<button type="button" class="btn btn-primary btn-block" id="connectUportBtn1">Add NPI credential to uPort using Doximity Verification</button>
+								<button type="button" class="btn btn-primary btn-block" id="admin_button">Administrator</button>
 								<!-- <button type="button" class="btn btn-primary btn-block" id="connectUportBtn1" onclick="uportConnect()">Connect uPort</button> -->
 								<!-- <button type="button" class="btn btn-primary btn-block" id="connectUportBtn2" onclick="sendEther()">Send Ether</button> -->
-								@if (isset($google))
+								<!-- @if (isset($google))
 									<a class="btn btn-primary btn-block" href="{{ url('/google') }}">
 										<i class="fa fa-btn fa-google"></i> Login with Google
 									</a>
@@ -116,7 +117,7 @@
 									<a class="btn btn-primary btn-block" href="{{ url('/twitter') }}">
 										<i class="fa fa-btn fa-twitter"></i> Login with Twitter
 									</a>
-								@endif
+								@endif -->
 							</div>
 						</div>
 						@endif
@@ -159,6 +160,7 @@
 <script src="{{ asset('assets/js/toastr.min.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
+		$('.admin_form').hide();
 		$("#username").focus();
 		$('[data-toggle="tooltip"]').tooltip();
 		$("#connectUportBtn1").click(function(){
@@ -166,6 +168,9 @@
         });
 		$('#doximity_modal').click(function(){
 			$('#modal1').modal('hide');
+		});
+		$('#admin_button').click(function(){
+			$('.admin_form').show();
 		});
 	});
 	// Setup

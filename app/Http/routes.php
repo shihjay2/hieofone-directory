@@ -256,4 +256,4 @@ Route::get('update_system', ['as' => 'update_system', 'uses' => 'OauthController
 
 // test and demo pages
 Route::any('test1', ['as' => 'test1', 'uses' => 'OauthController@test1']);
-Route::any('demo_patient_list', ['as' => 'demo_patient_list', 'uses' => 'OauthController@demo_patient_list']);
+Route::any('demo_patient_list/{login?}', ['as' => 'demo_patient_list', 'uses' => 'OauthController@demo_patient_list']);

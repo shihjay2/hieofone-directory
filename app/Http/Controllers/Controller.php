@@ -298,6 +298,39 @@ class Controller extends BaseController
 		return true;
 	}
 
+	protected function add_user($code, $username='', $password='', $owner=false)
+	{
+		$query = DB::table('invitation')->where('code', '=', $code)->first();
+		$sub = $this->gen_uuid();
+		if ($username == '') {
+			$username = $this->gen_uuid();
+			$password = sha1($username);
+		}
+		$data = [
+			'username' => $username,
+			'first_name' => $query->first_name,
+			'last_name' => $query->last_name,
+			'password' => $password,
+			'email' => $query->email,
+			'sub' => $sub
+		];
+		DB::table('oauth_users')->insert($data);
+		$data1 = [
+			'email' => $query->email,
+			'name' => $username
+		];
+		DB::table('users')->insert($data1);
+		if ($owner == true) {
+			$data1 = [
+				'lastname' => $query->last_name,
+				'firstname' => $query->first_name,
+				'sub' => $sub
+			];
+			DB::table('owner')->insert($data1);
+		}
+		return true;
+	}
+
 	protected function npi_lookup($first, $last='')
 	{
 		$url = 'https://npiregistry.cms.hhs.gov/api/?';
@@ -338,37 +371,37 @@ class Controller extends BaseController
 
 	protected function send_mail($template, $data_message, $subject, $to)
 	{
-		$google_client = DB::table('oauth_rp')->where('type', '=', 'google')->first();
-		$google = new Google_Client();
-		$google->setClientID($google_client->client_id);
-		$google->setClientSecret($google_client->client_secret);
-		$google->refreshToken($google_client->refresh_token);
-		$credentials = $google->getAccessToken();
-		$username = $google_client->smtp_username;
-		$password = $credentials['access_token'];
-		$config = [
-			'mail.driver' => 'smtp',
-			'mail.host' => 'smtp.gmail.com',
-			'mail.port' => 465,
-			'mail.from' => ['address' => null, 'name' => null],
-			'mail.encryption' => 'ssl',
-			'mail.username' => $username,
-			'mail.password' => $password,
-			'mail.sendmail' => '/usr/sbin/sendmail -bs'
-		];
-		config($config);
-		extract(Config::get('mail'));
-		$transport = Swift_SmtpTransport::newInstance($host, $port, 'ssl');
-		$transport->setAuthMode('XOAUTH2');
-		if (isset($encryption)) {
-			$transport->setEncryption($encryption);
-		}
-		if (isset($username)) {
-			$transport->setUsername($username);
-			$transport->setPassword($password);
-		}
+		// $google_client = DB::table('oauth_rp')->where('type', '=', 'google')->first();
+		// $google = new Google_Client();
+		// $google->setClientID($google_client->client_id);
+		// $google->setClientSecret($google_client->client_secret);
+		// $google->refreshToken($google_client->refresh_token);
+		// $credentials = $google->getAccessToken();
+		// $username = $google_client->smtp_username;
+		// $password = $credentials['access_token'];
+		// $config = [
+		// 	'mail.driver' => 'smtp',
+		// 	'mail.host' => 'smtp.gmail.com',
+		// 	'mail.port' => 465,
+		// 	'mail.from' => ['address' => null, 'name' => null],
+		// 	'mail.encryption' => 'ssl',
+		// 	'mail.username' => $username,
+		// 	'mail.password' => $password,
+		// 	'mail.sendmail' => '/usr/sbin/sendmail -bs'
+		// ];
+		// config($config);
+		// extract(Config::get('mail'));
+		// $transport = Swift_SmtpTransport::newInstance($host, $port, 'ssl');
+		// $transport->setAuthMode('XOAUTH2');
+		// if (isset($encryption)) {
+		// 	$transport->setEncryption($encryption);
+		// }
+		// if (isset($username)) {
+		// 	$transport->setUsername($username);
+		// 	$transport->setPassword($password);
+		// }
+		// Mail::setSwiftMailer(new Swift_Mailer($transport));
 		$owner = DB::table('owner')->first();
-		Mail::setSwiftMailer(new Swift_Mailer($transport));
 		Mail::send($template, $data_message, function ($message) use ($to, $subject, $owner) {
 			$message->to($to)
 				->from($owner->email, $owner->firstname . ' ' . $owner->lastname)
