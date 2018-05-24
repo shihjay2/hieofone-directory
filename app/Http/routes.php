@@ -57,6 +57,7 @@ Route::get('welcome1', ['as' => 'welcome1', 'uses' => 'OauthController@welcome1'
 Route::get('privacy_policy', ['as' => 'privacy_policy', 'uses' => 'OauthController@privacy_policy']);
 Route::get('patients/{create?}', ['as' => 'patients', 'uses' => 'OauthController@patients']);
 Route::get('providers', ['as' => 'providers', 'uses' => 'OauthController@providers']);
+Route::get('others', ['as' => 'others', 'uses' => 'OauthController@others']);
 Route::any('container_create/{code?}', ['as' => 'container_create', 'uses' => 'OauthController@container_create']);
 Route::any('search_welcome', ['as' => 'search_welcome', 'uses' => 'OauthController@search_welcome']);
 Route::any('metadata/{type}', ['as' => 'metadata', 'uses' => 'OauthController@metadata']);

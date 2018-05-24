@@ -644,6 +644,24 @@ class OauthController extends Controller
         }
     }
 
+    public function others(Request $request)
+    {
+        $query = DB::table('owner')->first();
+        if ($query) {
+            $description = $query->description;
+            if ($query->description == '') {
+                $description = 'This is some test text you can enter';
+            }
+            $data = [
+                'name' => $query->org_name,
+                'text' => $description
+            ];
+            return view('providers', $data);
+        } else {
+            return redirect()->route('install');
+        }
+    }
+
     /**
     * Login and logout functions
     *
