@@ -84,7 +84,7 @@ class HomeController extends Controller
     public function all_patients(Request $request)
     {
         $data['name'] = Session::get('owner');
-        $data['title'] = 'All Patients';
+        $data['title'] = 'All Participating Patients';
         $data['content'] = 'No patients yet.';
         $data['searchbar'] = 'yes';
         $query = DB::table('oauth_rp')->where('type', '=', 'as')->get();
