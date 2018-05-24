@@ -69,7 +69,7 @@
 					<hr><h3>Our Companywide Commitment to Your Privacy</h3>
 					<p>To make sure your personal information is secure, we communicate our privacy and security guidelines to Directory employees and strictly enforce privacy safeguards within the company.</p>
 					<hr><h3>Privacy Questions</h3>
-					<p>If you have any questions or concerns about Directory’s Privacy Policy or data processing or if you would like to make a complaint about a possible breach of local privacy laws, please contact us. You can always contact us by email at info@healthurl.com.</p>
+					<p>If you have any questions or concerns about Directory’s Privacy Policy or data processing or if you would like to make a complaint about a possible breach of local privacy laws, please contact us. You can always contact us by email at <a href="mailto:info@healthurl.com">info@healthurl.com</a>.</p>
 					<p>When a privacy question or access/download request is received we have a dedicated team which triages the contacts and seeks to address the specific concern or query which you are seeking to raise. Where your issue may be more substantive in nature, more information may be sought from you. All such substantive contacts receive a response. If you are unsatisfied with the reply received, you may refer your complaint to the relevant regulator in your jurisdiction. If you ask us, we will endeavor to provide you with information about relevant complaint avenues which may be applicable to your circumstances.</p>
 					<p>Directory may update its Privacy Policy from time to time. When we change the policy in a material way, a notice will be posted on our website along with the updated Privacy Policy.</p>
 					<p>HIE of One, PBC. 52 Marshall St., Watertown, MA, 02472</p>
