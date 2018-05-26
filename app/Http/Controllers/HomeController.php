@@ -41,10 +41,10 @@ class HomeController extends Controller
             if ($query1) {
                 $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
     			$data['content'] .= '<div class="list-group searchlist">';
-                $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span><span class="col-sm-1"><strong>Actions</strong></span></a>';
+                $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-4"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span><span class="col-sm-2"><strong>Actions</strong></span></a>';
                 foreach ($query1 as $client_row) {
                     $client = DB::table('oauth_rp')->where('as_uri', '=', $client_row->as_uri)->first();
-                    $link = '<span class="col-sm-5">';
+                    $link = '<span class="col-sm-4">';
                     $rs = DB::table('as_to_rs')->where('as_id', '=', $client_row->id)->get();
                     $rs_count=0;
                     if ($rs) {
@@ -69,7 +69,7 @@ class HomeController extends Controller
                     }
                     $timestamp = mt_rand(1, time());
                     $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
-                    $remove = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-minus fa-lg directory-remove" remove-val="' . $client->as_uri . '" title="Remove from My Patient List" style="cursor:pointer;"></i></span>';
+                    $remove = '<span class="col-sm-2"><span style="margin:10px"></span><i class="fa fa-minus fa-lg directory-remove" remove-val="' . $client->as_uri . '" title="Remove from My Patient List" style="cursor:pointer;"></i></span>';
                     $data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span style="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . $remove . '</a>';
     			}
     			$data['content'] .= '</div>';
@@ -91,9 +91,9 @@ class HomeController extends Controller
 		if ($query) {
             $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
 			$data['content'] .= '<div class="list-group searchlist">';
-            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span><span class="col-sm-1"><strong>Actions</strong></span></a>';
+            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-4"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span><span class="col-sm-2"><strong>Actions</strong></span></a>';
             foreach ($query as $client) {
-                $link = '<span class="col-sm-5">';
+                $link = '<span class="col-sm-4">';
                 $rs = DB::table('as_to_rs')->where('as_id', '=', $client_row->id)->get();
                 $rs_count=0;
                 if ($rs) {
@@ -118,7 +118,8 @@ class HomeController extends Controller
                 }
                 $timestamp = mt_rand(1, time());
                 $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
-                $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                // $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                $add = '<span class="col-sm-2 directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List and Get Notifications for any Changes"><i class="fa fa-plus fa-lg" style="cursor:pointer;"></i> Follow</span>';
                 $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
                 if ($check) {
                     $add = '';
@@ -133,12 +134,31 @@ class HomeController extends Controller
 
     public function add_patient(Request $request)
     {
-        $data = [
-            'as_uri' => $request->input('as_uri'),
-            'username' => Session::get('username')
+        $user = DB::table('oauth_users')->where('username', '=', Session::get('username'))->first();
+        $owner = DB::table('owner')->first();
+        $message = $user->first_name . ' ' . $user->last_name . ' is now following you on the ' . $owner->org_name . ' Directory.';
+        $action = [
+            'notification' => $message,
+            'add_clinician' => [
+                'first_name' => $user->first_name,
+                'last_name' =>  $user->last_name,
+                'email' => $user->email,
+                'npi' => $user->npi,
+                'uport_id' => $user->uport_id
+            ]
         ];
-        DB::table('rp_to_users')->insert($data);
-        return 'Patient added to My Patient list';
+        $return = $this->as_push_notification($request->input('as_uri'), $action);
+        if ($return['status'] == 'OK') {
+            $data = [
+                'as_uri' => $request->input('as_uri'),
+                'username' => Session::get('username')
+            ];
+            DB::table('rp_to_users')->insert($data);
+            $message = 'Patient added to My Patient list';
+        } else {
+            $message = $return['message'];
+        }
+        return $message;
     }
 
     public function remove_patient(Request $request)
@@ -153,86 +173,6 @@ class HomeController extends Controller
         $data['title'] = 'Reports';
         $data['content'] = 'This is where you can generate and review reports of connected patients.  The functionality is pending.';
         $data['searchbar'] = 'yes';
-        return view('home', $data);
-    }
-
-    public function search(Request $request)
-    {
-        $data['name'] = Session::get('owner');
-        $data['title'] = 'Search Results';
-        $data['content'] = '';
-        $data['searchbar'] = 'yes';
-        if ($request->isMethod('post')) {
-            $q = strtolower($request->input('search_field'));
-            Session::put('search_term', $q);
-        }
-        $proceed = false;
-        // Check all registered resources
-        if (Session::has('uma_search_complete')) {
-            $proceed = true;
-            Session::forget('uma_search_complete');
-        }
-        if ($proceed == false) {
-            if (Session::has('uma_search_count')) {
-                return redirect()->route('uma_aat_search');
-            } else {
-                $resource_query = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->whereNotNull('rpt')->get();
-                if ($resource_query) {
-                    foreach ($resource_query as $resource_row) {
-                        $uma_search_count[] = $resource_row->as_uri;
-                    }
-                    Session::forget('uma_search_arr');
-                    Session::put('uma_search_count', $uma_search_count);
-                    return redirect()->route('uma_aat_search');
-                }
-            }
-        }
-        if (Session::has('uma_search_arr')) {
-            $uma_search_arr = Session::get('uma_search_arr');
-            if (! empty($uma_search_arr)) {
-                foreach ($uma_search_arr as $uma_search_k => $uma_search_v) {
-                    $patient = DB::table('oauth_rp')->where('id', '=', $uma_search_k)->first();
-                    $data['content'] .= '<div class="panel panel-default"><div class="panel-heading">Resources from ' . $patient->as_name . '</div><div class="panel-body"><div class="list-group">';
-                    foreach ($uma_search_v as $uma_search_v_row) {
-                        $data['content'] .= '<li class="list-group-item">' . $uma_search_v_row . '</li>';
-                    }
-                    $data['content'] .= '</div></div></div>';
-                }
-            }
-            Session::forget('uma_search_arr');
-        }
-        $q = Session::get('search_term');
-        $query = DB::table('oauth_rp')
-            ->where('type', '=', 'pnosh')
-            ->where(function($query_array1) use ($q) {
-                $query_array1->where('as_name', 'LIKE', "%$q%")
-                ->orWhere('as_uri', 'LIKE', "%$q%");
-            })
-            ->get();
-        // Metadata search placeholder
-        if ($query) {
-            $data['content'] .= '<div class="panel panel-default"><div class="panel-heading">Connected Patients</div><div class="panel-body"><div class="list-group">';
-            foreach ($query as $client) {
-				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
-                if ($client->picture == '' || $client->picture == null) {
-                    $picture = '<i class="fa fa-btn fa-user"></i>';
-                } else {
-                    $picture = '<img src="' . $client->picture . '" height="30" width="30">';
-                }
-                $add = '<span class="pull-right"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
-                $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
-                if ($check) {
-                    $add = '';
-                }
-            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . $add . '</a>';
-			}
-            $data['content'] .= '</div></div></div>';
-        }
-        $data['content'] .= '<div class="alert alert-warning">Metadata search functionality coming soon...</div>';
-        if (Session::has('uma_errors')) {
-            $data['content'] .= '<div class="alert alert-danger">Errors: ' . Session::get('uma_errors') . '</div>';
-            Session::forget('uma_errors');
-        }
         return view('home', $data);
     }
 
@@ -1127,6 +1067,9 @@ class HomeController extends Controller
             $data['content'] .= '<li class="list-group-item">NPI: ' . $query->npi . '</li>';
         }
         $data['content'] .= '</ul>';
+        if (Session::get('is_owner') == 'yes') {
+            $data['content'] .= '<a href="' . route('change_password') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-cog"></i>Change Password</a>';
+        }
         $data['back'] = '<a href="' . URL::to('my_info_edit') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-pencil"></i> Edit</a>';
         return view('home', $data);
     }

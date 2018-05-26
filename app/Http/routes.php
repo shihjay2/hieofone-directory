@@ -56,7 +56,7 @@ Route::get('welcome0', ['as' => 'welcome0', 'uses' => 'OauthController@welcome0'
 Route::get('welcome1', ['as' => 'welcome1', 'uses' => 'OauthController@welcome1']);
 Route::get('privacy_policy', ['as' => 'privacy_policy', 'uses' => 'OauthController@privacy_policy']);
 Route::get('patients/{create?}', ['as' => 'patients', 'uses' => 'OauthController@patients']);
-Route::get('providers', ['as' => 'providers', 'uses' => 'OauthController@providers']);
+Route::get('clinicians', ['as' => 'clinicians', 'uses' => 'OauthController@clinicians']);
 Route::get('others', ['as' => 'others', 'uses' => 'OauthController@others']);
 Route::any('container_create/{code?}', ['as' => 'container_create', 'uses' => 'OauthController@container_create']);
 Route::any('search_welcome', ['as' => 'search_welcome', 'uses' => 'OauthController@search_welcome']);
@@ -71,7 +71,7 @@ Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
 Route::get('all_patients', ['as' => 'all_patients', 'uses' => 'HomeController@all_patients']);
 Route::post('add_patient', ['as' => 'add_patient', 'middleware' => 'csrf', 'uses' => 'HomeController@add_patient']);
 Route::post('remove_patient', ['as' => 'remove_patient', 'middleware' => 'csrf', 'uses' => 'HomeController@remove_patient']);
-Route::any('search', ['as' => 'search', 'uses' => 'HomeController@search']);
+Route::any('search', ['as' => 'search', 'uses' => 'OauthController@search']);
 Route::get('reports', ['as' => 'reports', 'uses' => 'HomeController@reports']);
 Route::get('resources/{id}', ['as' => 'resources', 'uses' => 'HomeController@resources']);
 Route::get('login_authorize', ['as' => 'login_authorize', 'uses' => 'HomeController@login_authorize']);

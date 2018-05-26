@@ -9,13 +9,10 @@
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
 			<div class="panel panel-default">
-				<div class="panel-heading">Licensed Providers</div>
+				<div class="panel-heading">Licensed Clinicians</div>
 				<div class="panel-body">
 					<div class="col-md-8 col-md-offset-2">
 						<a href="{{ url('/signup') }}" class="btn btn-primary btn-block"><i class="fa fa-btn fa-user-plus"></i> Sign Up</a>
-					</div>
-					<div class="col-md-8 col-md-offset-2">
-						<a href="{{ url('/login') }}" class="btn btn-primary btn-block"><i class="fa fa-btn fa-sign-in"></i> Login</a>
 					</div>
 				</div>
 			</div>

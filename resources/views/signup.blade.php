@@ -5,12 +5,12 @@
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading">Sign up to the Directory for {{ $name }}</div>
+				<div class="panel-heading">Sign up to the {{ $name }} Directory</div>
 				<div class="panel-body">
 					<div style="text-align: center;">
 					  <i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>
 					</div>
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}">
+					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}" id="signup_form" style="display:none;">
 						{{ csrf_field() }}
 
                         <div class="form-group">
@@ -18,11 +18,11 @@
                                 <button type="button" class="btn btn-primary btn-block" id="connectUportBtn" onclick="loginBtnClick()">
                                     <img src="{{ asset('assets/uport-logo-white.svg') }}" height="25" width="25" style="margin-right:5px"></img> Obtain credentials with uPort
                                 </button>
-                                <button type="button" class="btn btn-primary btn-block" id="connectUportBtn1"><i class="fa fa-btn fa-plus"></i> Add NPI credential to uPort using Doximity Verification</button>
+                                <button type="button" class="btn btn-primary btn-block" id="connectUportBtn1"><i class="fa fa-btn fa-plus"></i> Add Doximity Clinician Verification</button>
                             </div>
                         </div>
 
-						<div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
+						<!-- <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
 							<label for="username" class="col-md-4 control-label">Username</label>
 
 							<div class="col-md-6">
@@ -62,13 +62,13 @@
 									</span>
 								@endif
 							</div>
-						</div>
+						</div> -->
 
 						<div class="form-group{{ $errors->has('first_name') ? ' has-error' : '' }}">
 							<label for="first_name" class="col-md-4 control-label">First Name</label>
 
 							<div class="col-md-6">
-								<input id="first_name" class="form-control" name="first_name" value="{{ old('first_name') }}">
+								<input id="first_name" class="form-control" name="first_name" value="{{ old('first_name') }}" readonly>
 
 								@if ($errors->has('first_name'))
 									<span class="help-block">
@@ -82,7 +82,7 @@
 							<label for="last_name" class="col-md-4 control-label">Last Name</label>
 
 							<div class="col-md-6">
-								<input id="last_name" class="form-control" name="last_name" value="{{ old('last_name') }}">
+								<input id="last_name" class="form-control" name="last_name" value="{{ old('last_name') }}" readonly>
 
 								@if ($errors->has('last_name'))
 									<span class="help-block">
@@ -96,7 +96,7 @@
 							<label for="npi" class="col-md-4 control-label">NPI</label>
 
 							<div class="col-md-6">
-								<input id="npi" class="form-control" name="npi" value="{{ old('npi') }}">
+								<input id="npi" class="form-control" name="npi" value="{{ old('npi') }}" readonly>
 
 								@if ($errors->has('npi'))
 									<span class="help-block">
@@ -110,11 +110,25 @@
 							<label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
 							<div class="col-md-6">
-								<input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}">
+								<input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" readonly>
 
 								@if ($errors->has('email'))
 									<span class="help-block">
 										<strong>{{ $errors->first('email') }}</strong>
+									</span>
+								@endif
+							</div>
+						</div>
+
+						<div class="form-group{{ $errors->has('uport_id') ? ' has-error' : '' }}">
+							<label for="uport_id" class="col-md-4 control-label">uPort Address</label>
+
+							<div class="col-md-6">
+								<input id="uport_id" class="form-control" name="uport_id" value="{{ old('uport_id') }}" readonly>
+
+								@if ($errors->has('uport_id'))
+									<span class="help-block">
+										<strong>{{ $errors->first('uport_id') }}</strong>
 									</span>
 								@endif
 							</div>
@@ -137,12 +151,12 @@
 	<div class="modal-dialog">
 	  <!-- Modal content-->
 		<div class="modal-content">
-			<div id="modal1_header" class="modal-header">Add NPI credential to uPort?</div>
+			<div id="modal1_header" class="modal-header">Add clinician credential to uPort from Doximity?</div>
 			<div id="modal1_body" class="modal-body" style="height:30vh;overflow-y:auto;">
 				<p>This will simulate adding a verified credential to your existing uPort.</p>
 				<p>Clicking proceed with add a simulated NPI number</p>
 				<p>Clicking on Get from Doximity will demonstrate how you can get a verified credential if you have an existing Doximity account</p>
-				<p>After the NPI credential is added, click on Login with uPort</p>
+				<p>After the credential is added, click on Login with uPort</p>
 				<p>This will enable you to write a prescription.</p>
 			</div>
 			<div class="modal-footer">
@@ -191,12 +205,14 @@
             var parsed = NameParse.parse(credentials.name);
             $('#last_name').val(parsed.lastName);
             $('#first_name').val(parsed.firstName);
+			$('#uport_id').val(credentials.address);
             if (typeof credentials.NPI !== 'undefined') {
                 $('#npi').val(credentials.NPI);
             }
             if (typeof credentials.email !== 'undefined') {
 				$('#email').val(credentials.email);
 			}
+			$('#signup_form').show();
 		}, console.err);
 	};
 

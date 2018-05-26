@@ -141,7 +141,7 @@ class OauthController extends Controller
                     'grant_types' => $grant_types,
                     'scope' => $scopes,
                     'user_id' => $request->input('username'),
-                    'client_name' => $request->input('last_name'),
+                    'client_name' => $request->input('org_name'),
                     'client_uri' => URL::to('/'),
                     'redirect_uri' => URL::to('oauth_login'),
                     'authorized' => 1,
@@ -388,6 +388,9 @@ class OauthController extends Controller
                 $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
     			$data['content'] .= '<div class="list-group searchlist">';
                 $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span></a>';
+                // usort($query, function($a, $b) {
+                //     return $b['last_act'] <=> $a['last_act'];
+                // });
                 foreach ($query as $client) {
                     $link = '<span class="col-sm-5">';
                     $rs = DB::table('as_to_rs')->where('as_id', '=', $client_row->id)->get();
@@ -395,7 +398,7 @@ class OauthController extends Controller
                     if ($rs) {
                         foreach ($rs as $rs_row) {
                             if ($rs_row->rs_public == 0) {
-                                $link .= '<h4><span class="label label-danger">Please Sign-In</span></h4>';
+                                $link .= '<h4><span class="label label-danger">Please Sign In</span></h4>';
                             } else {
                                 $rs_uri = $rs_row->rs_uri;
                                 if (strpos($rs_row->rs_uri, "/nosh") !== false) {
@@ -626,7 +629,7 @@ class OauthController extends Controller
         }
     }
 
-    public function providers(Request $request)
+    public function clinicians(Request $request)
     {
         $query = DB::table('owner')->first();
         if ($query) {
@@ -638,7 +641,7 @@ class OauthController extends Controller
                 'name' => $query->org_name,
                 'text' => $description
             ];
-            return view('providers', $data);
+            return view('clinicians', $data);
         } else {
             return redirect()->route('install');
         }
@@ -660,6 +663,87 @@ class OauthController extends Controller
         } else {
             return redirect()->route('install');
         }
+    }
+
+    public function search(Request $request)
+    {
+        $owner = DB::table('owner')->first();
+        $data['name'] = $owner->org_name;
+        $data['title'] = 'Search Results';
+        $data['content'] = '';
+        $data['searchbar'] = 'yes';
+        if ($request->isMethod('post')) {
+            $q = strtolower($request->input('search_field'));
+            Session::put('search_term', $q);
+        }
+        $proceed = false;
+        // Check all registered resources
+        if (Session::has('uma_search_complete')) {
+            $proceed = true;
+            Session::forget('uma_search_complete');
+        }
+        if ($proceed == false) {
+            if (Session::has('uma_search_count')) {
+                return redirect()->route('uma_aat_search');
+            } else {
+                $resource_query = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->whereNotNull('rpt')->get();
+                if ($resource_query) {
+                    foreach ($resource_query as $resource_row) {
+                        $uma_search_count[] = $resource_row->as_uri;
+                    }
+                    Session::forget('uma_search_arr');
+                    Session::put('uma_search_count', $uma_search_count);
+                    return redirect()->route('uma_aat_search');
+                }
+            }
+        }
+        if (Session::has('uma_search_arr')) {
+            $uma_search_arr = Session::get('uma_search_arr');
+            if (! empty($uma_search_arr)) {
+                foreach ($uma_search_arr as $uma_search_k => $uma_search_v) {
+                    $patient = DB::table('oauth_rp')->where('id', '=', $uma_search_k)->first();
+                    $data['content'] .= '<div class="panel panel-default"><div class="panel-heading">Resources from ' . $patient->as_name . '</div><div class="panel-body"><div class="list-group">';
+                    foreach ($uma_search_v as $uma_search_v_row) {
+                        $data['content'] .= '<li class="list-group-item">' . $uma_search_v_row . '</li>';
+                    }
+                    $data['content'] .= '</div></div></div>';
+                }
+            }
+            Session::forget('uma_search_arr');
+        }
+        $q = Session::get('search_term');
+        $query = DB::table('oauth_rp')
+            ->where('type', '=', 'pnosh')
+            ->where(function($query_array1) use ($q) {
+                $query_array1->where('as_name', 'LIKE', "%$q%")
+                ->orWhere('as_uri', 'LIKE', "%$q%");
+            })
+            ->get();
+        // Metadata search placeholder
+        if ($query) {
+            $data['content'] .= '<div class="panel panel-default"><div class="panel-heading">Connected Patients</div><div class="panel-body"><div class="list-group">';
+            foreach ($query as $client) {
+				$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
+                if ($client->picture == '' || $client->picture == null) {
+                    $picture = '<i class="fa fa-btn fa-user"></i>';
+                } else {
+                    $picture = '<img src="' . $client->picture . '" height="30" width="30">';
+                }
+                $add = '<span class="pull-right"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
+                if ($check) {
+                    $add = '';
+                }
+            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item">' . $picture . '<span style="margin:10px">' . $client->as_name . '</span>' . $link . $add . '</a>';
+			}
+            $data['content'] .= '</div></div></div>';
+        }
+        $data['content'] .= '<div class="alert alert-warning">Metadata search functionality coming soon...</div>';
+        if (Session::has('uma_errors')) {
+            $data['content'] .= '<div class="alert alert-danger">Errors: ' . Session::get('uma_errors') . '</div>';
+            Session::forget('uma_errors');
+        }
+        return view('home', $data);
     }
 
     /**
@@ -842,190 +926,148 @@ class OauthController extends Controller
             }
         }
         if ($request->has('uport')) {
-            $uport_notify = false;
-            $valid_npi = '';
-            // Start searching for users by checking name
-            $name = $request->input('name');
-            $parser = new NameParser();
-            $name_arr = $parser->parse_name($name);
-            $uport_user = DB::table('oauth_users')->where('first_name', '=', $name_arr['fname'])->where('last_name', '=', $name_arr['lname'])->first();
-            if ($uport_user) {
-                // Save uport id, keep updating for demo purposes for now
-                // if ($uport_user->uport_id == null || $uport_user->uport_id = '') {
-                    $uport['uport_id'] = $request->input('uport');
-                    DB::table('oauth_users')->where('username', '=', $uport_user->username)->update($uport);
-                // }
-                if (Session::get('oauth_response_type') == 'code') {
-                    $client_id = Session::get('oauth_client_id');
-                } else {
-                    $client = DB::table('owner')->first();
-                    $client_id = $client->client_id;
-                }
-                Session::put('login_origin', 'login_direct');
-                $user = DB::table('users')->where('email', '=', $uport_user->email)->first();
-                $this->login_sessions($uport_user, $client_id);
-                Auth::loginUsingId($user->id);
-                Session::save();
-                $return['message'] = 'OK';
-                if (Session::has('uma_permission_ticket') && Session::has('uma_redirect_uri') && Session::has('uma_client_id') && Session::has('email')) {
-                    // If generated from rqp_claims endpoint, do this
-                    $return['url'] = route('rqp_claims');
-                }
-                if (Session::get('oauth_response_type') == 'code') {
-                    // Confirm if client is authorized
-                    $authorized = DB::table('oauth_clients')->where('client_id', '=', $client_id)->where('authorized', '=', 1)->first();
-                    if ($authorized) {
-                        // This call is from authorization endpoint and client is authorized.  Check if user is associated with client
-                        $user_array = explode(' ', $authorized->user_id);
-                        if (in_array($uport_user->username, $user_array)) {
-                            // Go back to authorize route
-                            Session::put('is_authorized', 'true');
-                            $return['url'] = route('authorize');
-                        } else {
-                            // Get user permission
-                            $return['url'] = route('login_authorize');
-                        }
-                    } else {
-                        // Get owner permission if owner is logging in from new client/registration server
-                        if ($oauth_user) {
-                            if ($owner_query->sub == $uport_user->sub) {
-                                $return['url'] = route('authorize_resource_server');
-                            } else {
-                                // Somehow, this is a registered user, but not the owner, and is using an unauthorized client - return back to login screen
-                                $return['message'] = 'Unauthorized client.  Please contact the owner of this authorization server for assistance.';
-                            }
-                        } else {
-                            // Not a registered user
-                            $return['message'] = 'Not a registered user.  Please contact the owner of this authorization server for assistance.';
+            $proceed = false;
+            $user_table = 'oauth_users';
+            $uport_static = 'npi';
+            $user_table_result = DB::select('SHOW INDEX FROM ' . $user_table . " WHERE Key_name = 'PRIMARY'");
+            $user_table_result_arr = json_decode(json_encode($user_table_result), true);
+            $table_key = $user_table_result_arr[0]['Column_name'];
+            $uport_credentials = [
+                'name' => [
+                    'fname' => 'first_name',
+                    'lname' => 'last_name',
+                    'description' => 'Name'
+                ],
+                'email' => [
+                    'column' => 'email',
+                    'description' => 'E-mail address'
+                ],
+                'npi' => [
+                    'column' => 'npi',
+                    'description' => 'NPI number'
+                ],
+                'uport' => [
+                    'column' => 'uport_id',
+                    'description' => 'uport address'
+                ]
+            ];
+            $username_arr = [];
+            $static = '';
+            $missing_creds = [];
+            foreach ($uport_credentials as $uport_credential_key => $uport_credential_value) {
+                if ($uport_credential_key == 'name') {
+                    $parser = new NameParser();
+                    $name_arr = $parser->parse_name($request->input('name'));
+                    $name_query = DB::table($user_table)->where($uport_credential_value['fname'], '=', $name_arr['fname'])->where($uport_credential_value['lname'], '=', $name_arr['lname'])->get();
+                    if ($name_query) {
+                        foreach ($name_query as $name_row) {
+                            $username_arr[$uport_credential_key][] = $name_row->{$table_key};
                         }
                     }
                 } else {
-                    //  This call is directly from the home route.
-                    $return['url'] = route('home');
-                }
-            } else {
-                // Check if NPI field exists
-                if ($request->has('npi')) {
-                    if ($request->input('npi') !== '') {
-                        if (is_numeric($request->input('npi'))) {
-                            $npi1 = $request->input('npi');
-                            if (strlen($npi1) == '10') {
-                                // Obtain NPI information
-                                $npi_arr = $this->npi_lookup($npi1);
-                                $name = '';
-                                if ($npi_arr['result_count'] > 0) {
-                                    $name = $npi_arr['results'][0]['basic']['first_name'];
-                                    if (isset($npi_arr['results'][0]['basic']['middle_name'])) {
-                                        $name .= ' ' . $npi_arr['results'][0]['basic']['middle_name'];
-                                    }
-                                    $name .= ' ' . $npi_arr['results'][0]['basic']['last_name'] . ', ' . $npi_arr['results'][0]['basic']['credential'];
-                                    // $label .= '<br><strong>NPI:</strong> ' . $npi['number'];
-                                    // $label .= '<br><strong>Specialty:</strong> ' . $npi['taxonomies'][0]['desc'];
-                                    // $label .= '<br><strong>Location:</strong> ' . $npi['addresses'][0]['city'] . ', ' . $npi['addresses'][0]['state'];
-                                    // $data['npi'] .= '<a class="list-group-item" href="' . route('google_md', [$npi['number']]) . '">' . $label . '</a>';
-                                }
-                                if ($name !== '') {
-                                    if ($owner_query->any_npi == 1) {
-                                        // Automatically add user if NPI is valid
-                                        if (Session::get('oauth_response_type') == 'code') {
-                                            $client_id = Session::get('oauth_client_id');
-                                        } else {
-                                            $client_id = $owner_query->client_id;
-                                        }
-                                        $authorized = DB::table('oauth_clients')->where('client_id', '=', $client_id)->where('authorized', '=', 1)->first();
-                                        if ($authorized) {
-                                            // Make sure email is unique
-                                            $email_check = DB::table('users')->where('email', '=', $request->input('email'))->first();
-                                            if ($email_check) {
-                                                $return['message'] = 'You are not authorized to access this authorization server.  Email address already exists for another user.';
-                                            } else {
-                                                // Add new user
-                                                Session::put('uport_first_name', $name_arr['fname']);
-                                                Session::put('uport_last_name', $name_arr['lname']);
-                                                Session::put('uport_id', $request->input('uport'));
-                                                Session::put('uport_email', $request->input('email'));
-                                                Session::put('uport_npi', $npi1);
-                                                Session::save();
-                                                $return['message'] = 'OK';
-                                                $return['url'] = route('uport_user_add');
-                                            }
-                                        } else {
-                                            $return['message'] = 'Unauthorized client.  Please contact the owner of this authorization server for assistance.';
-                                        }
-                                    } else {
-                                        $uport_notify = true;
-                                        $valid_npi = $npi1;
-                                    }
-                                } else {
-                                    $return['message'] = 'You are not authorized to access this authorization server.  NPI not found in database.';
-                                }
-                            } else {
-                                if ($owner_query->login_uport == 1) {
-                                    $uport_notify = true;
-                                } else {
-                                    $return['message'] = 'You are not authorized to access this authorization server.  NPI not 10 characters.';
-                                }
+                    if ($request->has($uport_credential_key)) {
+                        $cred_query = DB::table($user_table)->where($uport_credential_value['column'], '=', $request->input($uport_credential_key))->first();
+                        if ($cred_query) {
+                            $username_arr[$uport_credential_key] = $cred_query->{$table_key};
+                            if ($uport_static == $uport_credential_key) {
+                                $static = $cred_query->{$table_key};
                             }
-                        } else {
-                            if ($owner_query->login_uport == 1) {
-                                $uport_notify = true;
-                            } else {
-                                $return['message'] = 'You are not authorized to access this authorization server.  NPI not numeric.';
+                            if ($cred_query->sub == $owner_query->sub || in_array($cred_query->sub, $proxy_arr)) {
+                                //Admin user - start override
+                                $proceed = true;
+                                $uport_user = DB::table($user_table)->where($table_key, '=',  $cred_query->{$table_key})->first();
                             }
                         }
                     } else {
-                        if ($owner_query->login_uport == 1) {
-                            $uport_notify = true;
-                        } else {
-                            $return['message'] = 'You are not authorized to access this authorization server.  NPI is blank.';
-                        }
-                    }
-                } else {
-                    if ($owner_query->login_uport == 1) {
-                        $uport_notify = true;
-                    } else {
-                        $return['message'] = 'You are not authorized to access this authorization server';
+                        $missing_creds[] = $uport_credential_key;
                     }
                 }
             }
-            if ($uport_notify == true) {
-                if ($request->has('email') && $request->input('email') !== '') {
-                    // Check email if duplicate
-                    $email_query = DB::table('users')->where('email', '=', $request->input('email'))->first();
-                    if ($email_query) {
-                        $return['message'] = 'There is already a user that has your email address';
-                    } else {
-                        // Email notification to owner that someone is trying to login via uPort
-                        $uport_data = [
-                            'username' => $request->input('uport'),
-                            'first_name' => $name_arr['fname'],
-                            'last_name' => $name_arr['lname'],
-                            'uport_id' => $request->input('uport'),
-                            'password' => 'Pending',
-                            'npi' => $valid_npi
-                        ];
-                        DB::table('oauth_users')->insert($uport_data);
-                        $uport_data1 = [
-                            'name' => $request->input('uport'),
-                            'email' => $request->input('email')
-                        ];
-                        DB::table('users')->insert($uport_data1);
-                        $data1['message_data'] = $name . ' has just attempted to login using your HIE of One Authorizaion Server via uPort.';
-                        $data1['message_data'] .= 'Go to ' . route('authorize_user') . '/ to review and authorize.';
-                        $title = 'New uPort User';
-                        $to = $owner_query->email;
-                        $this->send_mail('auth.emails.generic', $data1, $title, $to);
-                        if ($owner_query->mobile != '') {
-                            $this->textbelt($owner_query->mobile, $data1['message_data']);
+            if (empty($missing_creds)) {
+                if (! empty($username_arr)) {
+                    // Check if static credential's username matches existing user
+                    if ($static !== '') {
+                        // There is a user with a static credential in the system
+                        // Update any non-static entries if different
+                        $uport_user = DB::table($user_table)->where($table_key, '=', $static)->first();
+                        $static_data = [];
+                        foreach ($uport_credentials as $uport_credential_key1 => $uport_credential_value1) {
+                            if ($uport_user->{$uport_credential_value1['column']} !== $request->input($uport_credential_key1)) {
+                                $static_data[$uport_credential_value1['column']] = $request->input($uport_credential_key1);
+                            }
                         }
-                        $return['message'] = 'Authorization owner has been notified and wait for an email for your approval';
+                        if (! empty($static_data)) {
+                            DB::table($table)->where($table_key, '=', $static)->update($static_data);
+                        }
+                        $proceed = true;
+                    } else {
+                        $return['message'] = 'You are not authorized to access this Directory.  Your ' . $uport_credentials[$uport_static]['description'] . ' does not exist in our system.';
                     }
                 } else {
-                    $return['message'] = 'No email address associated with your uPort account.';
+                    $return['message'] = 'You are not authorized to access this Directory';
+                }
+            } else {
+                $return['message'] = 'You are missing these credentials from your uPort: ';
+                $missing_ct = 0;
+                foreach ($missing_creds as $missing_cred) {
+                    if ($missing_ct > 0) {
+                        $return['message'] .= ', ';
+                    }
+                    $return['message'] .= $uport_credentials[$missing_cred]['description'];
+                    $missing_ct++;
                 }
             }
         } else {
             $return['message'] = 'Please contact the owner of this authorization server for assistance.';
+        }
+        if ($proceed == true) {
+            if (Session::get('oauth_response_type') == 'code') {
+                $client_id = Session::get('oauth_client_id');
+            } else {
+                $client_id = $owner_query->client_id;
+            }
+            Session::put('login_origin', 'login_direct');
+            $this->login_sessions($uport_user, $client_id);
+            $user = DB::table('users')->where('email', '=', $uport_user->email)->first();
+            Auth::loginUsingId($user->id);
+            Session::save();
+            $return['message'] = 'OK';
+            if (Session::has('uma_permission_ticket') && Session::has('uma_redirect_uri') && Session::has('uma_client_id') && Session::has('email')) {
+                // If generated from rqp_claims endpoint, do this
+                $return['url'] = route('rqp_claims');
+            }
+            if (Session::get('oauth_response_type') == 'code') {
+                // Confirm if client is authorized
+                $authorized = DB::table('oauth_clients')->where('client_id', '=', $client_id)->where('authorized', '=', 1)->first();
+                if ($authorized) {
+                    // This call is from authorization endpoint and client is authorized.  Check if user is associated with client
+                    $user_array = explode(' ', $authorized->user_id);
+                    if (in_array($uport_user->username, $user_array)) {
+                        // Go back to authorize route
+                        Session::put('is_authorized', 'true');
+                        $return['url'] = route('authorize');
+                    } else {
+                        // Get user permission
+                        $return['url'] = route('login_authorize');
+                    }
+                } else {
+                    // Get owner permission if owner is logging in from new client/registration server
+                    if ($oauth_user) {
+                        if ($owner_query->sub == $uport_user->sub) {
+                            $return['url'] = route('authorize_resource_server');
+                        } else {
+                            // Somehow, this is a registered user, but not the owner, and is using an unauthorized client - return back to login screen
+                            $return['message'] = 'Unauthorized client.  Please contact the owner of this authorization server for assistance.';
+                        }
+                    } else {
+                        // Not a registered user
+                        $return['message'] = 'Not a registered user.  Please contact the owner of this authorization server for assistance.';
+                    }
+                }
+            } else {
+                //  This call is directly from the home route.
+                $return['url'] = route('home');
+            }
         }
         return $return;
     }
@@ -2039,11 +2081,27 @@ class OauthController extends Controller
 
     public function test1(Request $request)
     {
-        $data2['message_data'] = 'Congratulations Michael Chen, you just sent an email with Mailgun!  You are truly awesome!';
-        $title = 'Hello Michael Chen';
-        $to = 'shihjay2@gmail.com';
-        $this->send_mail('auth.emails.generic', $data2, $title, $to);
-        return 'OK';
+        $username[] = [
+            'name' => 'mikey',
+            'email' => 'shihjay2@gmail.com'
+        ];
+        $username[] = [
+            'name' => 'agropper',
+            'email' => 'shihjay2@gmail.com'
+        ];
+        $c = '';
+        foreach ($username as $user) {
+            $q = DB::table('oauth_users')->where('username', '=', $user['name'])->where('email', '=', $user['email'])->first();
+            if ($q) {
+                $c .= $q->sub;
+            }
+        }
+        return $c;
+        // $data2['message_data'] = 'Congratulations Michael Chen, you just sent an email with Mailgun!  You are truly awesome!';
+        // $title = 'Hello Michael Chen';
+        // $to = 'shihjay2@gmail.com';
+        // $this->send_mail('auth.emails.generic', $data2, $title, $to);
+        // return 'OK';
     }
 
     public function demo_patient_list(Request $request, $login='no')
@@ -2059,7 +2117,8 @@ class OauthController extends Controller
             'as_name2' => 'Epic Health Records - XYZ Hospital',
             'picture' => '',
             'id' => '1',
-            'as_name' => 'Alice Patient'
+            'as_name' => 'Alice Patient',
+            'last_act' => mt_rand(1, time())
         ];
         $query_arr[] = [
             'as_uri' => 'http://hieofone.org',
@@ -2067,7 +2126,8 @@ class OauthController extends Controller
             'as_name2' => 'Cerner - ABC Hospital',
             'picture' => '',
             'id' => '2',
-            'as_name' => 'Bob Patient'
+            'as_name' => 'Bob Patient',
+            'last_act' => mt_rand(1, time())
         ];
         $query_arr[] = [
             'as_uri' => 'http://hieofone.org',
@@ -2075,7 +2135,8 @@ class OauthController extends Controller
             'as_name2' => 'NOSH ChartingSystem',
             'picture' => '',
             'id' => '3',
-            'as_name' => 'Charlie Patient'
+            'as_name' => 'Charlie Patient',
+            'last_act' => mt_rand(1, time())
         ];
         $query_arr[] = [
             'as_uri' => 'http://hieofone.org',
@@ -2083,24 +2144,28 @@ class OauthController extends Controller
             'as_name2' => 'Epic Health Records - DEF Hospital',
             'picture' => '',
             'id' => '4',
-            'as_name' => 'Donald Patient'
+            'as_name' => 'Donald Patient',
+            'last_act' => mt_rand(1, time())
         ];
         $query = $query_arr;
+        usort($query, function($a, $b) {
+            return $b['last_act'] <=> $a['last_act'];
+        });
         // $query = DB::table('oauth_rp')->where('type', '=', 'pnosh')->get();
 		if ($query) {
             $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
 			$data['content'] .= '<div class="list-group searchlist">';
-            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span>';
+            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-4"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span>';
             if ($login == 'yes') {
-                $data['content'] .= '<span class="col-sm-1"><strong>Actions</strong></span>';
+                $data['content'] .= '<span class="col-sm-2"><strong>Actions</strong></span>';
             }
             $data['content'] .= '</a>';
 			foreach ($query as $client) {
                 if ($login == 'yes') {
-    				$link = '<span class="col-sm-5"><h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri'] . '">Patient Centered Health Record</span></h4>';
+    				$link = '<span class="col-sm-4"><h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri'] . '">Patient Centered Health Record</span></h4>';
                     $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri2'] . '">' . $client['as_name2'] . '</span></h4></span>';
                 } else {
-                    $link = '<span class="col-sm-5"><h4><span class="label label-danger">Please Sign-In</span></h4></span>';
+                    $link = '<span class="col-sm-4"><h4><span class="label label-danger">Please Sign In</span></h4></span>';
                 }
                 if ($client['picture'] == '' || $client['picture'] == null) {
                     $picture = '<i class="fa fa-btn fa-user"></i>';
@@ -2108,11 +2173,10 @@ class OauthController extends Controller
                     $picture = '<img src="' . $client['picture'] . '" height="30" width="30">';
                 }
 
-                $timestamp = mt_rand(1, time());
-                $act = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
+                $act = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $client['last_act']) . '</span>';
             	$data['content'] .= '<a href="' . route('resources', [$client['id']]) . '" class="list-group-item row">' . '<span class="col-sm-3">' . $picture . $client['as_name'] . '</span>' . $link . $act;
                 if ($login == 'yes') {
-                    $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client['as_uri'] . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                    $add = '<span class="col-sm-2 directory-add" add-val="' . $client['as_uri'] . '" title="Add to My Patient List and Get Notifications for any Changes"><i class="fa fa-plus fa-lg" style="cursor:pointer;"></i> Follow</span>';
                     $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client['as_uri'])->first();
                     if ($check) {
                         $add = '';
@@ -2124,36 +2188,39 @@ class OauthController extends Controller
 			$data['content'] .= '</ul>';
 		}
         if ($login == 'yes') {
+            $data['demo'] = 'true';
             $data['title'] = 'All Participating Patients';
             $data['back'] = '<a href="" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
         }
-        $data['demo'] = 'true';
         // $data['noheader'] = 'true';
         return view('home', $data);
     }
 
     public function signup(Request $request)
 	{
+        $owner = DB::table('owner')->first();
 		if ($request->isMethod('post')) {
 			$this->validate($request, [
-				'username' => 'required|unique:oauth_users,username',
+				// 'username' => 'required|unique:oauth_users,username',
 				'email' => 'required|unique:oauth_users,email',
-				'password' => 'required|min:7',
-				'confirm_password' => 'required|min:7|same:password',
+				// 'password' => 'required|min:7',
+				// 'confirm_password' => 'required|min:7|same:password',
 				'first_name' => 'required',
 				'last_name' => 'required',
+                'uport_id' => 'required|unique:oauth_users,uport_id',
 				'npi' => 'required|min:10|numeric|unique:oauth_users,npi'
 			]);
 			// Register user
 			$sub = $this->gen_uuid();
 			$user_data = [
-				'username' => Crypt::encrypt($request->input('username')),
-				'password' => sha1($request->input('password')),
+				'username' => Crypt::encrypt($sub),
+				'password' => sha1($sub),
 				'first_name' => $request->input('first_name'),
 				'last_name' => $request->input('last_name'),
 				'sub' => $sub,
 				'email' => $request->input('email'),
-				'npi' => $request->input('npi')
+				'npi' => $request->input('npi'),
+                'uport_id' => $request->input('uport_id')
 			];
 			DB::table('oauth_users')->insert($user_data);
 			$user_data1 = [
@@ -2162,10 +2229,10 @@ class OauthController extends Controller
 			];
 			DB::table('users')->insert($user_data1);
 			$url = route('signup_confirmation', [$user_data['username']]);
-			$data2['message_data'] = 'This message is to notify you that you have registered for an account with the HIE of One Directory.<br>';
+			$data2['message_data'] = 'This message is to notify you that you have registered for an account with the ' . $owner->org_name . ' Directory.<br>';
 			$data2['message_data'] .= 'To complete your registration, please click on the following link or point your web browser to:<br>';
 			$data2['message_data'] .= $url;
-			$title = 'Complete registration to HIE of One Directory';
+			$title = 'Complete registration to the ' . $owner->org_name . ' Directory';
 			$to = $request->input('email');
 			$this->send_mail('auth.emails.generic', $data2, $title, $to);
 		} else {
@@ -2276,7 +2343,8 @@ class OauthController extends Controller
             $as_uri = $request->input('as_uri');
             $data1 = [
     			'type' => 'as',
-    			'as_uri' => $as_uri
+    			'as_uri' => $as_uri,
+                'last_update' => $request->input('last_update')
     		];
             $query = DB::table('oauth_rp')->where('as_uri', '=', $as_uri)->first();
     		if ($query) {
@@ -2371,7 +2439,8 @@ class OauthController extends Controller
             }
             $data1 = [
                 'as_uri' => $request->input('as_uri'),
-                'name' => $request->input('name')
+                'name' => $request->input('name'),
+                'last_update' => $request->input('last_update')
             ];
             $row = DB::table('oauth_rp')->where('id', '=', $id)->update($data1);
             $return['message'] = 'Update successful';

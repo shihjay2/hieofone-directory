@@ -75,43 +75,42 @@
 					@if (Auth::guest())
 						@if (!isset($noheader))
 							<li><a href="{{ url('/patients') }}">Patients</a></li>
-							<li><a href="{{ url('/providers') }}">Providers</a></li>
-							<li><a href="{{ url('/others') }}">Others</a></li>
+							<li><a href="{{ url('/clinicians') }}">Clinicians</a></li>
+							<!-- <li><a href="{{ url('/others') }}">Others</a></li> -->
 							<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
-							<li><a href="{{ url('/login') }}">Login</a></li>
-							<li><a href="{{ url('/signup') }}">Sign Up</a></li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-									Demo Pages <span class="caret"></span>
-								</a>
-								<ul class="dropdown-menu" role="menu">
-									<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Default Patient List</a></li>
-									<li><a href="{{ url('/demo_patient_list/yes') }}"><i class="fa fa-btn fa-list"></i>Patient List after Login</a></li>
-								</ul>
-							</li>
-						@endif
-						@if (isset($demo))
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-									Demo User <span class="caret"></span>
-								</a>
-								<ul class="dropdown-menu" role="menu">
-									<li><a href=""><i class="fa fa-btn fa-cogs"></i>My Information</a></li>
-									<li><a href=""><i class="fa fa-btn fa-cog"></i>Change Password</a></li>
-									<li><a href=""><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
-								</ul>
-							</li>
+							<!-- <li><a href="{{ url('/signup') }}">Sign Up</a></li> -->
+							@if (isset($demo))
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+										Demo User <span class="caret"></span>
+									</a>
+									<ul class="dropdown-menu" role="menu">
+										<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Default Patient List</a></li>
+										<li><a href=""><i class="fa fa-btn fa-cogs"></i>My Information</a></li>
+										<li><a href=""><i class="fa fa-btn fa-sign-out"></i>Sign Out</a></li>
+									</ul>
+								</li>
+							@else
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+										Demo Pages <span class="caret"></span>
+									</a>
+									<ul class="dropdown-menu" role="menu">
+										<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Default Patient List</a></li>
+										<li><a href="{{ url('/demo_patient_list/yes') }}"><i class="fa fa-btn fa-list"></i>Patient List after Login</a></li>
+									</ul>
+								</li>
+								<li><a href="{{ url('/login') }}">Sign In</a></li>
+							@endif
 						@endif
 					@else
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 								{{ Session::get('full_name') }} <span class="caret"></span>
 							</a>
-
 							<ul class="dropdown-menu" role="menu">
 								<li><a href="{{ url('/my_info') }}"><i class="fa fa-btn fa-cogs"></i>My Information</a></li>
-								<li><a href="{{ url('/change_password') }}"><i class="fa fa-btn fa-cog"></i>Change Password</a></li>
-								<li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+								<li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Sign Out</a></li>
 							</ul>
 						</li>
 					@endif
@@ -125,7 +124,7 @@
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1">
 				<form class="input-group form" border="0" id="search_patient_form" role="search" action="{{ url('/search') }}" method="POST" style="margin-bottom:0px;" data-nosh-target="search_patient_results">
-					<input type="text" class="form-control search" id="search_field" name="search_field" placeholder="Enter search term" style="margin-bottom:0px;" required autocomplete="off">
+					<input type="text" class="form-control search" id="search_field" name="search_field" placeholder="Search Directory" style="margin-bottom:0px;" required autocomplete="off">
 					<input type="hidden" name="type" value="div">
 					<span class="input-group-btn">
 						<button type="submit" class="btn btn-md" id="search_patient_submit" name="submit" value="Go"><i class="glyphicon glyphicon-search"></i></button>

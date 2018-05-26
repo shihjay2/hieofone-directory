@@ -20,6 +20,52 @@ class Controller extends BaseController
 {
 	use AuthorizesRequests, AuthorizesResources, DispatchesJobs, ValidatesRequests;
 
+	protected function as_push_notification($as_uri, $action)
+	{
+		$as = DB::table('oauth_rp')->where('as_uri', '=', $request->input('as_uri'))->first();
+		$params = [
+			'client_id' => $as->client_id,
+			'client_secret' => $as->client_id,
+			'action' => $action
+		];
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL, $as_uri);
+        curl_setopt($ch,CURLOPT_FAILONERROR,1);
+        curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch,CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
+        $domain_name = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close ($ch);
+        if ($httpCode !== 404 && $httpCode !== 0) {
+            $endpoint = $as_uri . '/as_push_notification';
+            $post_body = json_encode($params);
+            $content_type = 'application/json';
+            $ch1 = curl_init();
+            curl_setopt($ch1,CURLOPT_URL, $endpoint);
+            curl_setopt($ch1, CURLOPT_POST, 1);
+            curl_setopt($ch1, CURLOPT_POSTFIELDS, $post_body);
+            curl_setopt($ch1, CURLOPT_HTTPHEADER, [
+                "Content-Type: {$content_type}",
+                'Content-Length: ' . strlen($post_body)
+            ]);
+            curl_setopt($ch1, CURLOPT_HEADER, 0);
+            curl_setopt($ch1, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch1, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch1, CURLOPT_TIMEOUT, 60);
+            curl_setopt($ch1, CURLOPT_CONNECTTIMEOUT ,0);
+            $output = curl_exec($ch1);
+            curl_close ($ch1);
+            $response['status'] = 'OK';
+            $response['arr'] = json_decode($output, true);
+        } else {
+            $response['status'] = 'error';
+			$response['message'] = 'Authorization Server is not able to be reached';
+        }
+        return $response;
+	}
+
 	protected function base64url_encode($data)
 	{
 		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');

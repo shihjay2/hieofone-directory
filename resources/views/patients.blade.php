@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-<div id="patient_start" class="container">
+<div id="patient_start" class="container" style="display:none;">
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
 			<div class="panel panel-default">
@@ -23,7 +23,7 @@
 		</div>
 	</div>
 </div>
-<div id="container_no" class="container">
+<div id="container_no" class="container" style="display:none;">
 	<div class="row">
 		<div class="col-md-10 col-md-offset-1">
 			<div class="panel panel-default">
@@ -63,7 +63,7 @@
 		</div>
 	</div>
 </div>
-<div id="container_yes" class="container">
+<div id="container_yes" class="container" style="display:none;">
 	<div class="row">
 		<div class="col-md-10 col-md-offset-1">
 			<div class="panel panel-default">
@@ -110,12 +110,11 @@
         };
 		var create = '{{ $create }}';
 		if (create == 'no') {
-			$("#container_no").hide();
-			$("#container_yes").hide();
+			// $("#container_no").hide();
+			$("#patient_start").show();
 		} else {
 			$("#container_no").show();
-			$("#patient_start").hide();
-			$("#container_yes").hide();
+			// $("#patient_start").hide();
 		}
 		$("#no").click(function(){
 			$("#container_no").show();

@@ -34,7 +34,16 @@
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading">Login</div>
+				<div class="panel-heading">
+					<div class="container-fluid panel-container">
+						<div class="col-xs-6 col-md-9 text-left">
+							<h4 class="panel-title" style="height:35px;display:table-cell !important;vertical-align:middle;">Sign In</h4>
+						</div>
+						<div class="col-xs-3 text-right">
+							<button type="button" class="btn btn-primary" id="admin_button" title="Administrator Login"><i class="fa fa-btn fa-cogs"></i></button>
+						</div>
+					</div>
+				</div>
 				<div class="panel-body">
 					<div style="text-align: center;">
 						<div style="text-align: center;">
@@ -51,7 +60,7 @@
 					<form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">
 						{{ csrf_field() }}
 
-						<div class="admin_form form-group{{ $errors->has('username') ? ' has-error' : '' }}">
+						<div class="admin_form form-group{{ $errors->has('username') ? ' has-error' : '' }}" style="display:none;">
 							<label for="username" class="col-md-4 control-label">Username </label>
 
 							<div class="col-md-6">
@@ -65,7 +74,7 @@
 							</div>
 						</div>
 
-						<div class="admin_form form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+						<div class="admin_form form-group{{ $errors->has('password') ? ' has-error' : '' }}" style="display:none;">
 							<label for="password" class="col-md-4 control-label">Password</label>
 
 							<div class="col-md-6">
@@ -79,7 +88,7 @@
 							</div>
 						</div>
 
-						<div class="admin_form form-group">
+						<div class="admin_form form-group" style="display:none;">
 							<div class="col-md-6 col-md-offset-4">
 								<div class="checkbox">
 									<label>
@@ -89,10 +98,10 @@
 							</div>
 						</div>
 
-						<div class="admin_form form-group">
+						<div class="admin_form form-group" style="display:none;">
 							<div class="col-md-6 col-md-offset-4">
 								<button type="submit" class="btn btn-primary">
-									<i class="fa fa-btn fa-sign-in"></i> Login
+									<i class="fa fa-btn fa-sign-in"></i> Sign In
 								</button>
 
 								<a class="btn btn-link" href="{{ url('/password_email') }}">Forgot Your Password?</a>
@@ -102,10 +111,10 @@
 						<div class="form-group">
 							<div class="col-md-8 col-md-offset-2">
 								<button type="button" class="btn btn-primary btn-block" id="connectUportBtn" onclick="loginBtnClick()">
-									<img src="{{ asset('assets/uport-logo-white.svg') }}" height="25" width="25" style="margin-right:5px"></img> Login with uPort
+									<img src="{{ asset('assets/uport-logo-white.svg') }}" height="25" width="25" style="margin-right:5px"></img> Sign In with uPort
 								</button>
-								<button type="button" class="btn btn-primary btn-block" id="connectUportBtn1">Add NPI credential to uPort using Doximity Verification</button>
-								<button type="button" class="btn btn-primary btn-block" id="admin_button">Administrator</button>
+								<button type="button" class="btn btn-primary btn-block" id="connectUportBtn1"><i class="fa fa-btn fa-plus"></i> Add Doximity Clinician Verification</button>
+
 								<!-- <button type="button" class="btn btn-primary btn-block" id="connectUportBtn1" onclick="uportConnect()">Connect uPort</button> -->
 								<!-- <button type="button" class="btn btn-primary btn-block" id="connectUportBtn2" onclick="sendEther()">Send Ether</button> -->
 								<!-- @if (isset($google))
@@ -118,6 +127,9 @@
 										<i class="fa fa-btn fa-twitter"></i> Login with Twitter
 									</a>
 								@endif -->
+							</div>
+							<div class="col-md-8 col-md-offset-8">
+
 							</div>
 						</div>
 						@endif
@@ -136,12 +148,12 @@
 	<div class="modal-dialog">
 	  <!-- Modal content-->
 		<div class="modal-content">
-			<div id="modal1_header" class="modal-header">Add NPI credential to uPort?</div>
+			<div id="modal1_header" class="modal-header">Add clinician credential to uPort from Doximity?</div>
 			<div id="modal1_body" class="modal-body" style="height:30vh;overflow-y:auto;">
 				<p>This will simulate adding a verified credential to your existing uPort.</p>
 				<p>Clicking proceed with add a simulated NPI number</p>
 				<p>Clicking on Get from Doximity will demonstrate how you can get a verified credential if you have an existing Doximity account</p>
-				<p>After the NPI credential is added, click on Login with uPort</p>
+				<p>After the credential is added, click on Login with uPort</p>
 				<p>This will enable you to write a prescription.</p>
 			</div>
 			<div class="modal-footer">
@@ -160,7 +172,6 @@
 <script src="{{ asset('assets/js/toastr.min.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('.admin_form').hide();
 		$("#username").focus();
 		$('[data-toggle="tooltip"]').tooltip();
 		$("#connectUportBtn1").click(function(){
@@ -175,7 +186,7 @@
 	});
 	// Setup
 	const Connect = window.uportconnect.Connect;
-	const appName = 'hieofone';
+	const appName = 'Trustee Directory';
 	const connect = new Connect(appName, {
 		'clientId': '2ohNU4wT7Y7YqJ5kLMw2of1bdCnuFB1tZmr',
 		'signer': window.uportconnect.SimpleSigner('9d3aef4e1e1a80877fe501151f9372de2e34cb2744e875c5e1b1af5a73f4eb7e'),
@@ -197,6 +208,7 @@
 			if (typeof credentials.email !== 'undefined') {
 				uport_data += '&email=' + credentials.email;
 			}
+			console.log(uport_data);
 			$.ajax({
 				type: "POST",
 				url: uport_url,
