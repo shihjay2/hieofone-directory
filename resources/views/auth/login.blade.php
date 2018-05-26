@@ -150,14 +150,16 @@
 		<div class="modal-content">
 			<div id="modal1_header" class="modal-header">Add clinician credential to uPort from Doximity?</div>
 			<div id="modal1_body" class="modal-body" style="height:30vh;overflow-y:auto;">
-				<p>This will simulate adding a verified credential to your existing uPort.</p>
+				<p>We're demonstrating the addition of a verified credential to a blockchain identity by using Doximity. Anyone with a Doximity sign in is able to add this credential.</p>
+				<p>Please review Doximity's user verification policies before trusting this credential for any particular purpose.</p>
+				<!-- <p>This will simulate adding a verified credential to your existing uPort.</p>
 				<p>Clicking proceed with add a simulated NPI number</p>
 				<p>Clicking on Get from Doximity will demonstrate how you can get a verified credential if you have an existing Doximity account</p>
 				<p>After the credential is added, click on Login with uPort</p>
-				<p>This will enable you to write a prescription.</p>
+				<p>This will enable you to write a prescription.</p> -->
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal" onClick="attest()"><i class="fa fa-btn fa-check"></i> Proceed</button>
+				<!-- <button type="button" class="btn btn-default" data-dismiss="modal" onClick="attest()"><i class="fa fa-btn fa-check"></i> Proceed</button> -->
 				<a href="https://cloud.noshchartingsystem.com/doximity/" target="_blank" class="btn btn-default" id="doximity_modal"><i class="fa fa-btn fa-hand-o-right"></i> Get from Doximity</a>
 				<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-btn fa-times"></i> Close</button>
 			  </div>

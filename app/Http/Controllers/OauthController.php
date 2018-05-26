@@ -2208,7 +2208,8 @@ class OauthController extends Controller
 				'first_name' => 'required',
 				'last_name' => 'required',
                 'uport_id' => 'required|unique:oauth_users,uport_id',
-				'npi' => 'required|min:10|numeric|unique:oauth_users,npi'
+				'npi' => 'required|min:10|numeric|unique:oauth_users,npi',
+                'specialty' => 'required'
 			]);
 			// Register user
 			$sub = $this->gen_uuid();
@@ -2220,7 +2221,8 @@ class OauthController extends Controller
 				'sub' => $sub,
 				'email' => $request->input('email'),
 				'npi' => $request->input('npi'),
-                'uport_id' => $request->input('uport_id')
+                'uport_id' => $request->input('uport_id'),
+                'specialty' => $request->input('specialty')
 			];
 			DB::table('oauth_users')->insert($user_data);
 			$user_data1 = [

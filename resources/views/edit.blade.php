@@ -11,6 +11,7 @@
 				<div class="panel-body">
 					<div style="text-align: center;">
 					  <i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>
+					  <p>NPI and Specialty information is not editable as it is a verified claim</p>
 					</div>
 					<form class="form-horizontal" role="form" method="POST" action="{{ url('/my_info_edit') }}">
 						{{ csrf_field() }}

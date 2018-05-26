@@ -85,7 +85,7 @@
 										Demo User <span class="caret"></span>
 									</a>
 									<ul class="dropdown-menu" role="menu">
-										<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Default Patient List</a></li>
+										<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Public Patient List</a></li>
 										<li><a href=""><i class="fa fa-btn fa-cogs"></i>My Information</a></li>
 										<li><a href=""><i class="fa fa-btn fa-sign-out"></i>Sign Out</a></li>
 									</ul>
@@ -96,7 +96,7 @@
 										Demo Pages <span class="caret"></span>
 									</a>
 									<ul class="dropdown-menu" role="menu">
-										<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Default Patient List</a></li>
+										<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Public Patient List</a></li>
 										<li><a href="{{ url('/demo_patient_list/yes') }}"><i class="fa fa-btn fa-list"></i>Patient List after Login</a></li>
 									</ul>
 								</li>
@@ -104,7 +104,11 @@
 							@endif
 						@endif
 					@else
-						<li class="dropdown">
+						@if (Session::get('is_owner') == 'yes')
+							<li class="dropdown" style="background-color:#ee5f5b;">
+						@else
+							<li class="dropdown">
+						@endif
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 								{{ Session::get('full_name') }} <span class="caret"></span>
 							</a>

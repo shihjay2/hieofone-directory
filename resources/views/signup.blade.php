@@ -9,8 +9,11 @@
 				<div class="panel-body">
 					<div style="text-align: center;">
 					  <i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>
+					  <p>To register you'll need a smartphone with the <a href="https://uport.me" target="_blank">uPort app</a> installed.</p>
+					  <p>Make sure you add your NPI to your uPort app through the Doximity credential verification site</p>
+					  <p>After you register with the uPort app, the form fields will then populate with your information.<p>
 					</div>
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}" id="signup_form" style="display:none;">
+					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}" id="signup_form">
 						{{ csrf_field() }}
 
                         <div class="form-group">
@@ -106,6 +109,20 @@
 							</div>
 						</div>
 
+						<div class="form-group{{ $errors->has('specialty') ? ' has-error' : '' }}">
+							<label for="specialty" class="col-md-4 control-label">Specialty</label>
+
+							<div class="col-md-6">
+								<input id="specialty" class="form-control" name="specialty" value="{{ old('specialty') }}" readonly>
+
+								@if ($errors->has('specialty'))
+									<span class="help-block">
+										<strong>{{ $errors->first('specialty') }}</strong>
+									</span>
+								@endif
+							</div>
+						</div>
+
 						<div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
 							<label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
@@ -153,14 +170,16 @@
 		<div class="modal-content">
 			<div id="modal1_header" class="modal-header">Add clinician credential to uPort from Doximity?</div>
 			<div id="modal1_body" class="modal-body" style="height:30vh;overflow-y:auto;">
-				<p>This will simulate adding a verified credential to your existing uPort.</p>
+				<p>We're demonstrating the addition of a verified credential to a blockchain identity by using Doximity. Anyone with a Doximity sign in is able to add this credential.</p>
+				<p>Please review Doximity's user verification policies before trusting this credential for any particular purpose.</p>
+				<!-- <p>This will simulate adding a verified credential to your existing uPort.</p>
 				<p>Clicking proceed with add a simulated NPI number</p>
 				<p>Clicking on Get from Doximity will demonstrate how you can get a verified credential if you have an existing Doximity account</p>
 				<p>After the credential is added, click on Login with uPort</p>
-				<p>This will enable you to write a prescription.</p>
+				<p>This will enable you to write a prescription.</p> -->
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal" onClick="attest()"><i class="fa fa-btn fa-check"></i> Proceed</button>
+				<!-- <button type="button" class="btn btn-default" data-dismiss="modal" onClick="attest()"><i class="fa fa-btn fa-check"></i> Proceed</button> -->
 				<a href="https://cloud.noshchartingsystem.com/doximity/" target="_blank" class="btn btn-default" id="doximity_modal"><i class="fa fa-btn fa-hand-o-right"></i> Get from Doximity</a>
 				<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-btn fa-times"></i> Close</button>
 			  </div>
@@ -198,7 +217,7 @@
 
 	const loginBtnClick = () => {
 		connect.requestCredentials({
-	      requested: ['name', 'phone', 'country', 'email', 'description', 'NPI'],
+	      requested: ['name', 'phone', 'country', 'email', 'description', 'NPI', 'specialty'],
 	      notifications: true // We want this if we want to recieve credentials
 	    }).then((credentials) => {
 			console.log(credentials);
@@ -212,6 +231,9 @@
             if (typeof credentials.email !== 'undefined') {
 				$('#email').val(credentials.email);
 			}
+			if (typeof credentials.specialty !== 'undefined') {
+                $('#specialty').val(credentials.specialty);
+            }
 			$('#signup_form').show();
 		}, console.err);
 	};

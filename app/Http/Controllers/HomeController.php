@@ -1066,9 +1066,13 @@ class HomeController extends Controller
         if ($query->npi !== null && $query->npi !== '') {
             $data['content'] .= '<li class="list-group-item">NPI: ' . $query->npi . '</li>';
         }
+        if ($query->specialty !== null && $query->specialty !== '') {
+            $data['content'] .= '<li class="list-group-item">Speciality: ' . $query->specialty . '</li>';
+        }
         $data['content'] .= '</ul>';
         if (Session::get('is_owner') == 'yes') {
             $data['content'] .= '<a href="' . route('change_password') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-cog"></i>Change Password</a>';
+            $data['content'] .= '<hr/><div class="alert alert-danger">Administrator Account</div>';
         }
         $data['back'] = '<a href="' . URL::to('my_info_edit') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-pencil"></i> Edit</a>';
         return view('home', $data);
