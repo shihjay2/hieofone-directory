@@ -313,7 +313,7 @@ class Controller extends BaseController
 		}
 	}
 
-	protected function login_sessions($user, $client_id)
+	protected function login_sessions($user, $client_id, $admin)
 	{
 		$owner_query = DB::table('owner')->first();
 		$proxies = DB::table('owner')->where('sub', '!=', $owner_query->sub)->get();
@@ -335,7 +335,9 @@ class Controller extends BaseController
 		Session::put('invite', 'no');
 		Session::put('is_owner', 'no');
 		if ($user->sub == $owner_query->sub || in_array($user->sub, $proxy_arr)) {
-			Session::put('is_owner', 'yes');
+			if ($admin == 'yes') {
+				Session::put('is_owner', 'yes');
+			}
 		}
 		if ($owner_query->sub == $user->sub) {
 			Session::put('invite', 'yes');

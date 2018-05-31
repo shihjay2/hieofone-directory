@@ -915,7 +915,7 @@ class OauthController extends Controller
         return redirect()->route('welcome');
     }
 
-    public function login_uport(Request $request)
+    public function login_uport(Request $request, $admin='')
     {
         $owner_query = DB::table('owner')->first();
         $proxies = DB::table('owner')->where('sub', '!=', $owner_query->sub)->get();
@@ -927,94 +927,108 @@ class OauthController extends Controller
         }
         if ($request->has('uport')) {
             $proceed = false;
-            $user_table = 'oauth_users';
-            $uport_static = 'npi';
-            $user_table_result = DB::select('SHOW INDEX FROM ' . $user_table . " WHERE Key_name = 'PRIMARY'");
-            $user_table_result_arr = json_decode(json_encode($user_table_result), true);
-            $table_key = $user_table_result_arr[0]['Column_name'];
-            $uport_credentials = [
-                'name' => [
-                    'fname' => 'first_name',
-                    'lname' => 'last_name',
-                    'description' => 'Name'
-                ],
-                'email' => [
-                    'column' => 'email',
-                    'description' => 'E-mail address'
-                ],
-                'npi' => [
-                    'column' => 'npi',
-                    'description' => 'NPI number'
-                ],
-                'uport' => [
-                    'column' => 'uport_id',
-                    'description' => 'uport address'
-                ]
-            ];
-            $username_arr = [];
-            $static = '';
-            $missing_creds = [];
-            foreach ($uport_credentials as $uport_credential_key => $uport_credential_value) {
-                if ($uport_credential_key == 'name') {
-                    $parser = new NameParser();
-                    $name_arr = $parser->parse_name($request->input('name'));
-                    $name_query = DB::table($user_table)->where($uport_credential_value['fname'], '=', $name_arr['fname'])->where($uport_credential_value['lname'], '=', $name_arr['lname'])->get();
-                    if ($name_query) {
-                        foreach ($name_query as $name_row) {
-                            $username_arr[$uport_credential_key][] = $name_row->{$table_key};
-                        }
-                    }
-                } else {
-                    if ($request->has($uport_credential_key)) {
-                        $cred_query = DB::table($user_table)->where($uport_credential_value['column'], '=', $request->input($uport_credential_key))->first();
-                        if ($cred_query) {
-                            $username_arr[$uport_credential_key] = $cred_query->{$table_key};
-                            if ($uport_static == $uport_credential_key) {
-                                $static = $cred_query->{$table_key};
-                            }
-                            if ($cred_query->sub == $owner_query->sub || in_array($cred_query->sub, $proxy_arr)) {
-                                //Admin user - start override
-                                $proceed = true;
-                                $uport_user = DB::table($user_table)->where($table_key, '=',  $cred_query->{$table_key})->first();
-                            }
-                        }
-                    } else {
-                        $missing_creds[] = $uport_credential_key;
-                    }
-                }
-            }
-            if (empty($missing_creds)) {
-                if (! empty($username_arr)) {
-                    // Check if static credential's username matches existing user
-                    if ($static !== '') {
-                        // There is a user with a static credential in the system
-                        // Update any non-static entries if different
-                        $uport_user = DB::table($user_table)->where($table_key, '=', $static)->first();
-                        $static_data = [];
-                        foreach ($uport_credentials as $uport_credential_key1 => $uport_credential_value1) {
-                            if ($uport_user->{$uport_credential_value1['column']} !== $request->input($uport_credential_key1)) {
-                                $static_data[$uport_credential_value1['column']] = $request->input($uport_credential_key1);
-                            }
-                        }
-                        if (! empty($static_data)) {
-                            DB::table($table)->where($table_key, '=', $static)->update($static_data);
-                        }
-                        $proceed = true;
-                    } else {
-                        $return['message'] = 'You are not authorized to access this Directory.  Your ' . $uport_credentials[$uport_static]['description'] . ' does not exist in our system.';
-                    }
+            $admin_status = 'no';
+            if ($admin == 'admin') {
+                $admin_parser = new NameParser();
+                $admin_name_arr = $admin_parser->parse_name($request->input('name'));
+                $admin_name_query = DB::table('owner')->where('firstname', '=', $admin_name_arr['fname'])->where('lastname', '=', $admin_name_arr['lname'])->first();
+                if ($admin_name_query) {
+                    $uport_user = DB::table('oauth_users')->where('sub', '=', $admin_name_query->sub)->first();
+                    $proceed = true;
+                    $admin_status = 'yes';
                 } else {
                     $return['message'] = 'You are not authorized to access this Directory';
                 }
             } else {
-                $return['message'] = 'You are missing these credentials from your uPort: ';
-                $missing_ct = 0;
-                foreach ($missing_creds as $missing_cred) {
-                    if ($missing_ct > 0) {
-                        $return['message'] .= ', ';
+                $user_table = 'oauth_users';
+                $uport_static = 'npi';
+                $user_table_result = DB::select('SHOW INDEX FROM ' . $user_table . " WHERE Key_name = 'PRIMARY'");
+                $user_table_result_arr = json_decode(json_encode($user_table_result), true);
+                $table_key = $user_table_result_arr[0]['Column_name'];
+                $uport_credentials = [
+                    'name' => [
+                        'fname' => 'first_name',
+                        'lname' => 'last_name',
+                        'description' => 'Name'
+                    ],
+                    'email' => [
+                        'column' => 'email',
+                        'description' => 'E-mail address'
+                    ],
+                    'npi' => [
+                        'column' => 'npi',
+                        'description' => 'NPI number'
+                    ],
+                    'uport' => [
+                        'column' => 'uport_id',
+                        'description' => 'uport address'
+                    ]
+                ];
+                $username_arr = [];
+                $static = '';
+                $missing_creds = [];
+                foreach ($uport_credentials as $uport_credential_key => $uport_credential_value) {
+                    if ($uport_credential_key == 'name') {
+                        $parser = new NameParser();
+                        $name_arr = $parser->parse_name($request->input('name'));
+                        $name_query = DB::table($user_table)->where($uport_credential_value['fname'], '=', $name_arr['fname'])->where($uport_credential_value['lname'], '=', $name_arr['lname'])->get();
+                        if ($name_query) {
+                            foreach ($name_query as $name_row) {
+                                $username_arr[$uport_credential_key][] = $name_row->{$table_key};
+                            }
+                        }
+                    } else {
+                        if ($request->has($uport_credential_key)) {
+                            $cred_query = DB::table($user_table)->where($uport_credential_value['column'], '=', $request->input($uport_credential_key))->first();
+                            if ($cred_query) {
+                                $username_arr[$uport_credential_key] = $cred_query->{$table_key};
+                                if ($uport_static == $uport_credential_key) {
+                                    $static = $cred_query->{$table_key};
+                                }
+                                if ($cred_query->sub == $owner_query->sub || in_array($cred_query->sub, $proxy_arr)) {
+                                    //Admin user - start override
+                                    $proceed = true;
+                                    $uport_user = DB::table($user_table)->where($table_key, '=',  $cred_query->{$table_key})->first();
+                                }
+                            }
+                        } else {
+                            $missing_creds[] = $uport_credential_key;
+                        }
                     }
-                    $return['message'] .= $uport_credentials[$missing_cred]['description'];
-                    $missing_ct++;
+                }
+                if (empty($missing_creds)) {
+                    if (! empty($username_arr)) {
+                        // Check if static credential's username matches existing user
+                        if ($static !== '') {
+                            // There is a user with a static credential in the system
+                            // Update any non-static entries if different
+                            $uport_user = DB::table($user_table)->where($table_key, '=', $static)->first();
+                            $static_data = [];
+                            foreach ($uport_credentials as $uport_credential_key1 => $uport_credential_value1) {
+                                if ($uport_user->{$uport_credential_value1['column']} !== $request->input($uport_credential_key1)) {
+                                    $static_data[$uport_credential_value1['column']] = $request->input($uport_credential_key1);
+                                }
+                            }
+                            if (! empty($static_data)) {
+                                DB::table($table)->where($table_key, '=', $static)->update($static_data);
+                            }
+                            $proceed = true;
+                        } else {
+                            $return['message'] = 'You are not authorized to access this Directory.  Your ' . $uport_credentials[$uport_static]['description'] . ' does not exist in our system.';
+                        }
+                    } else {
+                        $return['message'] = 'You are not authorized to access this Directory';
+                    }
+                } else {
+                    $return['message'] = 'You are missing these credentials from your uPort: ';
+                    $missing_ct = 0;
+                    foreach ($missing_creds as $missing_cred) {
+                        if ($missing_ct > 0) {
+                            $return['message'] .= ', ';
+                        }
+                        $return['message'] .= $uport_credentials[$missing_cred]['description'];
+                        $missing_ct++;
+                    }
                 }
             }
         } else {
@@ -1027,7 +1041,7 @@ class OauthController extends Controller
                 $client_id = $owner_query->client_id;
             }
             Session::put('login_origin', 'login_direct');
-            $this->login_sessions($uport_user, $client_id);
+            $this->login_sessions($uport_user, $client_id, $admin_status);
             $user = DB::table('users')->where('email', '=', $uport_user->email)->first();
             Auth::loginUsingId($user->id);
             Session::save();

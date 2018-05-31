@@ -57,6 +57,7 @@
 							@endif
 						</div>
 					</div>
+					<input type="hidden" id="admin_set_id" value="no">
 					<form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">
 						{{ csrf_field() }}
 
@@ -183,7 +184,13 @@
 			$('#modal1').modal('hide');
 		});
 		$('#admin_button').click(function(){
-			$('.admin_form').show();
+			if ($("#admin_set_id").val() == 'no') {
+				$('.admin_form').show();
+				$('#admin_set_id').val('yes');
+			} else {
+				$('.admin_form').hide();
+				$('#admin_set_id').val('no');
+			}
 		});
 	});
 	// Setup
@@ -203,6 +210,9 @@
 	    }).then((credentials) => {
 			console.log(credentials);
 			var uport_url = '<?php echo route("login_uport"); ?>';
+			if ($('#admin_set_id').val() == 'yes') {
+				uport_url += '/admin';
+			}
 			var uport_data = 'name=' + credentials.name + '&uport=' + credentials.address;
 			if (typeof credentials.NPI !== 'undefined') {
 				uport_data += '&npi=' + credentials.NPI;

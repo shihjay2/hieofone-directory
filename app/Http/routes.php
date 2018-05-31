@@ -64,7 +64,7 @@ Route::any('metadata/{type}', ['as' => 'metadata', 'uses' => 'OauthController@me
 Route::get('check', ['as' => 'check', 'uses' => 'OauthController@check']);
 Route::any('login', ['as' => 'login', 'uses' => 'OauthController@login']);
 Route::any('logout', ['as' => 'logout', 'uses' => 'OauthController@logout']);
-Route::post('login_uport', ['as' => 'login_uport', 'middleware' => 'csrf', 'uses' => 'OauthController@login_uport']);
+Route::post('login_uport/{admin?}', ['as' => 'login_uport', 'middleware' => 'csrf', 'uses' => 'OauthController@login_uport']);
 Route::any('uport_user_add', ['as' => 'uport_user_add', 'uses' => 'OauthController@uport_user_add']);
 Route::any('remote_logout', ['as' => 'remote_logout', 'uses' => 'OauthController@remote_logout']);
 Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
