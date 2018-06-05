@@ -2360,7 +2360,7 @@ class OauthController extends Controller
             $data1 = [
     			'type' => 'as',
     			'as_uri' => $as_uri,
-                'last_update' => $request->input('last_update')
+                'last_activity' => $request->input('last_update')
     		];
             $query = DB::table('oauth_rp')->where('as_uri', '=', $as_uri)->first();
     		if ($query) {
@@ -2456,7 +2456,7 @@ class OauthController extends Controller
             $data1 = [
                 'as_uri' => $request->input('as_uri'),
                 'name' => $request->input('name'),
-                'last_update' => $request->input('last_update')
+                'last_activity' => $request->input('last_update')
             ];
             $row = DB::table('oauth_rp')->where('id', '=', $id)->update($data1);
             $return['message'] = 'Update successful';
