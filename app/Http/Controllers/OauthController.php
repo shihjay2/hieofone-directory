@@ -419,8 +419,9 @@ class OauthController extends Controller
                     } else {
                         $picture = '<img src="' . $client->picture . '" height="30" width="30">';
                     }
-                    $timestamp = mt_rand(1, time());
-                    $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
+                    // $timestamp = mt_rand(1, time());
+                    // $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
+                    $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $client->last_activity) . '</span>';
                     // $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
                     // $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
                     // if ($check) {
