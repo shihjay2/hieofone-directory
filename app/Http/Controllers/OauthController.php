@@ -427,7 +427,7 @@ class OauthController extends Controller
                     // if ($check) {
                     //     $add = '';
                     // }
-                	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span style="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+                	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
     			}
     			$data['content'] .= '</div>';
     		}
