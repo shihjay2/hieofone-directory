@@ -387,12 +387,12 @@ class OauthController extends Controller
     		if ($query) {
                 $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
     			$data['content'] .= '<div class="list-group searchlist">';
-                $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span></a>';
+                $data['content'] .= '<a class="list-group-item row"><span class="col-sm-4"><strong>Name</strong></span><span class="col-sm-4"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span></a>';
                 // usort($query, function($a, $b) {
                 //     return $b['last_act'] <=> $a['last_act'];
                 // });
                 foreach ($query as $client) {
-                    $link = '<span class="col-sm-5">';
+                    $link = '<span class="col-sm-4">';
                     $rs = DB::table('as_to_rs')->where('as_id', '=', $client_row->id)->get();
                     $rs_count=0;
                     if ($rs) {
@@ -427,7 +427,7 @@ class OauthController extends Controller
                     // if ($check) {
                     //     $add = '';
                     // }
-                	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+                	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-4">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
     			}
     			$data['content'] .= '</div>';
     		}
