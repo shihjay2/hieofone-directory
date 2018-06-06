@@ -393,7 +393,7 @@ class OauthController extends Controller
                 // });
                 foreach ($query as $client) {
                     $link = '<span class="col-sm-4">';
-                    $rs = DB::table('as_to_rs')->where('as_id', '=', $client_row->id)->get();
+                    $rs = DB::table('as_to_rs')->where('as_id', '=', $client->id)->get();
                     $rs_count=0;
                     if ($rs) {
                         foreach ($rs as $rs_row) {
