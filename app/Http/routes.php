@@ -59,9 +59,11 @@ Route::get('patients/{create?}', ['as' => 'patients', 'uses' => 'OauthController
 Route::get('clinicians', ['as' => 'clinicians', 'uses' => 'OauthController@clinicians']);
 Route::get('others', ['as' => 'others', 'uses' => 'OauthController@others']);
 Route::any('container_create/{code?}', ['as' => 'container_create', 'uses' => 'OauthController@container_create']);
+Route::get('key_download/{file}', ['as' => 'key_download', 'uses' => 'OauthController@key_download']);
 Route::any('search_welcome', ['as' => 'search_welcome', 'uses' => 'OauthController@search_welcome']);
 Route::any('metadata/{type}', ['as' => 'metadata', 'uses' => 'OauthController@metadata']);
 Route::get('check', ['as' => 'check', 'uses' => 'OauthController@check']);
+Route::post('mailgun', ['as' => 'mailgun', 'uses' => 'OauthController@mailgun']);
 Route::any('login', ['as' => 'login', 'uses' => 'OauthController@login']);
 Route::any('logout', ['as' => 'logout', 'uses' => 'OauthController@logout']);
 Route::post('login_uport/{admin?}', ['as' => 'login_uport', 'middleware' => 'csrf', 'uses' => 'OauthController@login_uport']);

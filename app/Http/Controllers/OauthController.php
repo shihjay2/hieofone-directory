@@ -584,13 +584,14 @@ class OauthController extends Controller
                 return view('welcome', $data6);
             } else {
                 $this->validate($request, [
-                    'email' => 'required'
+                    'email' => 'required',
+                    'url' => 'required'
                 ]);
                 $url7 = route('container_create', [$data['code']]);
                 $data7['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.</br>";
                 $data7['message_data'] .= "Your Trustee Patient Container is ready for use!";
                 $data7['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
-                $data1['message_data'] .= $url;
+                $data1['message_data'] .= $request->input('url');
                 $title7 = 'Your Trustee Patient Container has been created!';
                 $to7 = $request->input('email');
                 $this->send_mail('auth.emails.generic', $data7, $title7, $to7);
@@ -610,9 +611,19 @@ class OauthController extends Controller
                 // Check code
                 $query = DB::table('invitation')->where('code', '=', $code)->first();
                 if ($query) {
+                    // create SSH key pair for patient
+                    $rsa = new RSA();
+                    $rsa->setPublicKeyFormat(RSA::PUBLIC_FORMAT_OPENSSH);
+                    extract($rsa->createKey());
+                    $priv_key = $code . "_private_key";
+                    $pub_key = $code . "_public_key";
+                    File::put(storage_path() . "/app/" . $priv_key, $privatekey);
+                    File::put(storage_path() . "/app/" . $pub_key, $publickey);
                     $url2 = route('container_create', [$data['code']]);
                     $data3['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.</br>";
-                    $data3['message_data'] .= "Please create a container for " . $query->email;
+                    $data3['message_data'] .= "Please create a container for " . $query->email . "</br>";
+                    $data3['message_data'] .= 'This is the SSH public key to include the droplet creation';
+                    $data3['message_data'] .= nl2br($publickey);
                     $data3['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
                     $data3['message_data'] .= $url;
                     $title3 = 'Create a Trustee container under the ' . $owner->org_name . ' Trustee Directory';
@@ -622,12 +633,25 @@ class OauthController extends Controller
                     DB::table('invitation')->where('id', '=', $query->id)->update($data4);
                     $data5 = [
                         'name' => $owner->org_name,
-                        'text' => 'You are verfied to be a human and we will be creating your patient container shortly.  Please await an email response when your container is ready for use.  Thank you.'
+                        'text' => 'You are verfied to be a human and we will be creating your patient container shortly.  Please await an email response when your container is ready for use.  Thank you.',
+                        'privatekey' => route('key_download', [$priv_key]),
+                        'publickey' => route('key_download', [$pub_key])
                     ];
-                    return view('welcome', $data5);
+                    return view('container', $data5);
                 }
             }
         }
+    }
+
+    public function key_download(Request $request, $file)
+    {
+        $pathToFile = storage_path() . "/app/" . $file;
+        if(strpos($file, "private_key") !== false) {
+            $name = 'trustee_id_rsa';
+        } else {
+            $name = 'trustee_id_rsa.pub';
+        }
+        return response()->download($pathToFile, $name)->deleteFileAfterSend(true);
     }
 
     public function clinicians(Request $request)
@@ -2096,27 +2120,6 @@ class OauthController extends Controller
 
     public function test1(Request $request)
     {
-        $username[] = [
-            'name' => 'mikey',
-            'email' => 'shihjay2@gmail.com'
-        ];
-        $username[] = [
-            'name' => 'agropper',
-            'email' => 'shihjay2@gmail.com'
-        ];
-        $c = '';
-        foreach ($username as $user) {
-            $q = DB::table('oauth_users')->where('username', '=', $user['name'])->where('email', '=', $user['email'])->first();
-            if ($q) {
-                $c .= $q->sub;
-            }
-        }
-        return $c;
-        // $data2['message_data'] = 'Congratulations Michael Chen, you just sent an email with Mailgun!  You are truly awesome!';
-        // $title = 'Hello Michael Chen';
-        // $to = 'shihjay2@gmail.com';
-        // $this->send_mail('auth.emails.generic', $data2, $title, $to);
-        // return 'OK';
     }
 
     public function demo_patient_list(Request $request, $login='no')
@@ -2613,5 +2616,33 @@ class OauthController extends Controller
     {
         $query = DB::table('owner')->first();
         return $query->org_name;
+    }
+
+    public function mailgun(Request $request)
+    {
+        $uri = $request->input('uri');
+        $dns_uri = 'https://dns-api.org/A/' . $uri;
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL, $dns_uri);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch,CURLOPT_FAILONERROR,1);
+        curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch,CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
+        $return = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close ($ch);
+        $return_arr = json_decode($return, true);
+        if ($httpCode !== 404 && $httpCode !== 0) {
+            if ($return_arr[0]['value'] == $_SERVER['REMOTE_ADDR']) {
+                $secret = env('MAILGUN_SECRET', false);
+                return $secret;
+            } else {
+                return "No authorized.";
+            };
+        } else {
+            return "Try again.";
+        }
     }
 }
