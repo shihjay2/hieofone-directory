@@ -258,15 +258,57 @@ class OauthController extends Controller
                     DB::table('oauth_rp')->insert($google_data);
                     return redirect()->route('installgoogle');
                 } else {
-                    return redirect()->route('home');
+                    return redirect()->route('setup_mail_test');
                 }
             } else {
                 $data2['noheader'] = true;
+                $data2['mail_type'] = '';
+                $data2['mail_host'] = env('MAIL_HOST');
+                $data2['mail_port'] = env('MAIL_PORT');
+                $data2['mail_encryption'] = env('MAIL_ENCRYPTION');
+                $data2['mail_username'] = env('MAIL_USERNAME');
+                $data2['mail_password'] = env('MAIL_PASSWORD');
+                $data2['google_client_id'] = env('GOOGLE_KEY');
+                $data2['google_client_secret'] = env('GOOGLE_SECRET');
+                $data2['mail_username'] = env('MAIL_USERNAME');
+                $data2['mailgun_domain'] = env('MAILGUN_DOMAIN');
+                $data2['mailgun_secret'] = env('MAILGUN_SECRET');
+                $data2['mail_type'] == 'sparkpost';
+                $data2['sparkpost_secret'] = env('SPARKPOST_SECRET');
+                $data2['ses_key'] = env('SES_KEY');
+                $data2['ses_secret'] = env('SES_SECRET');
+                if (env('MAIL_DRIVER') == 'smtp') {
+                    if (env('MAIL_HOST') == 'smtp.gmail.com') {
+                        $data2['mail_type'] = 'gmail';
+                    } else {
+                        $data2['mail_type'] = 'unique';
+                    }
+                } else {
+                    $data2['mail_type'] = env('MAIL_DRIVER');
+                }
+                $data2['message_action'] = Session::get('message_action');
+                Session::forget('message_action');
                 return view('setup_mail', $data2);
             }
         } else {
             return redirect()->route('home');
         }
+    }
+
+    public function setup_mail_test(Request $request)
+    {
+        $data_message['item'] = 'This is a test';
+        $query = DB::table('owner')->first();
+        $message_action = 'Check to see in your registered e-mail account if you have recieved it.  If not, please come back to the E-mail Service page and try again.';
+        try {
+            $this->send_mail('auth.emails.generic', $data_message, 'Test E-mail', $query->email);
+        } catch(\Exception $e){
+            $message_action = 'Error - There is an error in your configuration.  Please try again.';
+            Session::put('message_action', $message_action);
+            return redirect()->route('setup_mail');
+        }
+        Session::put('message_action', $message_action);
+        return redirect()->route('home');
     }
 
     /**
@@ -1355,7 +1397,7 @@ class OauthController extends Controller
             $credentials = $google->authenticate($_GET['code']);
             $data['refresh_token'] = $credentials['refresh_token'];
             DB::table('oauth_rp')->where('type', '=', 'google')->update($data);
-            return redirect()->route('home');
+            return redirect()->route('setup_mail_test');
         } else {
             $authUrl = $google->createAuthUrl();
             header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));

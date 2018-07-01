@@ -51,6 +51,7 @@ App::singleton('oauth2', function () {
 // Core pages
 Route::any('install', ['as' => 'install', 'uses' => 'OauthController@install']);
 Route::any('setup_mail', ['as' => 'setup_mail', 'uses' => 'OauthController@setup_mail']);
+Route::get('setup_mail_test', ['as' => 'setup_mail_test', 'uses' => 'OauthController@setup_mail_test']);
 Route::get('/', ['as' => 'welcome', 'uses' => 'OauthController@welcome']);
 Route::get('welcome0', ['as' => 'welcome0', 'uses' => 'OauthController@welcome0']);
 Route::get('welcome1', ['as' => 'welcome1', 'uses' => 'OauthController@welcome1']);
