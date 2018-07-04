@@ -297,7 +297,7 @@ class OauthController extends Controller
 
     public function setup_mail_test(Request $request)
     {
-        $data_message['item'] = 'This is a test';
+        $data_message['message_data'] = 'This is a test';
         $query = DB::table('owner')->first();
         $message_action = 'Check to see in your registered e-mail account if you have recieved it.  If not, please come back to the E-mail Service page and try again.';
         try {
