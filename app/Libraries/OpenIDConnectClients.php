@@ -2043,7 +2043,8 @@ class OpenIDConnectClient
 			'grant_type' => 'urn:ietf:params:oauth:grant-type:uma-ticket',
 			'ticket' => $permission_ticket
 		);
-		$response = $this->fetchURL($rpt_request_endpoint, json_encode($send_object));
+		$headers = array("Authorization: Bearer {$this->accessToken}");
+		$response = $this->fetchURL($rpt_request_endpoint, json_encode($send_object), $headers);
 		$json_response = json_decode($response, true);
 		// Throw some errors if we encounter them
 		if ($json_response === false) {
