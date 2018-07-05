@@ -2370,7 +2370,9 @@ class OauthController extends Controller
 		$oidc->addScope('offline_access');
 		$oidc->addScope('uma_authorization');
 		// $oidc->addScope('uma_protection');
-		$oidc->authenticate(true);
+        $oidc->setUMA(true);
+        $oidc->setUMAType('');
+		$oidc->authenticate();
 		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
 		$name = $oidc->requestUserInfo('name');
 		$birthday = $oidc->requestUserInfo('birthday');
@@ -2397,7 +2399,9 @@ class OauthController extends Controller
 		$oidc->addScope('offline_access');
 		$oidc->addScope('uma_authorization');
 		// $oidc->addScope('uma_protection');
-		$oidc->authenticate(true);
+        $oidc->setUMA(true);
+        $oidc->setUMAType('');
+		$oidc->authenticate();
 		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
 		$name = $oidc->requestUserInfo('name');
 		$birthday = $oidc->requestUserInfo('birthday');
@@ -2465,7 +2469,15 @@ class OauthController extends Controller
             		$url1 = route('directory_auth');
             		$oidc = new OpenIDConnectClient($query1->as_uri);
             		$oidc->setClientName($client_name);
-            		$oidc->setRedirectURL($url1);
+            		// $oidc->setRedirectURL($url1);
+                    $oidc->setSessionName('directory');
+                    $oidc->addRedirectURLs($url1);
+                    $oidc->addRedirectURLs(route('uma_auth'));
+                    $oidc->addRedirectURLs(route('uma_api'));
+                    $oidc->addRedirectURLs(route('uma_aat'));
+                    $oidc->addRedirectURLs(route('uma_register_auth'));
+                    $oidc->addRedirectURLs(route('uma_aat_search'));
+                    $oidc->addRedirectURLs(route('uma_api_search'));
             		$oidc->addScope('openid');
             		$oidc->addScope('email');
             		$oidc->addScope('profile');
@@ -2473,7 +2485,8 @@ class OauthController extends Controller
             		$oidc->addScope('phone');
             		$oidc->addScope('offline_access');
             		$oidc->addScope('uma_authorization');
-            		$oidc->register(true);
+                    $oidc->setUMA(true);
+            		$oidc->register();
             		$client_id = $oidc->getClientID();
             		$client_secret = $oidc->getClientSecret();
                     $data2 = [
@@ -2570,14 +2583,22 @@ class OauthController extends Controller
 				$url1 = route('uma_auth');
 				$oidc = new OpenIDConnectClient($as_uri);
 				$oidc->setClientName($client_name);
-				$oidc->setRedirectURL($url1);
+                $oidc->setSessionName('directory');
+                $oidc->addRedirectURLs($url1);
+                $oidc->addRedirectURLs(route('directory_auth'));
+                $oidc->addRedirectURLs(route('uma_api'));
+                $oidc->addRedirectURLs(route('uma_aat'));
+                $oidc->addRedirectURLs(route('uma_register_auth'));
+                $oidc->addRedirectURLs(route('uma_aat_search'));
+                $oidc->addRedirectURLs(route('uma_api_search'));
 				$oidc->addScope('openid');
 				$oidc->addScope('email');
 				$oidc->addScope('profile');
 				$oidc->addScope('offline_access');
 				$oidc->addScope('uma_authorization');
                 // $oidc->addScope('uma_protection');
-				$oidc->register(true);
+                $oidc->setUMA(true);
+				$oidc->register();
 				$client_id = $oidc->getClientID();
 				$client_secret = $oidc->getClientSecret();
 				$data1 = [
@@ -2641,14 +2662,22 @@ class OauthController extends Controller
 				$url1 = route('uma_auth');
 				$oidc = new OpenIDConnectClient($url);
 				$oidc->setClientName($client_name);
-				$oidc->setRedirectURL($url1);
+                $oidc->setSessionName('directory');
+                $oidc->addRedirectURLs($url1);
+                $oidc->addRedirectURLs(route('directory_auth'));
+                $oidc->addRedirectURLs(route('uma_api'));
+                $oidc->addRedirectURLs(route('uma_aat'));
+                $oidc->addRedirectURLs(route('uma_register_auth'));
+                $oidc->addRedirectURLs(route('uma_aat_search'));
+                $oidc->addRedirectURLs(route('uma_api_search'));
 				$oidc->addScope('openid');
 				$oidc->addScope('email');
 				$oidc->addScope('profile');
 				$oidc->addScope('offline_access');
 				$oidc->addScope('uma_authorization');
                 // $oidc->addScope('uma_protection');
-				$oidc->register(true);
+                $oidc->setUMA(true);
+				$oidc->register();
 				$client_id = $oidc->getClientID();
 				$client_secret = $oidc->getClientSecret();
 				$data1 = [
