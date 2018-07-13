@@ -3,7 +3,6 @@ namespace App\Http\Controllers;
 
 use App;
 use App\Http\Controllers\Controller;
-use App\Libraries\OpenIDConnectClient;
 use App\User;
 use Artisan;
 use Auth;
@@ -22,6 +21,7 @@ use Storage;
 use URL;
 use phpseclib\Crypt\RSA;
 use Session;
+use Shihjay2\OpenIDConnectUMAClient;
 use SimpleXMLElement;
 use GuzzleHttp;
 use Symfony\Component\Process\Process;
@@ -1282,7 +1282,7 @@ class OauthController extends Controller
                 $install->run();
                 return nl2br($install->getOutput());
             }
-            if ($type = 'migrate') {
+            if ($type == 'migrate') {
                 $migrate = new Process("php artisan migrate --force");
                 $migrate->setWorkingDirectory(base_path());
                 $migrate->setTimeout(null);
@@ -1650,7 +1650,7 @@ class OauthController extends Controller
         }
         $open_id_url = 'http://noshchartingsystem.com/oidc';
         $url = route('mdnosh');
-        $oidc = new OpenIDConnectClient($open_id_url, $client['client_id'], $client['client_secret']);
+        $oidc = new OpenIDConnectUMAClient($open_id_url, $client['client_id'], $client['client_secret']);
         $oidc->setRedirectURL($url);
         $oidc->addScope('openid');
         $oidc->addScope('email');
@@ -1725,7 +1725,7 @@ class OauthController extends Controller
         $client_name = 'HIE of One Authorization Server for ' . $user->firstname . ' ' . $user->lastname . ' (DOB: ' . $dob . ')';
         $open_id_url = 'http://noshchartingsystem.com/oidc';
         $url = route('mdnosh');
-        $oidc = new OpenIDConnectClient($open_id_url);
+        $oidc = new OpenIDConnectUMAClient($open_id_url);
         $oidc->setClientName($client_name);
         $oidc->setRedirectURL($url);
         $oidc->register();
@@ -2363,7 +2363,7 @@ class OauthController extends Controller
 		$open_id_url = Session::get('pnosh_url');
 		$client_id = Session::get('pnosh_client_id');
 		$client_secret = Session::get('pnosh_client_secret');
-		$oidc = new OpenIDConnectClient($open_id_url, $client_id, $client_secret);
+		$oidc = new OpenIDConnectUMAClient($open_id_url, $client_id, $client_secret);
 		$oidc->setRedirectURL($url);
 		$oidc->addScope('openid');
 		$oidc->addScope('email');
@@ -2392,7 +2392,7 @@ class OauthController extends Controller
 		$open_id_url = Session::get('as_url');
 		$client_id = Session::get('as_client_id');
 		$client_secret = Session::get('as_client_secret');
-		$oidc = new OpenIDConnectClient($open_id_url, $client_id, $client_secret);
+		$oidc = new OpenIDConnectUMAClient($open_id_url, $client_id, $client_secret);
 		$oidc->setRedirectURL($url);
 		$oidc->addScope('openid');
 		$oidc->addScope('email');
@@ -2468,7 +2468,7 @@ class OauthController extends Controller
                 if ($query1) {
                     $client_name = "Directory - " . $owner->org_name;
             		$url1 = route('directory_auth');
-            		$oidc = new OpenIDConnectClient($query1->as_uri);
+            		$oidc = new OpenIDConnectUMAClient($query1->as_uri);
             		$oidc->setClientName($client_name);
             		// $oidc->setRedirectURL($url1);
                     $oidc->setSessionName('directory');
@@ -2582,7 +2582,7 @@ class OauthController extends Controller
                 $owner_query = DB::table('owner')->first();
 				$client_name = $owner_query->org_name . " Trustee Directory";
 				$url1 = route('uma_auth');
-				$oidc = new OpenIDConnectClient($as_uri);
+				$oidc = new OpenIDConnectUMAClient($as_uri);
 				$oidc->setClientName($client_name);
                 $oidc->setSessionName('directory');
                 $oidc->addRedirectURLs($url1);
@@ -2661,7 +2661,7 @@ class OauthController extends Controller
                 $owner_query = DB::table('owner')->first();
 				$client_name = $owner_query->org_name . " Trustee Directory";
 				$url1 = route('uma_auth');
-				$oidc = new OpenIDConnectClient($url);
+				$oidc = new OpenIDConnectUMAClient($url);
 				$oidc->setClientName($client_name);
                 $oidc->setSessionName('directory');
                 $oidc->addRedirectURLs($url1);

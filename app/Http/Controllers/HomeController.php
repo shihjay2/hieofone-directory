@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App;
 use App\Http\Requests;
-use App\Libraries\OpenIDConnectClient;
 use DB;
 use Form;
 use Illuminate\Http\Request;
 use QrCode;
 use Session;
+use Shihjay2\OpenIDConnectUMAClient;
 use URL;
 
 class HomeController extends Controller
@@ -255,7 +255,7 @@ class HomeController extends Controller
 		$as_uri = Session::get('uma_uri');
 		$client_id = Session::get('uma_client_id');
 		$client_secret = Session::get('uma_client_secret');
-		$oidc = new OpenIDConnectClient($as_uri, $client_id, $client_secret);
+		$oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
 		$oidc->requestAAT();
 		Session::put('uma_aat', $oidc->getAccessToken());
 		// Get permission ticket
@@ -284,7 +284,7 @@ class HomeController extends Controller
 			$client_id = Session::get('uma_client_id');
 			$client_secret = Session::get('uma_client_secret');
 			$url = route('uma_api');
-			$oidc = new OpenIDConnectClient($as_uri, $client_id, $client_secret);
+			$oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
 			$oidc->setAccessToken(Session::get('uma_aat'));
 			$oidc->setRedirectURL($url);
 			$result1 = $oidc->rpt_request($permission_ticket);
@@ -423,7 +423,7 @@ class HomeController extends Controller
         Session::put('uma_client_id', $client->client_id);
         Session::put('uma_client_secret', $client->client_secret);
         Session::save();
-		$oidc = new OpenIDConnectClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
+		$oidc = new OpenIDConnectUMAClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
 		$oidc->requestAAT();
 		Session::put('uma_aat', $oidc->getAccessToken());
 		// Get permission ticket
@@ -452,7 +452,7 @@ class HomeController extends Controller
 			$client_id = Session::get('uma_client_id');
 			$client_secret = Session::get('uma_client_secret');
 			$url = route('uma_api_search');
-			$oidc = new OpenIDConnectClient($as_uri, $client_id, $client_secret);
+			$oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
 			$oidc->setAccessToken(Session::get('uma_aat'));
 			$oidc->setRedirectURL($url);
 			$result1 = $oidc->rpt_request($permission_ticket);
