@@ -612,8 +612,8 @@ class OauthController extends Controller
                 $data['email'] = $request->input('email');
                 DB::table('invitation')->insert($data);
                 $url = route('container_create', [$data['code']]);
-                $data1['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.</br>";
-                $data1['message_data'] .= "Please confirm your e-mail so we know you're a real human";
+                $data1['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
+                $data1['message_data'] .= "Please confirm your e-mail so we know you're a real human.<br>";
                 $data1['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
                 $data1['message_data'] .= $url;
                 $title1 = 'Complete your Trustee Patient Container creation from the ' . $owner->org_name . ' Trustee Directory';
@@ -623,28 +623,26 @@ class OauthController extends Controller
                     'name' => $owner->org_name,
                     'text' => 'Your request for a patient container has been received.  You will be receiving a confirmation e-mail to verify if you hare a human.  Thank you.'
                 ];
-                return view('welcome', $data6);
+                return view('simple', $data6);
             } else {
                 $this->validate($request, [
                     'email' => 'required',
-                    'url' => 'required'
+                    'url' => 'required',
+                    'password' => 'required',
+                    'username' => 'required'
                 ]);
-                $password = 'g]r.39Bsn4%%';
                 $url7 = route('container_create', [$data['code']]);
-                $data7['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.</br>";
-                $data7['message_data'] .= "Your Trustee Patient Container is ready for use!";
+                $data7['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
+                $data7['message_data'] .= "Your Trustee Patient Container is ready for use!<br>";
                 $data7['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
                 $data7['message_data'] .= $request->input('url');
-                $data7['message_data'] .= '<br>If you need to login to the terminal through SSH (Secure Shell), you can set your SSH client or terminal to the same URL above, using port 22.<br>';
-                $data7['message_data'] .= 'Your temporary password is . ' . $password . '.  You will be asked to change your password upon your first login via SSH';
+                $data7['message_data'] .= '<br><br>If you need to login to the terminal through SSH (Secure Shell), you can set your SSH client or terminal to the same URL above, using port 22.<br><br>';
+                $data7['message_data'] .= 'Your usernmae is ' . $request->input('username') . '<br>';
+                $data7['message_data'] .= 'Your temporary password is ' . $request->input('password') . '<br><br>You will be asked to change your password upon your first login via SSH';
                 $title7 = 'Your Trustee Patient Container has been created!';
                 $to7 = $request->input('email');
                 $this->send_mail('auth.emails.generic', $data7, $title7, $to7);
-                $data8 = [
-                    'name' => $owner->org_name,
-                    'text' => 'Message has been sent to the patient.'
-                ];
-                return view('welcome', $data8);
+                return 'Message has been sent to the patient';
             }
         } else {
             if ($code == '') {
@@ -665,12 +663,12 @@ class OauthController extends Controller
                     // File::put(storage_path() . "/app/" . $priv_key, $privatekey);
                     // File::put(storage_path() . "/app/" . $pub_key, $publickey);
                     $url2 = route('container_create', [$data['code']]);
-                    $data3['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.</br>";
-                    $data3['message_data'] .= "Please create a container for " . $query->email . "</br>";
+                    $data3['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
+                    $data3['message_data'] .= "Please create a container for " . $query->email . "<br>";
                     // $data3['message_data'] .= 'This is the SSH public key to include the droplet creation';
                     // $data3['message_data'] .= nl2br($publickey);
-                    $data3['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
-                    $data3['message_data'] .= $url2;
+                    // $data3['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
+                    // $data3['message_data'] .= $url2;
                     $title3 = 'Create a Trustee container under the ' . $owner->org_name . ' Trustee Directory';
                     $to3 = $owner->email;
                     $this->send_mail('auth.emails.generic', $data3, $title3, $to3);
@@ -679,10 +677,10 @@ class OauthController extends Controller
                     $data5 = [
                         'name' => $owner->org_name,
                         'text' => 'You are verfied to be a human and we will be creating your patient container shortly.  Please await an email response when your container is ready for use.  Thank you.',
-                        'privatekey' => route('key_download', [$priv_key]),
-                        'publickey' => route('key_download', [$pub_key])
+                        // 'privatekey' => route('key_download', [$priv_key]),
+                        // 'publickey' => route('key_download', [$pub_key])
                     ];
-                    return view('container', $data5);
+                    return view('simple', $data5);
                 }
             }
         }

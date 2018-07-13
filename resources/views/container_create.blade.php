@@ -45,6 +45,20 @@
 							</div>
 						</div>
 
+						<div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+							<label for="password" class="col-md-4 control-label">One Time Password</label>
+
+							<div class="col-md-6">
+								<input id="password" class="form-control" name="password" value="{{ old('password') }}">
+
+								@if ($errors->has('password'))
+									<span class="help-block">
+										<strong>{{ $errors->first('password') }}</strong>
+									</span>
+								@endif
+							</div>
+						</div>
+
 						<div class="form-group">
 							<div class="col-md-6 col-md-offset-4">
 								<button type="submit" class="btn btn-primary">
@@ -53,29 +67,6 @@
 							</div>
 						</div>
 					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-<div id="container_yes" class="container">
-	<div class="row">
-		<div class="col-md-10 col-md-offset-1">
-			<div class="panel panel-default">
-				<div class="panel-heading">Add yourself to the Directory Listing</div>
-				<div class="panel-body">
-					<p style="text-align: center;">Register using your HIE of One by chosing one of the following methods:</p>
-					<div class="col-md-8 col-md-offset-2">
-						<button type="button" class="btn btn-primary btn-block" id="copy_url" url-val="{{ url('/') }}">
-							<i class="fa fa-btn fa-copy"></i> Copy URL of this Directory
-						</button>
-						<a href="{{ url('/uma_register_url') }}" class="btn btn-primary btn-block">
-							<i class="fa fa-btn fa-hand-o-right"></i> or Enter the Web Address (URL) associated with your Trustee Container
-						</a>
-						<a href="{{ url('/uma_register') }}" class="btn btn-primary btn-block">
-							<i class="fa fa-btn fa-hand-o-right"></i> or Enter E-mail associated with your Trustee Container
-						</a>
-					</div>
 				</div>
 			</div>
 		</div>
