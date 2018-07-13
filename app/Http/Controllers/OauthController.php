@@ -634,7 +634,7 @@ class OauthController extends Controller
                 $url7 = route('container_create', [$data['code']]);
                 $data7['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
                 $data7['message_data'] .= "Your Trustee Patient Container is ready for use!<br>";
-                $data7['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
+                $data7['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>https://';
                 $data7['message_data'] .= $request->input('url');
                 $data7['message_data'] .= '<br><br>If you need to login to the terminal through SSH (Secure Shell), you can set your SSH client or terminal to the same URL above, using port 22.<br><br>';
                 $data7['message_data'] .= 'Your usernmae is ' . $request->input('username') . '<br>';
