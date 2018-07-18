@@ -158,7 +158,11 @@ return [
         Laravel\Socialite\SocialiteServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
 		SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
-        DevDojo\Chatter\ChatterServiceProvider::class
+        Kordy\Ticketit\TicketitServiceProvider::class,
+        GrahamCampbell\Markdown\MarkdownServiceProvider::class,
+        Jenssegers\Date\DateServiceProvider::class,
+        Riari\Forum\ForumServiceProvider::class,
+        Riari\Forum\Frontend\ForumFrontendServiceProvider::class,
     ],
 
     /*
@@ -207,7 +211,8 @@ return [
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
-		'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class
+		'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
+        'Date' => Jenssegers\Date\Date::class
     ],
 
 ];

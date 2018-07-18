@@ -347,33 +347,67 @@ class Controller extends BaseController
 
 	protected function add_user($code, $username='', $password='', $owner=false)
 	{
-		$query = DB::table('invitation')->where('code', '=', $code)->first();
+		if (is_array($code)) {
+			$first_name = $code['first_name'];
+			$last_name = $code['last_name'];
+			$email = $code['email'];
+		} else {
+			$query = DB::table('invitation')->where('code', '=', $code)->first();
+			$first_name = $query->first_name;
+			$last_name = $query->last_name;
+			$email = $query->email;
+		}
 		$sub = $this->gen_uuid();
 		if ($username == '') {
 			$username = $this->gen_uuid();
 			$password = sha1($username);
+		} else {
+			if ($password !== '') {
+				$password = sha1($password);
+			} else {
+				$password = sha1($username);
+			}
 		}
 		$data = [
 			'username' => $username,
-			'first_name' => $query->first_name,
-			'last_name' => $query->last_name,
+			'first_name' => $first_name,
+			'last_name' => $last_name,
 			'password' => $password,
-			'email' => $query->email,
+			'email' => $email,
 			'sub' => $sub
 		];
 		DB::table('oauth_users')->insert($data);
 		$data1 = [
-			'email' => $query->email,
+			'email' => $email,
 			'name' => $username
 		];
 		DB::table('users')->insert($data1);
 		if ($owner == true) {
 			$data1 = [
-				'lastname' => $query->last_name,
-				'firstname' => $query->first_name,
+				'lastname' => $last_name,
+				'firstname' => $first_name,
 				'sub' => $sub
 			];
 			DB::table('owner')->insert($data1);
+		}
+		return true;
+	}
+
+	protected function update_user($user)
+	{
+		$query = DB::table('oauth_users')->where('username', '=', $user['username'])->first();
+		if ($query) {
+			$data = [
+				'first_name' => $user['first_name'],
+				'last_name' => $user['last_name'],
+				'password' => sha1($user['password']),
+				'email' => $user['email'],
+			];
+			DB::table('oauth_users')->where('username', '=', $query->username)->update($data);
+			$data1 = [
+				'email' => $user['email'],
+			];
+			DB::table('users')->where('name', '=', $query->username)->update($data1);
 		}
 		return true;
 	}

@@ -27,10 +27,15 @@
 	<div class="row">
 		<div class="col-md-10 col-md-offset-1">
 			<div class="panel panel-default">
-				<div class="panel-heading">Create your own Trustee Patient Container</div>
+				<div class="panel-heading">Create your own Trustee</div>
 				<div class="panel-body">
-					<p style="text-align: center;">Enter your e-mail address to get your own Trustee Patient Container.  You will be receiving a confirmation e-mail for further instructions.</p>
-					<div class="alert alert-danger" style="text-align: center;"><i class="fa fa-btn fa-exclamation-triangle"></i> Trustee Containers are in Beta Status.  Created containers are for testing only.</div>
+					@if (isset($message_action))
+						<div class="alert alert-danger">
+							<strong>{!! $message_action !!}</strong>
+						</div>
+					@endif
+					<p style="text-align: center;">Enter your e-mail address to get your own Trustee.  You will be receiving a confirmation e-mail for further instructions.</p>
+					<div class="alert alert-danger" style="text-align: center;"><i class="fa fa-btn fa-exclamation-triangle"></i> Trustees are in Beta Status. For testing only.</div>
 					<div style="text-align: center;">
 						<i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>
 					</div>
@@ -50,10 +55,24 @@
 							</div>
 						</div>
 
+						<div class="form-group{{ $errors->has('code') ? ' has-error' : '' }}">
+							<label for="code" class="col-md-4 control-label">Invitation Code</label>
+
+							<div class="col-md-6">
+								<input id="code" class="form-control" name="code" value="{{ old('code') }}">
+
+								@if ($errors->has('code'))
+									<span class="help-block">
+										<strong>{{ $errors->first('code') }}</strong>
+									</span>
+								@endif
+							</div>
+						</div>
+
 						<div class="form-group">
 							<div class="col-md-6 col-md-offset-4">
 								<button type="submit" class="btn btn-primary">
-									<i class="fa fa-btn fa-download"></i> Create a Container for Me
+									<i class="fa fa-btn fa-download"></i> Create a Trustee for Me
 								</button>
 							</div>
 						</div>
@@ -84,6 +103,21 @@
 				</div>
 			</div>
 		</div>
+	</div>
+</div>
+<div id="complete_modal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Creation Pending...</h4>
+      		</div>
+      		<div class="modal-body">
+        		<p>{!! $complete !!}</p>
+      		</div>
+      		<div class="modal-footer">
+        		<a href="{{ route('welcome0') }}" class="btn btn-default">Got It!</a>
+    		</div>
+    	</div>
 	</div>
 </div>
 @endsection
@@ -124,6 +158,10 @@
 			$("#container_yes").show();
 			$("#patient_start").hide();
 		});
+		var complete = '{!! $complete !!}';
+		if (complete !== 'no') {
+			$('#complete_modal').modal('show');
+		}
 	});
 </script>
 @endsection

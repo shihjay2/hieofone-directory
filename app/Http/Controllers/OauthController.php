@@ -7,6 +7,7 @@ use App\User;
 use Artisan;
 use Auth;
 use Crypt;
+use Date;
 use DB;
 use File;
 use Google_Client;
@@ -288,6 +289,7 @@ class OauthController extends Controller
                 }
                 $data2['message_action'] = Session::get('message_action');
                 Session::forget('message_action');
+                $data2['name'] = Session::get('owner');
                 return view('setup_mail', $data2);
             }
         } else {
@@ -319,92 +321,6 @@ class OauthController extends Controller
     public function welcome(Request $request)
     {
         $query = DB::table('owner')->first();
-        // Check for empty forum categories and seed if none
-        $categories = DB::table('chatter_categories')->first();
-        if (! $categories) {
-            DB::table('chatter_categories')->insert([
-                0 => [
-                    'id'         => 1,
-                    'parent_id'  => null,
-                    'order'      => 1,
-                    'name'       => 'Introductions',
-                    'color'      => '#3498DB',
-                    'slug'       => 'introductions',
-                    'created_at' => null,
-                    'updated_at' => null,
-                ],
-                1 => [
-                    'id'         => 2,
-                    'parent_id'  => null,
-                    'order'      => 2,
-                    'name'       => 'General',
-                    'color'      => '#2ECC71',
-                    'slug'       => 'general',
-                    'created_at' => null,
-                    'updated_at' => null,
-                ],
-                2 => [
-                    'id'         => 3,
-                    'parent_id'  => null,
-                    'order'      => 3,
-                    'name'       => 'Feedback',
-                    'color'      => '#9B59B6',
-                    'slug'       => 'feedback',
-                    'created_at' => null,
-                    'updated_at' => null,
-                ],
-                3 => [
-                    'id'         => 4,
-                    'parent_id'  => null,
-                    'order'      => 4,
-                    'name'       => 'Random',
-                    'color'      => '#E67E22',
-                    'slug'       => 'random',
-                    'created_at' => null,
-                    'updated_at' => null,
-                ],
-                4 => [
-                    'id'         => 5,
-                    'parent_id'  => 1,
-                    'order'      => 1,
-                    'name'       => 'Rules',
-                    'color'      => '#227ab5',
-                    'slug'       => 'rules',
-                    'created_at' => null,
-                    'updated_at' => null,
-                ],
-                5 => [
-                    'id'         => 6,
-                    'parent_id'  => 5,
-                    'order'      => 1,
-                    'name'       => 'Basics',
-                    'color'      => '#195a86',
-                    'slug'       => 'basics',
-                    'created_at' => null,
-                    'updated_at' => null,
-                ],
-                6 => [
-                    'id'         => 7,
-                    'parent_id'  => 5,
-                    'order'      => 2,
-                    'name'       => 'Contribution',
-                    'color'      => '#195a86',
-                    'slug'       => 'contribution',
-                    'created_at' => null,
-                    'updated_at' => null,
-                ],
-                7 => [
-                    'id'         => 8,
-                    'parent_id'  => 1,
-                    'order'      => 2,
-                    'name'       => 'About',
-                    'color'      => '#227ab5',
-                    'slug'       => 'about',
-                    'created_at' => null,
-                    'updated_at' => null,
-                ],
-            ]);
-        }
         if ($query) {
             if ($query->homepage == '0') {
                 return redirect()->route('welcome0');
@@ -425,52 +341,63 @@ class OauthController extends Controller
             $data['title'] = 'Participating Patients';
             $data['content'] = 'No patients yet.';
             $data['searchbar'] = 'yes';
+            $data['back'] = '<a href="' . route('patients', ['yes']) . '" class="btn btn-danger" role="button"><i class="fa fa-btn fa-plus"></i> Add a Patient</a>';
             $query = DB::table('oauth_rp')->where('type', '=', 'as')->get();
-    		if ($query) {
+            $query1 = DB::table('invitation')->where('first_name', '=', 'Pending')->where('last_name', '=', 'Pending')->get();
+    		if ($query || $query1) {
                 $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
     			$data['content'] .= '<div class="list-group searchlist">';
                 $data['content'] .= '<a class="list-group-item row"><span class="col-sm-4"><strong>Name</strong></span><span class="col-sm-4"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span></a>';
                 // usort($query, function($a, $b) {
                 //     return $b['last_act'] <=> $a['last_act'];
                 // });
-                foreach ($query as $client) {
-                    $link = '<span class="col-sm-4">';
-                    $rs = DB::table('as_to_rs')->where('as_id', '=', $client->id)->get();
-                    $rs_count=0;
-                    if ($rs) {
-                        foreach ($rs as $rs_row) {
-                            if ($rs_row->rs_public == 0) {
-                                $link .= '<h4><span class="label label-danger">Please Sign In</span></h4>';
-                            } else {
-                                $rs_uri = $rs_row->rs_uri;
-                                if (strpos($rs_row->rs_uri, "/nosh") !== false) {
-                                    $rs_uri . '/uma_auth';
+                if ($query1) {
+                    foreach ($query1 as $pending) {
+                        $link = '<span class="col-sm-4">' . $pending->code . '</span>';
+                        $activity = '<span class="col-sm-3"></span>';
+                        $data['content'] .= '<a href="#" class="list-group-item row"><span class="col-sm-4"><i class="fa fa-btn fa-user"></i>Pending Verification</span>' . $link . $activity . '</a>';
+                    }
+                }
+                if ($query) {
+                    foreach ($query as $client) {
+                        $link = '<span class="col-sm-4">';
+                        $rs = DB::table('as_to_rs')->where('as_id', '=', $client->id)->get();
+                        $rs_count=0;
+                        if ($rs) {
+                            foreach ($rs as $rs_row) {
+                                if ($rs_row->rs_public == 0) {
+                                    $link .= '<h4><span class="label label-danger">Please Sign In</span></h4>';
+                                } else {
+                                    $rs_uri = $rs_row->rs_uri;
+                                    if (strpos($rs_row->rs_uri, "/nosh") !== false) {
+                                        $rs_uri . '/uma_auth';
+                                    }
+                                    if ($rs_count > 0) {
+                                        $link .= '<br>';
+                                    }
+                                    $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></h4>';
+                                    $rs_count++;
                                 }
-                                if ($rs_count > 0) {
-                                    $link .= '<br>';
-                                }
-                                $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></h4>';
-                                $rs_count++;
                             }
                         }
-                    }
-                    $link .= '</span>';
-    				// $link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
-                    if ($client->picture == '' || $client->picture == null) {
-                        $picture = '<i class="fa fa-btn fa-user"></i>';
-                    } else {
-                        $picture = '<img src="' . $client->picture . '" height="30" width="30">';
-                    }
-                    // $timestamp = mt_rand(1, time());
-                    // $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
-                    $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $client->last_activity) . '</span>';
-                    // $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
-                    // $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
-                    // if ($check) {
-                    //     $add = '';
-                    // }
-                	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-4">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
-    			}
+                        $link .= '</span>';
+        				// $link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
+                        if ($client->picture == '' || $client->picture == null) {
+                            $picture = '<i class="fa fa-btn fa-user"></i>';
+                        } else {
+                            $picture = '<img src="' . $client->picture . '" height="30" width="30">';
+                        }
+                        // $timestamp = mt_rand(1, time());
+                        // $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
+                        $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $client->last_activity) . '</span>';
+                        // $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                        // $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
+                        // if ($check) {
+                        //     $add = '';
+                        // }
+                    	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-4">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+        			}
+                }
     			$data['content'] .= '</div>';
     		}
             // $data['back'] = '<a href="' . URL::to('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
@@ -521,6 +448,7 @@ class OauthController extends Controller
     public function privacy_policy(Request $request)
     {
         $data['date'] = 'May 16, 2018';
+        $data['name'] = Session::get('owner');
         return view('privacy_policy', $data);
     }
 
@@ -589,11 +517,14 @@ class OauthController extends Controller
             $data = [
                 'name' => $query->org_name,
                 'text' => $description,
-                'create' => 'no'
+                'create' => 'no',
+                'complete' => 'no'
             ];
             if ($create !== '') {
                 $data['create'] = 'yes';
             }
+            $data['message_action'] = Session::get('message_action');
+            Session::forget('message_action');
             return view('patients', $data);
         } else {
             return redirect()->route('install');
@@ -606,24 +537,37 @@ class OauthController extends Controller
         if ($request->isMethod('post')) {
             if ($code !== 'complete') {
                 $this->validate($request, [
-                    'email' => 'required'
+                    'email' => 'required',
+                    'code' => 'required'
                 ]);
-                $data['code'] = $this->gen_uuid();
-                $data['email'] = $request->input('email');
-                DB::table('invitation')->insert($data);
-                $url = route('container_create', [$data['code']]);
-                $data1['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
-                $data1['message_data'] .= "Please confirm your e-mail so we know you're a real human.<br>";
-                $data1['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
-                $data1['message_data'] .= $url;
-                $title1 = 'Complete your Trustee Patient Container creation from the ' . $owner->org_name . ' Trustee Directory';
-                $to1 = $request->input('email');
-                $this->send_mail('auth.emails.generic', $data1, $title1, $to1);
-                $data6 = [
-                    'name' => $owner->org_name,
-                    'text' => 'Your request for a patient container has been received.  You will be receiving a confirmation e-mail to verify if you hare a human.  Thank you.'
-                ];
-                return view('simple', $data6);
+                // $data['code'] = $this->gen_uuid();
+                // $data['email'] = $request->input('email');
+                // DB::table('invitation')->insert($data);
+                $match = DB::table('invitation')->where('email', '=', $request->input('email'))->where('code', '=', $request->input('code'))->first();
+                if ($match) {
+                    if ($match->first_name == 'Pending' && $match->last_name == 'Pending') {
+                        Session::put('message_action', 'You have already requested a Trustee Authorizaion Server.  Please wait for an email soon when it is ready.');
+                        return redirect()->route('patients', ['yes']);
+                    }
+                    $url = route('container_create', [$data['code']]);
+                    $data1['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
+                    $data1['message_data'] .= "Please confirm your e-mail so we know you're a real human.<br>";
+                    $data1['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
+                    $data1['message_data'] .= $url;
+                    $title1 = 'Complete your Trustee Patient Container creation from the ' . $owner->org_name . ' Trustee Directory';
+                    $to1 = $request->input('email');
+                    $this->send_mail('auth.emails.generic', $data1, $title1, $to1);
+                    $new_data = [
+                        'name' => $owner->org_name,
+                        'text' => '',
+                        'create' => 'yes',
+                        'complete' => 'Your request for a patient container has been received.<br>You will be receiving a confirmation e-mail to verify if you hare a human.<br>Thank you!'
+                    ];
+                    return view('patients', $new_data);
+                } else {
+                    Session::put('message_action', 'Your e-mail address and code do not match.  Try again.');
+                    return redirect()->route('patients', ['yes']);
+                }
             } else {
                 $this->validate($request, [
                     'email' => 'required',
@@ -633,13 +577,13 @@ class OauthController extends Controller
                 ]);
                 $url7 = route('container_create', [$data['code']]);
                 $data7['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
-                $data7['message_data'] .= "Your Trustee Patient Container is ready for use!<br>";
+                $data7['message_data'] .= "Your Trustee Authorization Server is ready for use!<br>";
                 $data7['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>https://';
                 $data7['message_data'] .= $request->input('url');
-                $data7['message_data'] .= '<br><br>If you need to login to the terminal through SSH (Secure Shell), you can set your SSH client or terminal to the same URL above, using port 22.<br><br>';
-                $data7['message_data'] .= 'Your usernmae is ' . $request->input('username') . '<br>';
-                $data7['message_data'] .= 'Your temporary password is ' . $request->input('password') . '<br><br>You will be asked to change your password upon your first login via SSH';
-                $title7 = 'Your Trustee Patient Container has been created!';
+                // $data7['message_data'] .= '<br><br>If you need to login to the terminal through SSH (Secure Shell), you can set your SSH client or terminal to the same URL above, using port 22.<br><br>';
+                // $data7['message_data'] .= 'Your usernmae is ' . $request->input('username') . '<br>';
+                // $data7['message_data'] .= 'Your temporary password is ' . $request->input('password') . '<br><br>You will be asked to change your password upon your first login via SSH';
+                $title7 = 'Your Trustee Authorizaion Server has been created!';
                 $to7 = $request->input('email');
                 $this->send_mail('auth.emails.generic', $data7, $title7, $to7);
                 return 'Message has been sent to the patient';
@@ -672,15 +616,16 @@ class OauthController extends Controller
                     $title3 = 'Create a Trustee container under the ' . $owner->org_name . ' Trustee Directory';
                     $to3 = $owner->email;
                     $this->send_mail('auth.emails.generic', $data3, $title3, $to3);
-                    $data4['code'] = 'Pending';
+                    $data4['first_name'] = 'Pending';
+                    $data4['last_name'] = 'Pending';
                     DB::table('invitation')->where('id', '=', $query->id)->update($data4);
-                    $data5 = [
+                    $new_data = [
                         'name' => $owner->org_name,
-                        'text' => 'You are verfied to be a human and we will be creating your patient container shortly.  Please await an email response when your container is ready for use.  Thank you.',
-                        // 'privatekey' => route('key_download', [$priv_key]),
-                        // 'publickey' => route('key_download', [$pub_key])
+                        'text' => $description,
+                        'create' => 'yes',
+                        'complete' => 'You are verfied to be a human and we will be creating your patient container shortly.<br>Please await an email response when your container is ready for use.<br>Thank you!'
                     ];
-                    return view('simple', $data5);
+                    return view('patients', $new_data);
                 }
             }
         }
@@ -1608,149 +1553,6 @@ class OauthController extends Controller
         }
     }
 
-    public function twitter_redirect()
-    {
-        $query0 = DB::table('oauth_rp')->where('type', '=', 'twitter')->first();
-        config(['services.twitter.client_id' => $query0->client_id]);
-        config(['services.twitter.client_secret' => $query0->client_secret]);
-        config(['services.twitter.redirect' => $query0->redirect_uri]);
-        return Socialite::driver('twitter')->redirect();
-    }
-
-    public function twitter(Request $request)
-    {
-        $query0 = DB::table('oauth_rp')->where('type', '=', 'twitter')->first();
-        config(['services.twitter.client_id' => $query0->client_id]);
-        config(['services.twitter.client_secret' => $query0->client_secret]);
-        config(['services.twitter.redirect' => $query0->redirect_uri]);
-        $user = Socialize::driver('twitter')->user();
-        Session::put('email', $user->getEmail());
-        Session::put('login_origin', 'login_twitter');
-        if (Session::has('uma_permission_ticket') && Session::has('uma_redirect_uri') && Session::has('uma_client_id') && Session::has('email')) {
-            // If generated from rqp_claims endpoint, do this
-            return redirect()->route('rqp_claims');
-        } else {
-            $this->oauth_authenticate($user->getEmail());
-            return redirect()->route('home');
-        }
-    }
-
-    public function mdnosh(Request $request)
-    {
-        // Check if dynamically registered
-        $query0 = DB::table('oauth_rp')->where('type', '=', 'mdnosh')->first();
-        if ($query0) {
-            // Registered
-            $client = [
-                'client_id' => $query0->client_id,
-                'client_secret' => $query0->client_secret
-            ];
-        } else {
-            $client = $this->mdnosh_register_client();
-        }
-        $open_id_url = 'http://noshchartingsystem.com/oidc';
-        $url = route('mdnosh');
-        $oidc = new OpenIDConnectUMAClient($open_id_url, $client['client_id'], $client['client_secret']);
-        $oidc->setRedirectURL($url);
-        $oidc->addScope('openid');
-        $oidc->addScope('email');
-        $oidc->addScope('profile');
-        $oidc->authenticate();
-        $firstname = $oidc->requestUserInfo('given_name');
-        $lastname = $oidc->requestUserInfo('family_name');
-        $email = $oidc->requestUserInfo('email');
-        $npi = $oidc->requestUserInfo('npi');
-        $sub = $oidc->requestUserInfo('sub');
-        $access_token = $oidc->getAccessToken();
-        Session::put('email',  $oidc->requestUserInfo('email'));
-        Session::put('login_origin', 'login_md_nosh');
-        Session::put('npi', $npi);
-        if (Session::has('uma_permission_ticket') && Session::has('uma_redirect_uri') && Session::has('uma_client_id') && Session::has('email')) {
-            // If generated from rqp_claims endpoint, do this
-            return redirect()->route('rqp_claims');
-        } elseif (Session::get('oauth_response_type') == 'code') {
-            $client_id = Session::get('oauth_client_id');
-            $authorized = DB::table('oauth_clients')->where('client_id', '=', $client_id)->where('authorized', '=', 1)->first();
-            if ($authorized) {
-                Session::put('is_authorized', 'true');
-                $owner_query = DB::table('owner')->first();
-                $proxies = DB::table('owner')->where('sub', '!=', $owner_query->sub)->get();
-                $proxy_arr = [];
-                if ($proxies) {
-                    foreach ($proxies as $proxy_row) {
-                        $proxy_arr[] = $proxy_row->sub;
-                    }
-                }
-                if ($owner_query->login_md_nosh == 1) {
-                    // Add user if not added already
-                    $sub_query = DB::table('oauth_users')->where('sub', '=', $sub)->first();
-                    if (!$sub_query) {
-                        $user_data = [
-                            'username' => $sub,
-                            'password' => sha1($sub),
-                            'first_name' => $firstname,
-                            'last_name' => $lastname,
-                            'sub' => $sub,
-                            'email' => $email,
-                            'npi' => $npi
-                        ];
-                        DB::table('oauth_users')->insert($user_data);
-                        $user_data1 = [
-                            'name' => $sub,
-                            'email' => $email
-                        ];
-                        DB::table('users')->insert($user_data1);
-                    }
-                    Session::put('sub', $sub);
-                    Session::save();
-                    $user1 = DB::table('users')->where('name', '=', $sub)->first();
-                    Auth::loginUsingId($user1->id);
-                    return redirect()->route('authorize');
-                } else {
-                    return redirect()->route('login')->withErrors(['tryagain' => 'Please contact the owner of this authorization server for assistance.']);
-                }
-            } else {
-                return redirect()->route('login')->withErrors(['tryagain' => 'Please contact the owner of this authorization server for assistance.']);
-            }
-        } else {
-            $this->oauth_authenticate($oidc->requestUserInfo('email'));
-            return redirect()->route('home');
-        }
-    }
-
-    public function mdnosh_register_client()
-    {
-        $user = DB::table('owner')->where('id', '=', '1')->first();
-        $dob = date('m/d/Y', strtotime($user->DOB));
-        $client_name = 'HIE of One Authorization Server for ' . $user->firstname . ' ' . $user->lastname . ' (DOB: ' . $dob . ')';
-        $open_id_url = 'http://noshchartingsystem.com/oidc';
-        $url = route('mdnosh');
-        $oidc = new OpenIDConnectUMAClient($open_id_url);
-        $oidc->setClientName($client_name);
-        $oidc->setRedirectURL($url);
-        $oidc->register();
-        $client_id = $oidc->getClientID();
-        $client_secret = $oidc->getClientSecret();
-        $data = [
-            'type' => 'mdnosh',
-            'client_id' => $client_id,
-            'client_secret' => $client_secret,
-            'redirect_uri' => $url
-        ];
-        DB::table('oauth_rp')->insert($data);
-        return $data;
-    }
-
-    public function oauth_authenticate($email)
-    {
-        $user = User::where('email', '=', $email)->first();
-        //$query = DB::table('oauth_users')->where('email', '=', $email)->first();
-        if ($user) {
-            Auth::login($user);
-        }
-        return true;
-    }
-
     /**
     * Authorization endpoint
     *
@@ -2095,64 +1897,6 @@ class OauthController extends Controller
         return $return;
     }
 
-    public function reset_demo(Request $request)
-    {
-        if (route('welcome') == 'https://cloud.noshchartingsystem.com/hiedirectory') {
-            $file = '/opt/hieofone-directory/demo_oidc.sql';
-    		$command = "mysql -u " . env('DB_USERNAME', false) . " -p". env('DB_PASSWORD', false) . " oidc_directory < " . $file;
-    		system($command);
-    		$request->session()->flush();
-    		Auth::logout();
-            Session::flush();
-            $mdnosh_url = 'http://noshchartingsystem.com/oidc/reset_demo';
-            return redirect($mdnosh_url);
-        } else {
-            return redirect()->route('welcome');
-        }
-    }
-
-    public function invite_demo(Request $request)
-    {
-        if (route('home') == 'https://shihjay.xyz/home') {
-            if ($request->isMethod('post')) {
-                $this->validate($request, [
-                    'email' => 'required'
-                ]);
-                $data['email'] = $request->input('email');
-                $owner = DB::table('owner')->first();
-                DB::table('oauth_users')->where('sub', '=', $owner->sub)->update($data);
-                $oauth_user = DB::table('oauth_users')->where('sub', '=', $owner->sub)->first();
-                DB::table('users')->where('name', '=', $oauth_user->username)->update($data);
-                $time = time() + 600;
-                $file = $time . ',' . $request->ip();
-                File::put(base_path() . "/.timer", $file);
-                Session::flush();
-                Auth::logout();
-                return redirect()->route('login');
-            } else {
-                $data = [
-                    'noheader' => true,
-                    'timer' => true
-                ];
-                $file = File::get(base_path() . "/.timer");
-                $arr = explode(',', $file);
-                if (time() > $arr[0]) {
-                    $data['timer'] = false;
-                }
-                if ($data['timer'] == true) {
-                    $left = ($arr[0] - time()) / 60;
-                    $data['timer_val'] = round($left);
-                    $data['timer_val1'] = 10 - $data['timer_val'];
-                    $newfile = $arr[0] . ',' . $request->ip();
-                    File::put(base_path() . "/.timer", $newfile);
-                }
-                return view('reset_demo', $data);
-            }
-        } else {
-            return redirect()->route('welcome');
-        }
-    }
-
     public function check_demo(Request $request)
     {
         $file = File::get(base_path() . "/.timer");
@@ -2324,10 +2068,9 @@ class OauthController extends Controller
 			$to = $request->input('email');
 			$this->send_mail('auth.emails.generic', $data2, $title, $to);
 		} else {
-            $query = DB::table('owner')->first();
 			$data2 = [
 				'noheader' => true,
-                'name' => $query->org_name
+                'name' => $owner->org_name
 			];
 			return view('signup', $data2);
 		}
@@ -2356,6 +2099,55 @@ class OauthController extends Controller
         $data['content'] = 'This is a placeholder page for deploying a new HIE of One container instances for a patient.  This will be installed as a subdomain of the directory root domain.';
         return view('home', $data);
     }
+
+    public function support(Request $request)
+	{
+        $owner = DB::table('owner')->first();
+		if ($request->isMethod('post')) {
+			$this->validate($request, [
+				'email' => 'required',
+			]);
+            $text = 'From: ' . $request->input('email') . ';';
+            $html = '<p>From: ' . $request->input('email') . '</p>';
+            if ($request->has('message_text')) {
+                $text .= $request->input('message_text');
+                $html .= '<p>' . $request->input('message_text') . '</p>';
+            }
+            $data = [
+                'subject' => 'Guest Support',
+                'content' => $text,
+                'html' => $html,
+                'status_id' => '1',
+                'priority_id' => '1',
+                'user_id' => '1',
+                'agent_id' => '1',
+                'category_id' => '1',
+                'created_at' => Date::now(),
+                'updated_at' => Date::now()
+            ];
+            $id = DB::table('ticketit')->insertGetId($data);
+            $data3['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
+            $data3['message_data'] .= "You have a guest support question from " . $request->input('email') . "<br>";
+            $data3['message_data'] .= "View it at " . url('/') . '/tickets/' . $id;
+            $title3 = 'New Support Question from ' . $owner->org_name . ' Trustee Directory';
+            $to3 = $owner->email;
+            $this->send_mail('auth.emails.generic', $data3, $title3, $to3);
+            $data2 = [
+				'noheader' => true,
+                'name' => $owner->org_name,
+                'complete' => 'Thank you and we will contact you via email with a response to your question.'
+			];
+            return view('support', $data2);
+		} else {
+			$data2 = [
+				'noheader' => true,
+                'name' => $owner->org_name,
+                'complete' => 'no'
+			];
+			return view('support', $data2);
+		}
+		return redirect()->route('home');
+	}
 
     public function uma_auth(Request $request)
 	{
@@ -2406,7 +2198,7 @@ class OauthController extends Controller
 		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
 		$name = $oidc->requestUserInfo('name');
 		$birthday = $oidc->requestUserInfo('birthday');
-		$refresh_data['as_name'] = $name . ' (DOB: ' . $birthday . ')';
+		// $refresh_data['as_name'] = $name . ' (DOB: ' . $birthday . ')';
 		$refresh_data['picture'] = $oidc->requestUserInfo('picture');
 		DB::table('oauth_rp')->where('id', '=', Session::get('as_id'))->update($refresh_data);
         $owner = DB::table('owner')->first();
@@ -2436,7 +2228,8 @@ class OauthController extends Controller
             $data1 = [
     			'type' => 'as',
     			'as_uri' => $as_uri,
-                'last_activity' => $request->input('last_update')
+                'last_activity' => $request->input('last_update'),
+                'as_name' => $request->input('name')
     		];
             $query = DB::table('oauth_rp')->where('as_uri', '=', $as_uri)->first();
     		if ($query) {
@@ -2445,6 +2238,12 @@ class OauthController extends Controller
     			DB::table('oauth_rp')->where('id', '=', $query->id)->update($data1);
     		} else {
     			$id = DB::table('oauth_rp')->insertGetId($data1);
+                $user = [
+                    'first_name' => $request->input('first_name'),
+                    'last_name' => $request->input('last_name'),
+                    'email' => $request->input('email')
+                ];
+                $this->add_user($user, $request->input('name'), $request->input('password'), false);
     		}
             $rs = json_decode(json_encode($request->input('rs')), true);
             foreach ($rs as $rs_row) {
@@ -2516,6 +2315,13 @@ class OauthController extends Controller
         if ($row) {
             DB::table('oauth_rp')->where('id', '=', $id)->delete();
             DB::table('as_to_rs')->where('as_id', '=', $id)->delete();
+            if ($request->has('name')) {
+                $user = DB::table('oauth_users')->where('username', '=', $request->input('name'))->first();
+                if ($user) {
+                    DB::table('users')->where('name', '=', $request->input('name'))->delete();
+                    DB::table('oauth_users')->where('username', '=', $request->input('name'))->delete();
+                }
+            }
             $return['message'] = 'Directory removed';
         } else {
             $return['message'] = 'Error: Authorization Server not registered';
@@ -2542,10 +2348,19 @@ class OauthController extends Controller
             }
             $data1 = [
                 'as_uri' => $request->input('as_uri'),
-                'name' => $request->input('name'),
+                // 'name' => $request->input('name'),
                 'last_activity' => $request->input('last_update')
             ];
             $row = DB::table('oauth_rp')->where('id', '=', $id)->update($data1);
+            if ($request->has('password')) {
+                $user = [
+                    'first_name' => $request->input('first_name'),
+                    'last_name' => $request->input('last_name'),
+                    'email' => $request->input('email'),
+                    'password' => $request->input('password')
+                ];
+                $this->update_user($user);
+            }
             $return['message'] = 'Update successful';
         } else {
             $return['message'] = 'Error: Authorization Server not registered';
@@ -2715,6 +2530,18 @@ class OauthController extends Controller
     {
         $query = DB::table('owner')->first();
         return $query->org_name;
+    }
+
+    public function check_as(Request $request)
+    {
+        $return = [];
+        $query = DB::table('oauth_rp')->where('type', '=', 'as')->get();
+        if ($query) {
+            foreach ($query as $row) {
+                $return[] = $row->as_name;
+            }
+        }
+        return $return;
     }
 
     public function mailgun(Request $request)

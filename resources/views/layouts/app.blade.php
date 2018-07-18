@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 
-	<title>Directory</title>
+	<title>Directory @yield('page')</title>
 
 	<!-- Styles -->
 	<link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
@@ -60,10 +60,12 @@
 									<li><a href="{{ url('/authorize_user') }}">Pending Authorization</a></li>
 								</ul>
 							</li>
+							<li><a href="{{ url('/make_invitation') }}">Invite</a></li>
 						@else
 							<li><a href="{{ url('/home') }}">My Patients</a></li>
 						@endif
-						<li><a href="{{ url('/forums') }}">Forum</a></li>
+						<li><a href="{{ url('/forum') }}">Forum</a></li>
+						<li><a href="{{ url('/tickets') }}">Support</a></li>
 						<li><a href="{{ url('/reports') }}">Reports</a></li>
 						<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
 					@endif
@@ -78,6 +80,7 @@
 							<li><a href="{{ url('/clinicians') }}">Clinicians</a></li>
 							<!-- <li><a href="{{ url('/others') }}">Others</a></li> -->
 							<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
+							<li><a href="{{ url('/support') }}">Support</a></li>
 							<!-- <li><a href="{{ url('/signup') }}">Sign Up</a></li> -->
 							@if (isset($demo))
 								<li class="dropdown">
@@ -105,13 +108,18 @@
 						@endif
 					@else
 						@if (Session::get('is_owner') == 'yes')
-							<li class="dropdown" style="background-color:#ee5f5b;">
+							<li class="dropdown" id="owner_li">
 						@else
 							<li class="dropdown">
 						@endif
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+							@if (Session::get('is_owner') == 'yes')
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+							@else
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+							@endif
 								{{ Session::get('full_name') }} <span class="caret"></span>
 							</a>
+
 							<ul class="dropdown-menu" role="menu">
 								<li><a href="{{ url('/my_info') }}"><i class="fa fa-btn fa-cogs"></i>My Information</a></li>
 								<li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Sign Out</a></li>
@@ -168,5 +176,6 @@
 		// }, 3000);
 	</script>
 	@yield('js')
+	@yield('footer')
 </body>
 </html>

@@ -25,8 +25,12 @@
         "google/apiclient": "~2.0",
         "simplesoftwareio/simple-qrcode": "~1.4",
         "naviocean/laravel-nameparser": "dev-master",
-        "devdojo/chatter": "0.2.*",
-        "shihjay2/openid-connect-uma-php": "dev-master"
+        "shihjay2/openid-connect-uma-php": "dev-master",
+        "kordy/ticketit": ">=0.4.",
+        "graham-campbell/markdown": "10.*",
+        "jenssegers/date": "*",
+        "riari/laravel-forum": "~4.0",
+        "riari/laravel-forum-frontend": "~1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -787,9 +787,9 @@ class HomeController extends Controller
                 } else {
                     if (Session::get('sub') == $owner->sub) {
                         if (in_array($user->sub, $proxy_arr)) {
-                            $data['content'] .= '<td><a href="' . route('proxy_remove', [$user->sub]) . '" class="btn btn-danger" role="button">Remove As Proxy</a></td>';
+                            $data['content'] .= '<td><a href="' . route('proxy_remove', [$user->sub]) . '" class="btn btn-danger" role="button">Remove As Admin</a></td>';
                         } else {
-                            $data['content'] .= '<td><a href="' . route('proxy_add', [$user->sub]) . '" class="btn btn-success" role="button">Add As Proxy</a></td>';
+                            $data['content'] .= '<td><a href="' . route('proxy_add', [$user->sub]) . '" class="btn btn-success" role="button">Add As Admin</a></td>';
                         }
                     } else {
                         $data['content'] .= '<td></td>';
@@ -936,18 +936,18 @@ class HomeController extends Controller
         if ($request->isMethod('post')) {
             $this->validate($request, [
                 'email' => 'required|unique:users,email',
-                'first_name' => 'required',
-                'last_name' => 'required'
+                // 'first_name' => 'required',
+                // 'last_name' => 'required'
             ]);
-            // Check if
             $access_lifetime = App::make('oauth2')->getConfig('access_lifetime');
-            $code = $this->gen_secret();
+            $code = mt_rand( 10000000, 99999999);
+            // $code = $this->gen_secret();
             $data1 = [
                 'email' => $request->input('email'),
                 'expires' => date('Y-m-d H:i:s', time() + $access_lifetime),
                 'code' => $code,
-                'first_name' => $request->input('first_name'),
-                'last_name' => $request->input('last_name'),
+                // 'first_name' => $request->input('first_name'),
+                // 'last_name' => $request->input('last_name'),
                 'owner' => 'no'
             ];
             if ($request->has('client_id')) {
@@ -955,22 +955,25 @@ class HomeController extends Controller
             }
             DB::table('invitation')->insert($data1);
             // Send email to invitee
-            $url = URL::to('accept_invitation') . '/' . $code;
+            $url = route('patients', ['yes']);
             $query0 = DB::table('oauth_rp')->where('type', '=', 'google')->first();
-            $data2['message_data'] = 'You are invited to the HIE of One Authorization Server for ' . $owner->firstname . ' ' . $owner->lastname . '.<br>';
-            $data2['message_data'] .= 'Go to ' . $url . ' to get registered.';
-            $title = 'Invitation to ' . $owner->firstname . ' ' . $owner->lastname  . "'s Authorization Server";
+            $data2['message_data'] = 'You are invited to create a Trustee Authorization Server.<br>';
+            $data2['message_data'] .= 'Go to ' . $url . ' to get started.<br>';
+            $data2['message_data'] .= 'Your Invitation Code is: ' . $code;
+            $data2['message_data'] .= '<br><br><br>See you soon,<br>From the ' . $owner->org_name . ' Trustee Directory';
+            $title = 'Invitation to get a Trustee Authorization Server from ' . $owner->org_name . ' Trustee Directory';
             $to = $request->input('email');
             $this->send_mail('auth.emails.generic', $data2, $title, $to);
             $data3['name'] = Session::get('owner');
             $data3['title'] = 'Invitation Code';
-            $data3['content'] = '<p>Invitation sent to ' . $request->input('first_name') . ' ' . $request->input('last_name') . ' (' . $to . ')</p>';
-            $data3['content'] .= '<p>Alternatively, show the recently invited guest your QR code:</p><div style="text-align: center;">';
-            $data3['content'] .= QrCode::size(300)->generate($url);
-            $data3['content'] .= '</div>';
+            $data3['content'] = '<p>Invitation sent to ' . $to . '</p>';
+            $data3['content'] .= '<p>Invitation code saved as: ' . $code . '</p>';
+            // $data3['content'] .= '<p>Alternatively, show the recently invited guest your QR code:</p><div style="text-align: center;">';
+            // $data3['content'] .= QrCode::size(300)->generate($url);
+            // $data3['content'] .= '</div>';
             return view('home', $data3);
         } else {
-            $data['title'] = 'Invite a user to the Directory';
+            $data['title'] = 'Invite a user to the get a Trustee Authorizaion Server';
             $data['post'] = route('make_invitation');
             return view('invite', $data);
         }
@@ -1263,6 +1266,7 @@ class HomeController extends Controller
                 $data['homepage'] = $query->homepage;
                 $data['description'] = $query->description;
                 $data['condition'] = $query->condition;
+                $data['name'] = Session::get('owner');
                 return view('settings', $data);
             }
         } else {

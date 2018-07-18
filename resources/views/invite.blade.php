@@ -28,7 +28,7 @@
 							</div>
 						</div>
 
-						<div class="form-group{{ $errors->has('first_name') ? ' has-error' : '' }}">
+						<!-- <div class="form-group{{ $errors->has('first_name') ? ' has-error' : '' }}">
 							<label for="first_name" class="col-md-4 control-label">First Name</label>
 
 							<div class="col-md-6">
@@ -54,7 +54,7 @@
 									</span>
 								@endif
 							</div>
-						</div>
+						</div> -->
 
 						<div class="form-group">
 							<div class="col-md-6 col-md-offset-4">

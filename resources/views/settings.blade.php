@@ -32,7 +32,7 @@
 
 							<div class="col-md-6">
 								<select id="homepage" class="form-control" name="homepage" value="{{ old('homepage', $homepage) }}">
-									<option value="0">Patient Registration</option>
+									<option value="0">Participating Patients</option>
 									<option value="1">Search Page</option>
 								</select>
 								@if ($errors->has('homepage'))
