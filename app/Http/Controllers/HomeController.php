@@ -528,6 +528,258 @@ class HomeController extends Controller
         return redirect()->route('search');
 	}
 
+    // Needs work
+
+    public function uma_list(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $this->validate($request, [
+                'url' => 'required|url'
+            ]);
+            // Register to HIE of One AS - confirm it
+            $this->clean_uma_sessions();
+            $test_uri = rtrim($request->input('url'), '/') . "/.well-known/uma2-configuration";
+            $url_arr = parse_url($test_uri);
+            if (!isset($url_arr['scheme'])) {
+                $test_uri = 'https://' . $test_uri;
+            }
+            $ch = curl_init($test_uri);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $data = curl_exec($ch);
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            if($httpcode>=200 && $httpcode<302){
+                $url_arr = parse_url($test_uri);
+                $as_uri = $url_arr['scheme'] . '://' . $url_arr['host'];
+            } else {
+                return redirect()->back()->withErrors(['url' => 'Try again, URL is invalid, httpcode: ' . $httpcode . ', URL: ' . $request->input('url')]);
+            }
+            $practice = DB::table('practiceinfo')->where('practice_id', '=', Session::get('practice_id'))->first();
+            $client_name = 'mdNOSH - ' . $practice->practice_name;
+            $url1 = route('uma_auth');
+            $oidc = new OpenIDConnectUMAClient($as_uri);
+            $oidc->setClientName($client_name);
+            $oidc->setSessionName('nosh');
+            $oidc->addRedirectURLs($url1);
+            $oidc->addRedirectURLs(route('uma_api'));
+            $oidc->addRedirectURLs(route('uma_aat'));
+            $oidc->addRedirectURLs(route('uma_register_auth'));
+            // $oidc->addRedirectURLs(route('uma_resources'));
+            // $oidc->addRedirectURLs(route('uma_resource_view'));
+            $oidc->addScope('openid');
+            $oidc->addScope('email');
+            $oidc->addScope('profile');
+            $oidc->addScope('address');
+            $oidc->addScope('phone');
+            $oidc->addScope('offline_access');
+            $oidc->addScope('uma_authorization');
+            $oidc->setLogo('https://cloud.noshchartingsystem.com/SAAS-Logo.jpg');
+            $oidc->setClientURI(str_replace('/uma_auth', '', $url1));
+            $oidc->setUMA(true);
+            $oidc->register();
+            $client_id = $oidc->getClientID();
+            $client_secret = $oidc->getClientSecret();
+            $data1 = [
+                'hieofone_as_client_id' => $client_id,
+                'hieofone_as_client_secret' => $client_secret,
+                'hieofone_as_url' => $as_uri
+            ];
+            Session::put('uma_add_patient', $data1);
+            Session::save();
+            return redirect()->route('uma_resource_view', ['new']);
+        } else {
+            $items[] = [
+                'name' => 'url',
+                'label' => "URL of Patient's Authorization Server",
+                'type' => 'text',
+                'required' => true,
+                'default_value' => null
+            ];
+            $form_array = [
+                'form_id' => 'uma_list_form',
+                'action' => route('uma_list'),
+                'items' => $items,
+                'save_button_label' => 'Add New Patient'
+            ];
+            $data['panel_header'] = 'FHIR Connected Patients';
+            $data['content'] = $this->form_build($form_array);
+            $query = DB::table('demographics')->where('hieofone_as_url', '!=', '')->orWhere('hieofone_as_url', '!=', null)->get();
+            if ($query->count()) {
+                $list_array = [];
+                foreach ($query as $row) {
+                    $arr = [];
+                    $dob = date('m/d/Y', strtotime($row->DOB));
+                    $arr['label'] = $row->lastname . ', ' . $row->firstname . ' (DOB: ' . $dob . ') (ID: ' . $row->pid . ')';
+                    $arr['view'] = route('uma_resources', [$row->pid]);
+                    $arr['jump'] = $row->hieofone_as_url . '/nosh/uma_auth';
+                    $list_array[] = $arr;
+                }
+                $data['content'] .= $this->result_build($list_array, 'fhir_list');
+            }
+            $data['message_action'] = Session::get('message_action');
+            Session::forget('message_action');
+            $data['assets_js'] = $this->assets_js();
+            $data['assets_css'] = $this->assets_css();
+            return view('core', $data);
+        }
+    }
+
+    public function uma_register_auth(Request $request)
+    {
+        $oidc = new OpenIDConnectUMAClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
+        $oidc->setSessionName('directory');
+        $oidc->setRedirectURL(route('uma_register_auth'));
+        $oidc->setUMA(true);
+        $oidc->setUMAType('client');
+        $oidc->authenticate();
+        if (Session::has('uma_add_patient')) {
+            $data = Session::get('uma_add_patient');
+            $data['hieofone_as_refresh_token'] = $oidc->getRefreshToken();
+            Session::put('uma_add_patient', $data);
+            $resources = $oidc->get_resources(true);
+            if (count($resources) > 0) {
+                // Get the access token from the AS in anticipation for the RPT
+                Session::put('uma_auth_access_token_directory', $oidc->getAccessToken());
+                Session::put('uma_auth_resources', $resources);
+                $patient_urls = [];
+                foreach ($resources as $resource) {
+                    // Assume there is always a Trustee pNOSH resource and save it
+                    if (strpos($resource['name'], 'from Trustee')) {
+                        foreach ($resource['resource_scopes'] as $scope) {
+                            $scope_arr = explode('/', $scope);
+                            if (in_array('Patient', $scope_arr)) {
+                                Session::put('patient_uri', $scope . '?subject:Patient=1');
+                            }
+                            if (in_array('MedicationStatement', $scope_arr)) {
+                                Session::put('medicationstatement_uri', $scope);
+                            }
+                        }
+                    }
+                }
+                return redirect()->route('uma_aat');
+            } else {
+                Session::put('message_action', 'Error - the authorization you were trying to connect to has no resources.');
+                Session::forget('uma_add_patient');
+                return redirect()->route('uma_list');
+            }
+        } else {
+            $pid = Session::get('uma_resources_start');
+            Session::forget('uma_resources_start');
+            return redirect()->route('uma_resources', [$pid]);
+        }
+    }
+
+    public function uma_resources(Request $request, $id)
+    {
+        $patient = DB::table('demographics')->where('pid', '=', $id)->first();
+        // Get access token from AS in anticipation for geting the RPT; if no refresh token before, get it too.
+        if ($patient->hieofone_as_refresh_token == '' || $patient->hieofone_as_refresh_token == null) {
+            Session::put('uma_resources_start', $id);
+            return redirect()->route('uma_register_auth');
+        }
+        $oidc = new OpenIDConnectUMAClient($patient->hieofone_as_url, $patient->hieofone_as_client_id, $patient->hieofone_as_client_secret);
+        $oidc->setSessionName('nosh');
+        $oidc->setUMA(true);
+        $oidc->refreshToken($patient->hieofone_as_refresh_token);
+        Session::put('uma_auth_access_token_nosh', $oidc->getAccessToken());
+        $resources = $oidc->get_resources(true);
+        Session::put('uma_auth_resources', $resources);
+        $resources_array = $this->fhir_resources();
+        $data['panel_header'] = $patient->firstname . ' ' . $patient->lastname . "'s Patient Summary";
+        $data['content'] = 'No resources available yet.';
+        $data['message_action'] = Session::get('message_action');
+        Session::forget('message_action');
+        $dropdown_array = [];
+        $items = [];
+        $items[] = [
+            'type' => 'item',
+            'label' => 'Back',
+            'icon' => 'fa-chevron-left',
+            'url' => route('uma_list')
+        ];
+        $dropdown_array['items'] = $items;
+        $data['panel_dropdown'] = $this->dropdown_build($dropdown_array);
+        // Look for pNOSH link through registered client to mdNOSH Gateway
+        $data['content'] = '<div class="list-group">';
+        $i = 0;
+        foreach($resources as $resource) {
+            foreach ($resource['resource_scopes'] as $scope) {
+                if (parse_url($scope, PHP_URL_HOST) !== null) {
+                    $fhir_arr = explode('/', $scope);
+                    $resource_type = array_pop($fhir_arr);
+                    if (strpos($resource['name'], 'from Trustee') && $i == 0) {
+                        array_pop($fhir_arr);
+                        $data['content'] .= '<a href="' . implode('/', $fhir_arr) . '/uma_auth" target="_blank" class="list-group-item nosh-no-load"><span style="margin:10px;">Patient Centered Health Record (pNOSH) for ' . $patient->hieofone_as_name . '</span><span class="label label-success">Patient Centered Health Record</span></a>';
+                        $i++;
+                    }
+                    break;
+                }
+            }
+            $data['content'] .= '<a href="' . route('uma_resource_view', [$resource['_id']]) . '" class="list-group-item"><i class="fa ' . $resources_array[$resource_type]['icon'] . ' fa-fw"></i><span style="margin:10px;">' . $resources_array[$resource_type]['name'] . '</span></a>';
+        }
+        $data['content'] .= '</div>';
+        Session::put('uma_pid', $id);
+        Session::put('last_page', $request->fullUrl());
+        if ($id == Session::get('pid')) {
+            $data = array_merge($data, $this->sidebar_build('chart'));
+            $data['assets_js'] = $this->assets_js('chart');
+            $data['assets_css'] = $this->assets_css('chart');
+        } else {
+            $data['assets_js'] = $this->assets_js();
+            $data['assets_css'] = $this->assets_css();
+        }
+        return view('core', $data);
+    }
+
+    public function uma_resource_view(Request $request, $type)
+    {
+        if (Session::has('uma_add_patient')) {
+            $data = Session::get('uma_add_patient');
+            Session::put('uma_uri', $data['hieofone_as_url']);
+            Session::put('uma_client_id', $data['hieofone_as_client_id']);
+            Session::put('uma_client_secret', $data['hieofone_as_client_secret']);
+            Session::put('type', 'Patient');
+        } else {
+            $patient = DB::table('demographics')->where('pid', '=', Session::get('uma_pid'))->first();
+            Session::put('uma_uri', $patient->hieofone_as_url);
+            Session::put('uma_client_id', $patient->hieofone_as_client_id);
+            Session::put('uma_client_secret', $patient->hieofone_as_client_secret);
+            Session::put('uma_as_name', $patient->hieofone_as_name);
+            $resources = Session::get('uma_auth_resources');
+            $key = array_search($type, array_column($resources, '_id'));
+            foreach ($resources[$key]['resource_scopes'] as $scope) {
+                if (parse_url($scope, PHP_URL_HOST) !== null) {
+                    $fhir_arr = explode('/', $scope);
+                    $resource_type = array_pop($fhir_arr);
+                    Session::put('type', $resource_type);
+                    if (strpos($resources[$key]['name'], 'from Trustee')) {
+                        if ($resource_type == 'Patient') {
+                            $scope .= '?subject:Patient=1';
+                        }
+                        Session::put('uma_resource_uri', $scope);
+                        break;
+                    } else {
+                        Session::put('uma_resource_uri', $scope);
+                    }
+                    $name_arr = explode(' from ', $resources[$key]['name']);
+                    Session::put('fhir_name', $name_arr[1]);
+                }
+            }
+        }
+        Session::save();
+        if (Session::has('rpt')) {
+            return redirect()->route('uma_api');
+        } else {
+            if (Session::has('uma_add_patient')) {
+                return redirect()->route('uma_register_auth');
+            } else {
+                return redirect()->route('uma_aat');
+            }
+        }
+    }
+
     /**
      * Client authorization pages.
      *
