@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/font-awesome.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
-    
+
     <style>
     body {
         /* padding: 30px 0; */
@@ -126,8 +126,8 @@
 							</a>
 
 							<ul class="dropdown-menu" role="menu">
-								<li><a href="{{ url('/my_info') }}"><i class="fa fa-btn fa-cogs"></i>My Information</a></li>
-								<li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Sign Out</a></li>
+								<li><a href="{{ url('/my_info') }}"><i class="fa fa-fw fa-btn fa-cogs"></i>My Information</a></li>
+								<li><a href="{{ url('/logout') }}"><i class="fa fa-fw fa-btn fa-sign-out"></i>Sign Out</a></li>
 							</ul>
 						</li>
 					@endif
