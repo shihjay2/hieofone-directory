@@ -584,7 +584,7 @@ class OauthController extends Controller
                 $data7['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
                 $data7['message_data'] .= "Your Trustee has been created and is waiting for you to initialize it and connect it to this Trustee Directory. Please click or go to:<br>https://";
                 $data7['message_data'] .= $request->input('url');
-                $data7['message_data'] .= ' to continue.';
+                $data7['message_data'] .= ' to continue.<br>If you have support questions at any time, please go to the <a href="' . url('/') .'/tickets">Support page</a> in the Directory.';
                 // $data7['message_data'] .= '<br><br>If you need to login to the terminal through SSH (Secure Shell), you can set your SSH client or terminal to the same URL above, using port 22.<br><br>';
                 // $data7['message_data'] .= 'Your usernmae is ' . $request->input('username') . '<br>';
                 // $data7['message_data'] .= 'Your temporary password is ' . $request->input('password') . '<br><br>You will be asked to change your password upon your first login via SSH';

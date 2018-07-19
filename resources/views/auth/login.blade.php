@@ -40,7 +40,7 @@
 							<h4 class="panel-title" style="height:35px;display:table-cell !important;vertical-align:middle;">Sign In</h4>
 						</div>
 						<div class="col-xs-3 text-right">
-							<button type="button" class="btn btn-primary" id="admin_button" title="Administrator Login"><i class="fa fa-btn fa-cogs"></i></button>
+							<button type="button" class="btn btn-primary" id="admin_button" title="Trustee Users/Administrator Login"><i class="fa fa-btn fa-cogs"></i></button>
 						</div>
 					</div>
 				</div>
@@ -65,7 +65,7 @@
 							<label for="username" class="col-md-4 control-label">Username </label>
 
 							<div class="col-md-6">
-								<input id="username" class="form-control" name="username" value="{{ old('username') }}" data-toggle="tooltip" title="Demo Username: AdrianGropper">
+								<input id="username" class="form-control" name="username" value="{{ old('username') }}" data-toggle="tooltip" title="">
 
 								@if ($errors->has('username'))
 									<span class="help-block">
@@ -79,7 +79,7 @@
 							<label for="password" class="col-md-4 control-label">Password</label>
 
 							<div class="col-md-6">
-								<input id="password" type="password" class="form-control" name="password" data-toggle="tooltip" title="Demo Password: demo">
+								<input id="password" type="password" class="form-control" name="password" data-toggle="tooltip" title="">
 
 								@if ($errors->has('password'))
 									<span class="help-block">
