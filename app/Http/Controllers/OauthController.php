@@ -2290,6 +2290,7 @@ class OauthController extends Controller
             		$oidc->addScope('phone');
             		$oidc->addScope('offline_access');
             		$oidc->addScope('uma_authorization');
+                    $oidc->setClientURI(url('/'));
                     $oidc->setUMA(true);
             		$oidc->register();
             		$client_id = $oidc->getClientID();
