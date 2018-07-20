@@ -1207,7 +1207,7 @@ class HomeController extends Controller
             }
             DB::table('invitation')->insert($data1);
             // Send email to invitee
-            $url = route('patients', ['yes']);
+            $url = route('container_create', [$code]);
             $query0 = DB::table('oauth_rp')->where('type', '=', 'google')->first();
             $data2['message_data'] = 'You are invited to create a Trustee Authorization Server.<br>';
             $data2['message_data'] .= 'Go to ' . $url . ' to get started.<br>';

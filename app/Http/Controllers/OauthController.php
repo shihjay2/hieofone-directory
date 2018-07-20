@@ -371,7 +371,7 @@ class OauthController extends Controller
                         if ($rs) {
                             foreach ($rs as $rs_row) {
                                 if ($rs_row->rs_public == 0) {
-                                    $link .= '<h4><span class="label label-danger">Please Sign In</span></h4>';
+                                    $link .= '<h5><span class="label label-danger">Please Sign In</span></h5>';
                                 } else {
                                     $rs_uri = $rs_row->rs_uri;
                                     if (strpos($rs_row->rs_uri, "/nosh") !== false) {
@@ -2000,7 +2000,7 @@ class OauthController extends Controller
     				$link = '<span class="col-sm-4"><h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri'] . '">Patient Centered Health Record</span></h4>';
                     $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri2'] . '">' . $client['as_name2'] . '</span></h4></span>';
                 } else {
-                    $link = '<span class="col-sm-4"><h4><span class="label label-danger">Please Sign In</span></h4></span>';
+                    $link = '<span class="col-sm-4"><h5><span class="label label-danger">Please Sign In</span></h5></span>';
                 }
                 if ($client['picture'] == '' || $client['picture'] == null) {
                     $picture = '<i class="fa fa-btn fa-user"></i>';
