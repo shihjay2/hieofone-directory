@@ -227,52 +227,54 @@ class HomeController extends Controller
 
     public function uma_aat(Request $request)
 	{
-		// Check if call comes from rqp_claims redirect
-		if (Session::has('uma_aat') && Session::has('uma_permission_ticket')) {
-			if (isset($_REQUEST["authorization_state"])) {
-				if ($_REQUEST["authorization_state"] != 'claims_submitted') {
-					if ($_REQUEST["authorization_state"] == 'not_authorized') {
-						$text = 'You are not authorized to have the desired authorization data added.';
-					}
-					if ($_REQUEST["authorization_state"] == 'request_submitted') {
-						$text = 'The authorization server needs additional information in order to determine whether you are authorized to have this authorization data.';
-					}
-					if ($_REQUEST["authorization_state"] == 'need_info') {
-						$text = 'The authorization server requires intervention by the patient to determine whether authorization data can be added. Try again later after receiving any information from the patient regarding updates on your access status.';
-					}
-					return $text;
-				} else {
-					// Great - move on!
-					return redirect()->route('uma_api');
-				}
-			} else {
-				Session::forget('uma_aat');
-				Session::forget('uma_permission_ticket');
-			}
-		}
-		// Get AAT
-		$url_array = ['/nosh/oidc','/nosh/fhir/oidc'];
-		$as_uri = Session::get('uma_uri');
-		$client_id = Session::get('uma_client_id');
-		$client_secret = Session::get('uma_client_secret');
-		$oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
-		$oidc->requestAAT();
-		Session::put('uma_aat', $oidc->getAccessToken());
-		// Get permission ticket
-		$urlinit = $as_uri . '/nosh/fhir/' . Session::get('type') . '?subject:Patient=1';
-		$result = $this->fhir_request($urlinit,true);
-		if (isset($result['error'])) {
-			// error - return something
-			return $result;
-		}
-		$permission_ticket = $result['ticket'];
-		Session::put('uma_permission_ticket', $permission_ticket);
-		Session::save();
-		$as_uri = $result['as_uri'];
-		$url = route('uma_aat');
-		// Requesting party claims
-		$oidc->setRedirectURL($url);
-		$oidc->rqp_claims($permission_ticket);
+        // Check if call comes from rqp_claims redirect
+        if (Session::has('uma_permission_ticket')) {
+            if (isset($_REQUEST["authorization_state"])) {
+                if ($_REQUEST["authorization_state"] != 'claims_submitted') {
+                    if ($_REQUEST["authorization_state"] == 'not_authorized') {
+                        $text = 'You are not authorized to have the desired authorization data added.';
+                    }
+                    if ($_REQUEST["authorization_state"] == 'request_submitted') {
+                        $text = 'The authorization server needs additional information in order to determine whether you are authorized to have this authorization data.';
+                    }
+                    if ($_REQUEST["authorization_state"] == 'need_info') {
+                        $text = 'The authorization server requires intervention by the patient to determine whether authorization data can be added. Try again later after receiving any information from the patient regarding updates on your access status.';
+                    }
+                    $data['title'] = 'Error getting data';
+                    $data['content'] = 'Description:<br>' . $text;
+                    $data['name'] = Session::get('owner');
+                    $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+                    return view('home', $data);
+                } else {
+                    // Great - move on!
+                    return redirect()->route('uma_api');
+                }
+            } else {
+                Session::forget('uma_permission_ticket');
+            }
+        }
+        if (Session::has('uma_add_patient')) {
+            $urlinit = Session::get('patient_uri');
+        } else {
+            $urlinit = Session::get('uma_resource_uri');
+        }
+        $result = $this->fhir_request($urlinit,true);
+        if (isset($result['error'])) {
+            $data['title'] = 'Error getting data';
+            $data['content'] = 'Description:<br>' . $result;
+            $data['name'] = Session::get('owner');
+            $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+            return view('home', $data);
+        }
+        $permission_ticket = $result['ticket'];
+        Session::put('uma_permission_ticket', $permission_ticket);
+        Session::save();
+        $as_uri = $result['as_uri'];
+        $url = route('uma_aat');
+        // Requesting party claims
+        $oidc = new OpenIDConnectUMAClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
+        $oidc->setRedirectURL($url);
+        $oidc->rqp_claims($permission_ticket);
 	}
 
 	public function uma_api(Request $request)
