@@ -79,6 +79,7 @@ class HomeController extends Controller
             }
 		}
         $data['back'] = '<a href="' . URL::to('all_patients') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-users"></i> All Patients</a>';
+        Session::put('last_page', $request->fullUrl());
         return view('home', $data);
     }
 
@@ -131,6 +132,7 @@ class HomeController extends Controller
 			$data['content'] .= '</div>';
 		}
         $data['back'] = '<a href="' . URL::to('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
+        Session::put('last_page', $request->fullUrl());
         return view('home', $data);
     }
 
@@ -185,22 +187,62 @@ class HomeController extends Controller
      */
     public function resources(Request $request, $id)
     {
+        // $client = DB::table('oauth_rp')->where('id', '=', $id)->first();
+		// $data['title'] = $client->as_name . "'s Patient Summary";
+		// $data['message_action'] = $request->session()->get('message_action');
+		// $request->session()->forget('message_action');
+		// $data['back'] = '<a href="' . route('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> My Patients</a>';
+		// $data['content'] = '<div class="list-group">';
+		// $link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
+		// $data['content'] .= '<a href="' . $client->as_uri . '/nosh/uma_auth" target="_blank" class="list-group-item"><span style="margin:10px;">Patient Centered Health Record (pNOSH) for ' . $client->as_name . '</span>' . $link . '</a>';
+		// $data['content'] .= '<a href="' . route('resource_view', ['Condition']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-condition.png" height="20" width="20"><span style="margin:10px;">Conditions</span></a>';
+		// $data['content'] .= '<a href="' . route('resource_view', ['MedicationStatement']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-pharmacy.png" height="20" width="20"><span style="margin:10px;">Medication List</span></a>';
+		// $data['content'] .= '<a href="' . route('resource_view', ['AllergyIntolerance']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-allergy.png" height="20" width="20"><span style="margin:10px;">Allergy List</span></a>';
+		// $data['content'] .= '<a href="' . route('resource_view', ['Immunization']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-immunizations.png" height="20" width="20"><span style="margin:10px;">Immunizations</span></a>';
+		// $data['content'] .= '</div>';
+        // $data['searchbar'] = 'yes';
+		// Session::put('current_client_id', $id);
+		// return view('home', $data);
+
         $client = DB::table('oauth_rp')->where('id', '=', $id)->first();
 		$data['title'] = $client->as_name . "'s Patient Summary";
-		$data['message_action'] = $request->session()->get('message_action');
-		$request->session()->forget('message_action');
-		$data['back'] = '<a href="' . route('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> My Patients</a>';
-		$data['content'] = '<div class="list-group">';
-		$link = '<span class="label label-success pnosh_link" nosh-link="' . $client->as_uri . '/nosh/uma_auth">Patient Centered Health Record</span>';
-		$data['content'] .= '<a href="' . $client->as_uri . '/nosh/uma_auth" target="_blank" class="list-group-item"><span style="margin:10px;">Patient Centered Health Record (pNOSH) for ' . $client->as_name . '</span>' . $link . '</a>';
-		$data['content'] .= '<a href="' . route('resource_view', ['Condition']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-condition.png" height="20" width="20"><span style="margin:10px;">Conditions</span></a>';
-		$data['content'] .= '<a href="' . route('resource_view', ['MedicationStatement']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-pharmacy.png" height="20" width="20"><span style="margin:10px;">Medication List</span></a>';
-		$data['content'] .= '<a href="' . route('resource_view', ['AllergyIntolerance']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-allergy.png" height="20" width="20"><span style="margin:10px;">Allergy List</span></a>';
-		$data['content'] .= '<a href="' . route('resource_view', ['Immunization']) . '" class="list-group-item"><img src="https://cloud.noshchartingsystem.com/i-immunizations.png" height="20" width="20"><span style="margin:10px;">Immunizations</span></a>';
-		$data['content'] .= '</div>';
-        $data['searchbar'] = 'yes';
-		Session::put('current_client_id', $id);
-		return view('home', $data);
+		$data['message_action'] = Session::get('message_action');
+		Session::forget('message_action');
+        // Get access token from AS in anticipation for geting the RPT; if no refresh token before, get it too.
+        $oidc = new OpenIDConnectUMAClient($client->as_uri, $client->client_id, $client->client_secret);
+        $oidc->setSessionName('directory');
+        $oidc->setUMA(true);
+        $oidc->refreshToken($client->refresh_token);
+        Session::put('uma_auth_access_token_nosh', $oidc->getAccessToken());
+        $resources = $oidc->get_resources(true);
+        Session::put('uma_auth_resources', $resources);
+        $resources_array = $this->fhir_resources();
+        $data['content'] = 'No resources available yet.';
+        $data['message_action'] = Session::get('message_action');
+        Session::forget('message_action');
+        $data['back'] = '<a href="' . Session::get('last_page') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Back</a>';
+        // Look for pNOSH link through registered client to mdNOSH Gateway
+        $data['content'] = '<div class="list-group">';
+        $i = 0;
+        foreach($resources as $resource) {
+            foreach ($resource['resource_scopes'] as $scope) {
+                if (parse_url($scope, PHP_URL_HOST) !== null) {
+                    $fhir_arr = explode('/', $scope);
+                    $resource_type = array_pop($fhir_arr);
+                    if (strpos($resource['name'], 'from Trustee') && $i == 0) {
+                        array_pop($fhir_arr);
+                        $data['content'] .= '<a href="' . implode('/', $fhir_arr) . '/uma_auth" target="_blank" class="list-group-item nosh-no-load"><span style="margin:10px;">Patient Centered Health Record (pNOSH) for ' . $patient->hieofone_as_name . '</span><span class="label label-success">Patient Centered Health Record</span></a>';
+                        $i++;
+                    }
+                    break;
+                }
+            }
+            $data['content'] .= '<a href="' . route('resource_view', [$resource['_id']]) . '" class="list-group-item"><i class="fa ' . $resources_array[$resource_type]['icon'] . ' fa-fw"></i><span style="margin:10px;">' . $resources_array[$resource_type]['name'] . '</span></a>';
+        }
+        $data['content'] .= '</div>';
+        Session::put('uma_pid', $id);
+        Session::put('last_page', $request->fullUrl());
+        return view('home', $data);
     }
 
     /**
@@ -216,13 +258,33 @@ class HomeController extends Controller
 		Session::put('uma_uri', $client->as_uri);
 		Session::put('uma_client_id', $client->client_id);
 		Session::put('uma_client_secret', $client->client_secret);
-		Session::put('type', $type);
-		Session::save();
-		if (Session::has('rpt')) {
-			return redirect()->route('uma_api');
-		} else {
-			return redirect()->route('uma_aat');
-		}
+        Session::put('uma_as_name', $client->as_name);
+        $resources = Session::get('uma_auth_resources');
+        $key = array_search($type, array_column($resources, '_id'));
+        foreach ($resources[$key]['resource_scopes'] as $scope) {
+            if (parse_url($scope, PHP_URL_HOST) !== null) {
+                $fhir_arr = explode('/', $scope);
+                $resource_type = array_pop($fhir_arr);
+                Session::put('type', $resource_type);
+                if (strpos($resources[$key]['name'], 'from Trustee')) {
+                    if ($resource_type == 'Patient') {
+                        $scope .= '?subject:Patient=1';
+                    }
+                    Session::put('uma_resource_uri', $scope);
+                    break;
+                } else {
+                    Session::put('uma_resource_uri', $scope);
+                }
+                $name_arr = explode(' from ', $resources[$key]['name']);
+                Session::put('fhir_name', $name_arr[1]);
+            }
+        }
+        Session::save();
+        if (Session::has('rpt')) {
+            return redirect()->route('uma_api');
+        } else {
+            return redirect()->route('uma_aat');
+        }
     }
 
     public function uma_aat(Request $request)
@@ -243,7 +305,7 @@ class HomeController extends Controller
                     $data['title'] = 'Error getting data';
                     $data['content'] = 'Description:<br>' . $text;
                     $data['name'] = Session::get('owner');
-                    $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+                    $data['back'] = '<a href="' . Session::get('last_page') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
                     return view('home', $data);
                 } else {
                     // Great - move on!
@@ -253,11 +315,7 @@ class HomeController extends Controller
                 Session::forget('uma_permission_ticket');
             }
         }
-        if (Session::has('uma_add_patient')) {
-            $urlinit = Session::get('patient_uri');
-        } else {
-            $urlinit = Session::get('uma_resource_uri');
-        }
+        $urlinit = Session::get('uma_resource_uri');
         $result = $this->fhir_request($urlinit,true);
         if (isset($result['error'])) {
             $data['title'] = 'Error getting data';
@@ -277,110 +335,71 @@ class HomeController extends Controller
         $oidc->rqp_claims($permission_ticket);
 	}
 
-	public function uma_api(Request $request)
+    public function uma_api(Request $request)
 	{
-		$as_uri = Session::get('uma_uri');
-		if (!Session::has('rpt')) {
-			// Send permission ticket + AAT to Authorization Server to get RPT
-			$permission_ticket = Session::get('uma_permission_ticket');
-			$client_id = Session::get('uma_client_id');
-			$client_secret = Session::get('uma_client_secret');
-			$url = route('uma_api');
-			$oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
-			$oidc->setAccessToken(Session::get('uma_aat'));
-			$oidc->setRedirectURL($url);
-			$result1 = $oidc->rpt_request($permission_ticket);
-			if (isset($result1['error'])) {
-				// error - return something
-				if ($result1['error'] == 'expired_ticket') {
-				    Session::forget('uma_aat');
-					Session::forget('uma_permission_ticket');
-					return redirect()->route('uma_aat');
-				} else {
-					$data['title'] = 'Error getting data';
-					$data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
-					$data['content'] = 'Description:<br>' . $result1['error'];
-					return view('home', $data);
-				}
-			}
-			$rpt = $result1['rpt'];
-			// Save RPT in session in case for future calls in same session
-			Session::put('rpt', $rpt);
-			Session::save();
-		} else {
-			$rpt = Session::get('rpt');
-		}
-        // Save RPT to indicate successful connection by user for future use
-        $rpt_data['rpt'] = $rpt;
-        $rpt_query = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', Session::get('uma_uri'))->first();
-        if ($rpt_query) {
-            DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', Session::get('uma_uri'))->update($rpt_data);
+        $as_uri = Session::get('uma_uri');
+        if (!Session::has('rpt')) {
+            // Send permission ticket + AAT to Authorization Server to get RPT
+            $permission_ticket = Session::get('uma_permission_ticket');
+            $client_id = Session::get('uma_client_id');
+            $client_secret = Session::get('uma_client_secret');
+            $url = route('uma_api');
+            $oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
+            $oidc->setSessionName('directory');
+            $oidc->setAccessToken(Session::get('uma_auth_access_token_nosh'));
+            $oidc->setRedirectURL($url);
+            $result1 = $oidc->rpt_request($permission_ticket);
+            if (isset($result1['error'])) {
+                // error - return something
+                if ($result1['error'] == 'expired_ticket' || $result1['error'] == 'invalid_grant') {
+                    // Session::forget('uma_aat');
+                    Session::forget('uma_permission_ticket');
+                    return redirect()->route('uma_aat');
+                } else {
+                    $data['title'] = 'Error getting data';
+                    $data['content'] = 'Description:<br>' . $result1['error'];
+                    $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+                    return view('home', $data);
+                }
+            }
+            if (isset($result1['errors'])) {
+                $data['title'] = 'Error getting data';
+                $data['content'] = 'Description:<br>' . $result1['errors'];
+                $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+                return view('home', $data);
+            }
+            $rpt = $result1['access_token'];
+            // Save RPT in session in case for future calls in same session
+            Session::put('rpt', $rpt);
+            Session::save();
         } else {
-            $rpt_data['username'] = Session::get('username');
-            $rpt_data['as_uri'] = Session::get('uma_uri');
-            DB::table('rp_to_users')->insert($rpt_data);
+            $rpt = Session::get('rpt');
         }
-        DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', Session::get('uma_uri'))->update($rpt_data);
-		// Contact pNOSH again, now with RPT
-		$urlinit = $as_uri . '/nosh/fhir/' . Session::get('type') . '?subject:Patient=1';
-		$result3 = $this->fhir_request($urlinit,false,$rpt);
-		if (isset($result3['ticket'])) {
-			// New permission ticket issued, expire rpt session
-			Session::forget('rpt');
-			Session::put('uma_permission_ticket', $result3['ticket']);
-			Session::save();
-			// Get new RPT
-			return redirect()->route('uma_api');
-		}
-		// Format the result into a nice display
-		$data['message_action'] = Session::get('message_action');
-		Session::forget('message_action');
-		$id = Session::get('current_client_id');
-		$client = DB::table('oauth_rp')->where('id', '=', Session::get('current_client_id'))->first();
-		$title_array = [
-			'Condition' => 'Conditions',
-			'MedicationStatement' => 'Medication List',
-			'AllergyIntolerance' => 'Allergy List',
-			'Immunization' => 'Immunizations',
-			'Patient' => 'Patient Information'
-		];
-		$query = DB::table('resource_set')->where('resource_set_id', '=', $id)->first();
-		$data['title'] = $title_array[Session::get('type')] . ' for ' . $client->as_name;
-		$data['back'] = '<a href="' . route('resources', [$id]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
-		$data['content'] = 'None.';
-		$pt_name = '';
-		if (isset($result3['total'])) {
-			if ($result3['total'] != '0') {
-                $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
-				$data['content'] .= '<ul class="list-group searchlist">';
-				foreach ($result3['entry'] as $entry) {
-					if (Session::get('type') == 'Patient' && Session::get('hnosh') == 'true') {
-						$data['title'] = $title_array[Session::get('type')];
-						$data['content'] .= '<li class="list-group-item">' . $entry['resource']['text']['div'];
-						$urlinit1 = $as_uri . '/nosh/fhir/MedicationStatement?subject:Patient=1';
-						$result4 = $this->fhir_request($urlinit1,false,$rpt);
-						if (isset($result4['total'])) {
-							if ($result4['total'] != '0') {
-								$data['content'] .= '<strong>Medications</strong><ul>';
-								foreach ($result4['entry'] as $entry1) {
-									$data['content'] .= '<li>' . $entry1['resource']['text']['div'] . '</li>';
-								}
-								$data['content'] .= '</ul>';
-							}
-						}
-						$data['content'] .= '</li>';
-					} else  {
-						$data['content'] .= '<li class="list-group-item">' . $entry['resource']['text']['div'] . '</li>';
-					}
-					if (Session::get('type') == 'Patient') {
-						$pt_name = $entry['resource']['name'][0]['given'][0] . ' ' . $entry['resource']['name'][0]['family'][0] . ' (DOB: ' . $entry['resource']['birthDate'] . ')';
-					}
-				}
-				$data['content'] .= '</ul>';
-			}
-		}
+        // Contact resource again, now with RPT
+        $urlinit = Session::get('uma_resource_uri');
+        $result3 = $this->fhir_request($urlinit,false,$rpt);
+        if (isset($result3['ticket'])) {
+            // New permission ticket issued, expire rpt session
+            Session::forget('rpt');
+            Session::put('uma_permission_ticket', $result3['ticket']);
+            Session::save();
+            // Get new RPT
+            return redirect()->route('uma_api');
+        }
+        // Format the result into a nice display
+        $data['message_action'] = Session::get('message_action');
+        Session::forget('message_action');
+        $title_array = $this->fhir_resources();
+        $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+        $data['content'] = 'None.';
+        $data['title'] = $title_array[Session::get('type')]['name'] . ' for ' . Session::get('uma_as_name');
+        if (isset($result3['total'])) {
+            if ($result3['total'] != '0') {
+                $data = $this->fhir_display($result3, Session::get('type'), $data);
+            }
+        }
         $data['searchbar'] = 'yes';
-		return view('home', $data);
+        return view('home', $data);
 	}
 
     public function uma_aat_search(Request $request)

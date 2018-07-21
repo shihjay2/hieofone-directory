@@ -108,6 +108,44 @@ class Controller extends BaseController
 		}
 	}
 
+	protected function array_gender()
+    {
+        $gender = [
+            'm' => 'Male',
+            'f' => 'Female',
+            'u' => 'Undifferentiated'
+        ];
+        return $gender;
+    }
+
+	protected function fhir_display($result, $type, $data)
+    {
+        $title_array = $this->fhir_resources();
+        $gender_arr = $this->array_gender();
+        if ($type == 'Patient') {
+            $data['content'] = '<div class="alert alert-success">';
+            $data['content'] .= '<strong>Name:</strong> ' . $result['name'][0]['given'][0] . ' ' . $result['name'][0]['family'][0];
+            $data['content'] .= '<br><strong>Date of Birth:</strong> ' . date('Y-m-d', strtotime($result['birthDate']));
+            $data['content'] .= '<br><strong>Gender:</strong> ' . $gender_arr[strtolower(substr($result['gender'],0,1))];
+            $data['content'] .= '</div>';
+            $data['content'] .= '<div class="list-group">';
+            foreach ($title_array as $title_k=>$title_v) {
+                if ($title_k !== 'Patient') {
+                    $data['content'] .= '<a href="' . route('fhir_connect_display', [$title_k]) . '" class="list-group-item"><i class="fa ' . $title_v['icon'] . ' fa-fw"></i><span style="margin:10px;">' . $title_v['name'] . '</span></a>';
+                }
+            }
+            $data['content'] .= '</div>';
+        } else {
+			$data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
+			$data['content'] .= '<ul class="list-group searchlist">';
+			foreach ($result['entry'] as $entry) {
+				$data['content'] .= '<li class="list-group-item">' . $entry['resource']['text']['div'] . '</li>';
+			}
+			$data['content'] .= '</ul>';
+        }
+        return $data;
+    }
+
 	protected function fhir_request($url, $response_header=false, $token='')
 	{
 		$ch = curl_init();
@@ -147,6 +185,67 @@ class Controller extends BaseController
 		curl_close($ch);
 		return $result;
 	}
+
+	protected function fhir_resources()
+    {
+        $return = [
+            'Condition' => [
+                'icon' => 'fa-bars',
+                'name' => 'Conditions',
+                'table' => 'issues',
+                'order' => 'issue'
+            ],
+            'MedicationStatement' => [
+                'icon' => 'fa-eyedropper',
+                'name' => 'Medications',
+                'table' => 'rx_list',
+                'order' => 'rxl_medication'
+            ],
+            'AllergyIntolerance' => [
+                'icon' => 'fa-exclamation-triangle',
+                'name' => 'Allergies',
+                'table' => 'allergies',
+                'order' => 'allergies_med'
+            ],
+            'Immunization' => [
+                'icon' => 'fa-magic',
+                'name' => 'Immunizations',
+                'table' => 'immunizations',
+                'order' => 'imm_immunization'
+            ],
+            'Patient' => [
+                'icon' => 'fa-user',
+                'name' => 'Patient Information',
+                'table' => 'demographics',
+                'order' => 'pid'
+            ],
+            'Encounter' => [
+                'icon' => 'fa-stethoscope',
+                'name' => 'Encounters',
+                'table' => 'encounters',
+                'order' => 'encounter_cc'
+            ],
+            'FamilyHistory' => [
+                'icon' => 'fa-sitemap',
+                'name' => 'Family History',
+                'table' => 'other_history',
+                'order' => 'oh_fh'
+            ],
+            'Binary' => [
+                'icon' => 'fa-file-text',
+                'name' => 'Documents',
+                'table' => 'documents',
+                'order' => 'documents_desc'
+            ],
+            'Observation' => [
+                'icon' => 'fa-flask',
+                'name' => 'Observations',
+                'table' => 'tests',
+                'order' => 'test_name'
+            ]
+        ];
+        return $return;
+    }
 
 	protected function gen_secret()
 	{
