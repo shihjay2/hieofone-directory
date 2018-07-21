@@ -128,13 +128,13 @@ class Controller extends BaseController
             $data['content'] .= '<br><strong>Date of Birth:</strong> ' . date('Y-m-d', strtotime($result['birthDate']));
             $data['content'] .= '<br><strong>Gender:</strong> ' . $gender_arr[strtolower(substr($result['gender'],0,1))];
             $data['content'] .= '</div>';
-            $data['content'] .= '<div class="list-group">';
-            foreach ($title_array as $title_k=>$title_v) {
-                if ($title_k !== 'Patient') {
-                    $data['content'] .= '<a href="' . route('fhir_connect_display', [$title_k]) . '" class="list-group-item"><i class="fa ' . $title_v['icon'] . ' fa-fw"></i><span style="margin:10px;">' . $title_v['name'] . '</span></a>';
-                }
-            }
-            $data['content'] .= '</div>';
+            // $data['content'] .= '<div class="list-group">';
+            // foreach ($title_array as $title_k=>$title_v) {
+            //     if ($title_k !== 'Patient') {
+            //         $data['content'] .= '<a href="' . route('fhir_connect_display', [$title_k]) . '" class="list-group-item"><i class="fa ' . $title_v['icon'] . ' fa-fw"></i><span style="margin:10px;">' . $title_v['name'] . '</span></a>';
+            //     }
+            // }
+            // $data['content'] .= '</div>';
         } else {
 			$data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
 			$data['content'] .= '<ul class="list-group searchlist">';
