@@ -123,11 +123,12 @@ class Controller extends BaseController
         $title_array = $this->fhir_resources();
         $gender_arr = $this->array_gender();
         if ($type == 'Patient') {
-            $data['content'] = '<div class="alert alert-success">';
-            $data['content'] .= '<strong>Name:</strong> ' . $result['entry'][0]['name'][0]['given'][0] . ' ' . $result['entry'][0]['name'][0]['family'][0];
-            $data['content'] .= '<br><strong>Date of Birth:</strong> ' . date('Y-m-d', strtotime($result['entry'][0]['birthDate']));
-            $data['content'] .= '<br><strong>Gender:</strong> ' . $gender_arr[strtolower(substr($result['entry'][0]['gender'],0,1))];
-            $data['content'] .= '</div>';
+			$data['content'] = json_encode($result);
+            // $data['content'] = '<div class="alert alert-success">';
+            // $data['content'] .= '<strong>Name:</strong> ' . $result['entry'][0]['name'][0]['given'][0] . ' ' . $result['entry'][0]['name'][0]['family'][0];
+            // $data['content'] .= '<br><strong>Date of Birth:</strong> ' . date('Y-m-d', strtotime($result['entry'][0]['birthDate']));
+            // $data['content'] .= '<br><strong>Gender:</strong> ' . $gender_arr[strtolower(substr($result['entry'][0]['gender'],0,1))];
+            // $data['content'] .= '</div>';
             // $data['content'] .= '<div class="list-group">';
             // foreach ($title_array as $title_k=>$title_v) {
             //     if ($title_k !== 'Patient') {
