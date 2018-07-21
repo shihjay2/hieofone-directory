@@ -1444,27 +1444,15 @@ class HomeController extends Controller
         Session::forget('message_action');
         $data['name'] = Session::get('owner');
         $query = DB::table('owner')->first();
-        $data['login_direct'] = '';
-        $data['login_md_nosh'] = '';
-        $data['any_npi'] = '';
-        $data['login_google'] = '';
-        if ($query->login_direct == 1) {
-            $data['login_direct'] = 'checked';
-        }
-        if ($query->login_md_nosh == 1) {
-            $data['login_md_nosh'] = 'checked';
-        }
-        if ($query->any_npi == 1) {
-            $data['any_npi'] = 'checked';
-        }
-        if ($query->login_google == 1) {
-            $data['login_google'] = 'checked';
-        }
-        if ($query->login_uport == 1) {
-            $data['login_uport'] = 'checked';
+        $default_policy_types = $this->default_policy_type();
+        foreach ($default_policy_types as $default_policy_type) {
+            $data[$default_policy_type] = '';
+            if ($query->{$default_policy_type} == 1) {
+                $data[$default_policy_type] = 'checked';
+            }
         }
         $data['content'] = '<div><i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i></div>';
-        $data['content'] .= '<h3>Resource Registration Consent Default Policies</h3>';
+        $data['content'] .= '<h3>Resource Registration Consent Default Policies for Trustee Authorization Servers Your Directory Deploys</h3>';
         $data['content'] .= '<p>You can set default policies (who gets access to your resources) whenever you have a new resource server registered to this authorization server.</p>';
         return view('policies', $data);
     }
@@ -1472,30 +1460,15 @@ class HomeController extends Controller
     public function change_policy(Request $request)
     {
         if ($request->input('submit') == 'save') {
-            if ($request->input('login_direct') == 'on') {
-                $data['login_direct'] = 1;
-            } else {
-                $data['login_direct'] = 0;
-            }
-            if ($request->input('login_md_nosh') == 'on') {
-                $data['login_md_nosh'] = 1;
-            } else {
-                $data['login_md_nosh'] = 0;
-            }
-            if ($request->input('any_npi') == 'on') {
-                $data['any_npi'] = 1;
-            } else {
-                $data['any_npi'] = 0;
-            }
-            if ($request->input('login_google') == 'on') {
-                $data['login_google'] = 1;
-            } else {
-                $data['login_google'] = 0;
-            }
-            if ($request->input('login_uport') == 'on') {
-                $data['login_uport'] = 1;
-            } else {
-                $data['login_uport'] = 0;
+            $default_policy_types = $this->default_policy_type();
+            foreach ($default_policy_types as $default_policy_type) {
+                if ($request->has($default_policy_type)) {
+                    if ($request->input($default_policy_type) == 'on') {
+                        $data[$default_policy_type] = 1;
+                    } else {
+                        $data[$default_policy_type] = 0;
+                    }
+                }
             }
             $query = DB::table('owner')->first();
             DB::table('owner')->where('id', '=', $query->id)->update($data);

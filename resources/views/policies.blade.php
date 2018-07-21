@@ -5,7 +5,7 @@
 	<div class="row">
 		<div class="col-md-10 col-md-offset-1">
 			<div class="panel panel-default">
-				<div class="panel-heading">Resource Registration Consent Default Policies</div>
+				<div class="panel-heading">Resource Registration Consent Default Policies for Trustee Authroization Servers Deployed By This Directory</div>
 				<div class="panel-body">
 					<form class="form-horizontal" role="form" method="POST" action="{{ URL::to('change_policy') }}">
 						<div style="text-align: center;">
@@ -25,15 +25,27 @@
 						<div class="form-group">
 							<div class="col-sm-offset-2 col-sm-10">
 								<div class="checkbox">
-									<label><input type="checkbox" name="login_md_nosh" {{ $login_md_nosh }}> Anyone signed in via mdNOSH sees these Resources</label>
-									<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#login_md_nosh_detail" style="margin-left:20px">Details</button>
+									<label><input type="checkbox" name="public_publish_directory" {!! $public_publish_directory !!}> Anyone can see where this resource is located in a Directory</label>
+									<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#public_publish_directory_detail" style="margin-left:20px">Details</button>
 								</div>
-								<div id="login_md_nosh_detail" class="collapse">
-									<p>mdNOSH is single sign-on solution for healthcare providers.  This allows the providers to access many pNOSH patient centric health records without having to remember different usernames and passwords.</p>
+								<div id="public_publish_directory_detail" class="collapse">
+									<p>Any party that has access to a Directory that you participate in can see where this resource is found.</p>
 								</div>
 							</div>
 						</div>
 						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<div class="checkbox">
+									<label><input type="checkbox" name="private_publish_directory" {!! $private_publish_directory !!}> Only previously authorized users can see where this resource is located in a Directory</label>
+									<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#private_publish_directory_detail" style="margin-left:20px">Details</button>
+								</div>
+								<div id="private_publish_directory_detail" class="collapse">
+									<p>Only previously authorized users that has access to a Directory that you participate in can see where this resource is found.</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- <div class="form-group">
 							<div class="col-sm-offset-2 col-sm-10">
 								<div class="checkbox">
 									<label><input type="checkbox" name="login_uport" {{ $login_uport }}> Anyone signed in via uPort may be able to see these Resources</label>
@@ -43,11 +55,11 @@
 									<p>uPort is a complete self-sovereign identity system built on Ethereum.  By checking this box, any new user with a uPort identity accessing this Authorization Server will notify you via SMS or Email for your decision for the uPort user's access to your Protected Health Information</p>
 								</div>
 							</div>
-						</div>
+						</div> -->
 						<div class="form-group">
 							<div class="col-sm-offset-2 col-sm-10">
 								<div class="checkbox">
-									<label><input type="checkbox" name="any_npi" {{ $any_npi }}> Anyone that has a National Provider Identifier (NPI) sees these Resources"</label>
+									<label><input type="checkbox" name="any_npi" {{ $any_npi }}> Anyone that has a National Provider Identifier (NPI) sees these Resources</label>
 									<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#any_npi_detail" style="margin-left:20px">Details</button>
 								</div>
 								<div id="any_npi_detail" class="collapse">
@@ -76,17 +88,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="form-group">
-							<div class="col-sm-offset-2 col-sm-10">
-								<div class="checkbox">
-									<label><input type="checkbox" name="login_google" {{ $login_google }}> Anyone signed in via Google ID sees these Resources</label>
-									<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#login_google_detail" style="margin-left:20px">Details</button>
-								</div>
-								<div id="login_google_detail" class="collapse">
-									<p>Any party that has a Google ID (they have a Gmail account) will be able to see your Protected Health Information.</p>
-								</div>
-							</div>
-						</div>
+
 						<div class="form-group">
 							<div class="col-md-6 col-md-offset-3">
 								<button type="submit" class="btn btn-success btn-block" name="submit" value="save">

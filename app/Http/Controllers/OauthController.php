@@ -2225,6 +2225,17 @@ class OauthController extends Controller
         }
     }
 
+    public function directory_default_policy_type(Request $request)
+	{
+        $owner = DB::table('owner')->first();
+        $return = [];
+        $default_policy_types = $this->default_policy_type();
+        foreach ($default_policy_types as $default_policy_type) {
+            $return[$default_policy_type] = $owner->{$default_policy_type};
+        }
+		return $return;
+	}
+
     public function directory_registration(Request $request, $id='')
 	{
         $owner = DB::table('owner')->first();

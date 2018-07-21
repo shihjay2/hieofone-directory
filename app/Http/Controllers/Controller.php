@@ -118,6 +118,20 @@ class Controller extends BaseController
         return $gender;
     }
 
+	protected function default_policy_type()
+	{
+		$return = [
+			'login_direct',
+			// 'login_md_nosh',
+			'any_npi',
+			// 'login_google',
+			'login_uport',
+			'public_publish_directory',
+			'private_publish_directory'
+		];
+		return $return;
+	}
+
 	protected function fhir_display($result, $type, $data)
     {
         $title_array = $this->fhir_resources();

@@ -52,6 +52,13 @@
 					@if (!Auth::guest())
 						@if (Session::get('is_owner') == 'yes')
 							<li><a href="{{ url('/setup_mail') }}">E-mail Service</a></li>
+							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"> Settings <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="{{ url('/settings') }}">Directory Settings</a></li>
+									<li><a href="{{ url('/default_policies') }}">Default Policies</a></li>
+									<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
+								</ul>
+							</li>
 							<li><a href="{{ url('/settings') }}">Settings</a></li>
 							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"> Users <span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
@@ -61,13 +68,16 @@
 								</ul>
 							</li>
 							<li><a href="{{ url('/make_invitation') }}">Invite</a></li>
+
 						@else
 							<li><a href="{{ url('/home') }}">My Patients</a></li>
 						@endif
 						<li><a href="{{ url('/forum') }}">Forum</a></li>
 						<li><a href="{{ url('/tickets') }}">Support</a></li>
 						<li><a href="{{ url('/reports') }}">Reports</a></li>
-						<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
+						@if (Session::get('is_owner') == 'no')
+							<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
+						@endif
 					@endif
 				</ul>
 

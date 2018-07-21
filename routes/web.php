@@ -130,8 +130,8 @@ Route::any('password_reset/{id}', ['as' => 'password_reset', 'uses' => 'OauthCon
 Route::any('change_password', ['as' => 'change_password', 'uses' => 'HomeController@change_password']);
 Route::get('my_info', ['as' => 'my_info', 'uses' => 'HomeController@my_info']);
 Route::any('my_info_edit', ['as' => 'my_info_edit', 'uses' => 'HomeController@my_info_edit']);
-// Route::get('default_policies', ['as' => 'default_policies', 'uses' => 'HomeController@default_policies']);
-// Route::post('change_policy', ['as' => 'change_policy', 'uses' => 'HomeController@change_policy']);
+Route::get('default_policies', ['as' => 'default_policies', 'uses' => 'HomeController@default_policies']);
+Route::post('change_policy', ['as' => 'change_policy', 'uses' => 'HomeController@change_policy']);
 Route::post('fhir_edit', ['as' => 'fhir_edit', 'middleware' => 'csrf', 'uses' => 'HomeController@fhir_edit']);
 // Route::post('pnosh_sync', ['as' => 'pnosh_sync', 'uses' => 'OauthController@pnosh_sync']);
 // Route::any('reset_demo', ['as' => 'reset_demo', 'uses' => 'OauthController@reset_demo']);
