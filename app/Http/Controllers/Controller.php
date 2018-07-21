@@ -123,7 +123,7 @@ class Controller extends BaseController
         $title_array = $this->fhir_resources();
         $gender_arr = $this->array_gender();
         if ($type == 'Patient') {
-			$data['content'] = $result['entry'][0]['resource']['text'];
+			$data['content'] = $result['entry'][0]['resource']['text']['div'];
             // $data['content'] = '<div class="alert alert-success">';
             // $data['content'] .= '<strong>Name:</strong> ' . $result['entry'][0]['name'][0]['given'][0] . ' ' . $result['entry'][0]['name'][0]['family'][0];
             // $data['content'] .= '<br><strong>Date of Birth:</strong> ' . date('Y-m-d', strtotime($result['entry'][0]['birthDate']));
