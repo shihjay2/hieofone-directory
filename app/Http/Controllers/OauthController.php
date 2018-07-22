@@ -2261,7 +2261,10 @@ class OauthController extends Controller
                     'email' => $request->input('email')
                 ];
                 $this->add_user($user, $request->input('name'), $request->input('password'), false);
-                DB::table('invitaion')->where('email', '=', $request->input('email'))->delete();
+                $inv = DB::table('invitaion')->where('email', '=', $request->input('email'))->first();
+                if ($inv) {
+                    DB::table('invitaion')->where('email', '=', $request->input('email'))->delete();
+                }
     		}
             $rs = json_decode(json_encode($request->input('rs')), true);
             foreach ($rs as $rs_row) {
