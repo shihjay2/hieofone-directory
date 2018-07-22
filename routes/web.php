@@ -98,10 +98,11 @@ Route::any('uma_register_url', ['as' => 'uma_register_url', 'uses' => 'OauthCont
 Route::get('uma_resources/{id}', ['as' => 'uma_resources', 'uses' => 'HomeController@uma_resources']);
 Route::get('uma_resource_view/{type}', ['as' => 'uma_resource_view', 'uses' => 'HomeController@uma_resource_view']);
 Route::any('directory_auth', ['as' => 'directory_auth', 'uses' => 'OauthController@directory_auth']);
-Route::get('directory_check/{id}', ['as' => 'directory_check', 'uses' => 'HomeController@directory_check']);
+Route::get('directory_check/{id}', ['as' => 'directory_check', 'uses' => 'OauthController@directory_check']);
+Route::any('directory_default_policy_type', ['as' => 'directory_default_policy_type', 'uses' => 'OauthController@directory_default_policy_type']);
 Route::any('directory_registration/{id?}', ['as' => 'directory_registration', 'uses' => 'OauthController@directory_registration']);
-Route::post('directory_remove/{id}', ['as' => 'directory_remove', 'uses' => 'HomeController@directory_remove']);
-Route::post('directory_update/{id}', ['as' => 'directory_update', 'uses' => 'HomeController@directory_update']);
+Route::post('directory_remove/{id}', ['as' => 'directory_remove', 'uses' => 'OauthController@directory_remove']);
+Route::post('directory_update/{id}', ['as' => 'directory_update', 'uses' => 'OauthController@directory_update']);
 Route::any('signup', ['as' => 'signup', 'uses' => 'OauthController@signup']);
 Route::any('signup_confirmation/{code}', ['as' => 'signup_confirmation', 'uses' => 'OauthController@signup_confirmation']);
 Route::any('signup_hieofone', ['as' => 'signup_hieofone', 'uses' => 'OauthController@signup_hieofone']);
