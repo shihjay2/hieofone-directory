@@ -7,6 +7,10 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">Resource Registration Consent Default Policies for Trustee Authroization Servers Deployed By This Directory</div>
 				<div class="panel-body">
+					<div class="alert alert-success">
+						<p>Below are polices that Trustee Authorization Servers will adopt as default when initially deployed</p>
+						<p>These do not pertain to resources registered in the Trustee Authorizaion Server that the Directory itself will be able to access</p>
+					</div>
 					<form class="form-horizontal" role="form" method="POST" action="{{ URL::to('change_policy') }}">
 						<div style="text-align: center;">
 							{!! $content !!}

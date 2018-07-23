@@ -352,20 +352,20 @@ class OauthController extends Controller
     		if ($query || $query1) {
                 $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
     			$data['content'] .= '<div class="list-group searchlist">';
-                $data['content'] .= '<a class="list-group-item row"><span class="col-sm-4"><strong>Name</strong></span><span class="col-sm-4"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span></a>';
+                $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span></a>';
                 // usort($query, function($a, $b) {
                 //     return $b['last_act'] <=> $a['last_act'];
                 // });
                 if ($query1) {
                     foreach ($query1 as $pending) {
-                        $link = '<span class="col-sm-4">' . $pending->code . '</span>';
+                        $link = '<span class="col-sm-5">' . $pending->code . '</span>';
                         $activity = '<span class="col-sm-3"></span>';
-                        $data['content'] .= '<a href="#" class="list-group-item row"><span class="col-sm-4"><i class="fa fa-btn fa-user"></i>Pending Verification</span>' . $link . $activity . '</a>';
+                        $data['content'] .= '<a href="#" class="list-group-item row"><span class="col-sm-3"><i class="fa fa-btn fa-user"></i>Pending Verification</span>' . $link . $activity . '</a>';
                     }
                 }
                 if ($query) {
                     foreach ($query as $client) {
-                        $link = '<span class="col-sm-4">';
+                        $link = '<span class="col-sm-5">';
                         $rs = DB::table('as_to_rs')->where('as_id', '=', $client->id)->get();
                         $rs_count=0;
                         if ($rs) {
@@ -380,7 +380,7 @@ class OauthController extends Controller
                                     if ($rs_count > 0) {
                                         $link .= '<br>';
                                     }
-                                    $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></h4>';
+                                    $link .= '<h5><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></h5>';
                                     $rs_count++;
                                 }
                             }
@@ -400,7 +400,7 @@ class OauthController extends Controller
                         // if ($check) {
                         //     $add = '';
                         // }
-                    	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-4">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+                    	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
         			}
                 }
     			$data['content'] .= '</div>';
@@ -2199,7 +2199,7 @@ class OauthController extends Controller
 		// $oidc->addScope('uma_authorization');
 		// $oidc->addScope('uma_protection');
         $oidc->setUMA(true);
-        $oidc->setUMAType('client');
+        $oidc->setUMAType('resource_server');
 		$oidc->authenticate();
 		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
 		$name = $oidc->requestUserInfo('name');
@@ -2277,9 +2277,15 @@ class OauthController extends Controller
                 ];
                 DB::table('as_to_rs')->insert($data);
             }
+            $policies = [];
+            $default_policy_types = $this->default_policy_type();
+            foreach ($default_policy_types as $default_policy_type) {
+                $policies[$default_policy_type] = $owner->{$default_policy_type};
+            }
             $return = [
                 'id' => $id,
-                'uri' => route('directory_registration', [$id])
+                'uri' => route('directory_registration', [$id]),
+                'policies' => $policies
             ];
             return $return;
         } else {
@@ -2306,6 +2312,7 @@ class OauthController extends Controller
             		$oidc->addScope('phone');
             		$oidc->addScope('offline_access');
             		$oidc->addScope('uma_authorization');
+                    $oidc->addScope('uma_protection');
                     $oidc->setClientURI(url('/'));
                     $oidc->setUMA(true);
             		$oidc->register();
