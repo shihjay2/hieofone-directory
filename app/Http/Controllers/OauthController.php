@@ -1272,7 +1272,7 @@ class OauthController extends Controller
                                         }
                                     }
                                     file_put_contents($filename, $file);
-                                    if ($filename == 'composer.json') {
+                                    if ($filename == 'composer.json' || $filename == 'composer.lock') {
                                         $composer = true;
                                     }
                                 }
@@ -2192,14 +2192,14 @@ class OauthController extends Controller
 		$oidc = new OpenIDConnectUMAClient($open_id_url, $client_id, $client_secret);
         $oidc->setSessionName('directory');
 		$oidc->setRedirectURL($url);
-		// $oidc->addScope('openid');
-		// $oidc->addScope('email');
-		// $oidc->addScope('profile');
-		// $oidc->addScope('offline_access');
-		// $oidc->addScope('uma_authorization');
-		// $oidc->addScope('uma_protection');
+		$oidc->addScope('openid');
+		$oidc->addScope('email');
+		$oidc->addScope('profile');
+		$oidc->addScope('offline_access');
+		$oidc->addScope('uma_authorization');
+		$oidc->addScope('uma_protection');
         $oidc->setUMA(true);
-        $oidc->setUMAType('resource_server');
+        // $oidc->setUMAType('resource_server');
 		$oidc->authenticate();
 		$refresh_data['refresh_token'] = $oidc->getRefreshToken();
 		$name = $oidc->requestUserInfo('name');
