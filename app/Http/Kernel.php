@@ -52,6 +52,7 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'token' => \App\Http\Middleware\TokenMiddleware::class,
-        'csrf' => \App\Http\Middleware\VerifyCsrfToken::class
+        'csrf' => \App\Http\Middleware\VerifyCsrfToken::class,
+        'uma' => \App\Http\Middleware\Uma::class,
     ];
 }

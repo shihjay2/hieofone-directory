@@ -1452,8 +1452,8 @@ class HomeController extends Controller
             }
         }
         $data['content'] = '<div><i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i></div>';
-        $data['content'] .= '<h3>Resource Registration Consent Default Policies for Trustee Authorization Servers Your Directory Deploys</h3>';
-        $data['content'] .= '<p>You can set default policies (who gets access to your resources) whenever you have a new resource server registered to this authorization server.</p>';
+        $data['content'] .= '<h5>Default Policies for Trustee Authorization Servers Your Directory Deploys</h5>';
+        // $data['content'] .= '<p>You can set default policies (who gets access to your resources) whenever you have a new resource server registered to this authorization server.</p>';
         return view('policies', $data);
     }
 

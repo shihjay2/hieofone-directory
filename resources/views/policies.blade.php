@@ -5,9 +5,9 @@
 	<div class="row">
 		<div class="col-md-10 col-md-offset-1">
 			<div class="panel panel-default">
-				<div class="panel-heading">Resource Registration Consent Default Policies for Trustee Authroization Servers Deployed By This Directory</div>
+				<div class="panel-heading">Default Policies for Trustee Authroization Servers Deployed By This Directory</div>
 				<div class="panel-body">
-					<div class="alert alert-success">
+					<div class="alert alert-info">
 						<p>Below are polices that Trustee Authorization Servers will adopt as default when initially deployed</p>
 						<p>These do not pertain to resources registered in the Trustee Authorizaion Server that the Directory itself will be able to access</p>
 					</div>
@@ -45,6 +45,17 @@
 								</div>
 								<div id="private_publish_directory_detail" class="collapse">
 									<p>Only previously authorized users that has access to a Directory that you participate in can see where this resource is found.</p>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<div class="checkbox">
+									<label><input type="checkbox" name="last_activity" {!! $last_activity !!}> Publish the most recent date and time when this Authorization was active to a Directory</label>
+									<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#last_activity_detail" style="margin-left:20px">Details</button>
+								</div>
+								<div id="last_activity_detail" class="collapse">
+									<p>Activty of an authorizaion server refers to when a client attempts to view/edit a resource, adding/updating/removing a resource server, or registering new clients</p>
 								</div>
 							</div>
 						</div>

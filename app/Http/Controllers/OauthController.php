@@ -400,7 +400,8 @@ class OauthController extends Controller
                         // if ($check) {
                         //     $add = '';
                         // }
-                    	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+                    	// $data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+                        $data['content'] .= '<a href="' . $client->as_uri . '" class="list-group-item row" target="_blank"><span class="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
         			}
                 }
     			$data['content'] .= '</div>';
@@ -2208,6 +2209,32 @@ class OauthController extends Controller
 		$refresh_data['picture'] = $oidc->requestUserInfo('picture');
 		DB::table('oauth_rp')->where('id', '=', Session::get('as_id'))->update($refresh_data);
         $owner = DB::table('owner')->first();
+        // Register last activity resources
+        $resource_set_array = [];
+        $resource_set_array[] = [
+            'name' => 'Last Activity from Trustee',
+            'icon' => '',
+            'scopes' => [
+                route('LastActivity.show', [Session::get('as_id')]),
+                route('LastActivity.update', [Session::get('as_id')]),
+                route('LastActivity.destroy', [Session::get('as_id')])
+            ]
+        ];
+        foreach ($resource_set_array as $resource_set_item) {
+            $response = $oidc->resource_set($resource_set_item['name'], $resource_set_item['icon'], $resource_set_item['scopes']);
+            if (isset($response['resource_set_id'])) {
+                foreach ($resource_set_item['scopes'] as $scope_item) {
+                    $response_data1 = [
+                        'resource_set_id' => $response['resource_set_id'],
+                        'scope' => $scope_item,
+                        'user_access_policy_uri' => $response['user_access_policy_uri'],
+                        'as_id' => Session::get('as_id')
+                    ];
+                    DB::table('uma')->insert($response_data1);
+                    $this->audit('Add');
+                }
+            }
+        }
         $params = [
             'name' => $owner->org_name,
             'directory_id' => Session::get('as_id')
