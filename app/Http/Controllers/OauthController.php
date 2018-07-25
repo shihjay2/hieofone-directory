@@ -371,7 +371,7 @@ class OauthController extends Controller
                         if ($rs) {
                             foreach ($rs as $rs_row) {
                                 if ($rs_row->rs_public == 0) {
-                                    $link .= '<h5><span class="label label-danger">Please Sign In</span></h5>';
+                                    $link .= '<p><span class="label label-danger">Please Sign In</span></p>';
                                 } else {
                                     $rs_uri = $rs_row->rs_uri;
                                     if (strpos($rs_row->rs_uri, "/nosh") !== false) {
@@ -380,7 +380,7 @@ class OauthController extends Controller
                                     if ($rs_count > 0) {
                                         $link .= '<br>';
                                     }
-                                    $link .= '<h5><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></h5>';
+                                    $link .= '<p><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></p>';
                                     $rs_count++;
                                 }
                             }
@@ -1998,10 +1998,10 @@ class OauthController extends Controller
             $data['content'] .= '</a>';
 			foreach ($query as $client) {
                 if ($login == 'yes') {
-    				$link = '<span class="col-sm-4"><h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri'] . '">Patient Centered Health Record</span></h4>';
-                    $link .= '<h4><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri2'] . '">' . $client['as_name2'] . '</span></h4></span>';
+    				$link = '<span class="col-sm-4"><p><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri'] . '">Patient Centered Health Record</span></p>';
+                    $link .= '<p><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri2'] . '">' . $client['as_name2'] . '</span></p></span>';
                 } else {
-                    $link = '<span class="col-sm-4"><h5><span class="label label-danger">Please Sign In</span></h5></span>';
+                    $link = '<span class="col-sm-4"><p><span class="label label-danger">Please Sign In</span></p></span>';
                 }
                 if ($client['picture'] == '' || $client['picture'] == null) {
                     $picture = '<i class="fa fa-btn fa-user"></i>';
@@ -2231,7 +2231,6 @@ class OauthController extends Controller
                         'as_id' => Session::get('as_id')
                     ];
                     DB::table('uma')->insert($response_data1);
-                    $this->audit('Add');
                 }
             }
         }
