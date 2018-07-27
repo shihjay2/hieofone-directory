@@ -26,7 +26,7 @@ class AddErrorToOidcRelayTable extends Migration
     public function down()
     {
         Schema::table('oidc_relay', function (Blueprint $table) {
-            //
+            $table->dropColumn('error');
         });
     }
 }
