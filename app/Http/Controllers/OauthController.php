@@ -2646,7 +2646,7 @@ class OauthController extends Controller
             if ($httpCode !== 404 && $httpCode !== 0) {
                 if ($return_arr[0]['value'] == $_SERVER['REMOTE_ADDR']) {
                     // called from pNOSH or AS to set state with the origin
-                    $query2 = DB::table('oauth_relay')->where('state', '=', $request->input('state'))->first();
+                    $query2 = DB::table('oidc_relay')->where('state', '=', $request->input('state'))->first();
                     if ($query2) {
                         return 'Not authorized - duplicate state';
                     } else {
@@ -2672,9 +2672,9 @@ class OauthController extends Controller
             }
         } else {
             if ($state !== '') {
-                $query2 = DB::table('oauth_relay')->where('state', '=', $state)->first();
+                $query2 = DB::table('oidc_relay')->where('state', '=', $state)->first();
                 if ($query2) {
-                    DB::table('oauth_relay')->where('state', '=', $state)->delete();
+                    DB::table('oidc_relay')->where('state', '=', $state)->delete();
                     if ($query2->error !== null && $query2->error !== '') {
                         $return['error'] = $query2->error;
                     } else {
