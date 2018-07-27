@@ -2646,28 +2646,23 @@ class OauthController extends Controller
             if ($httpCode !== 404 && $httpCode !== 0) {
                 if ($return_arr[0]['value'] == $_SERVER['REMOTE_ADDR']) {
                     // called from pNOSH or AS to set state with the origin
-                    $query = DB::table('oauth_rp')->where('as_uri', '=', $request->input('as_uri'))->where('type', '=', 'as')->first();
-                    if ($query) {
-                        $query2 = DB::table('oauth_relay')->where('state', '=', $request->input('state'))->first();
-                        if ($query2) {
-                            return 'Not authorized - duplicate state';
-                        } else {
-                            $data = [
-                                'state' => $request->input('state'),
-                                'origin_uri' => $request->input('origin_uri'),
-                                'response_uri' => $request->input('response_uri'),
-                                'fhir_url' => $request->input('fhir_url'),
-                                'fhir_auth_url' => $request->input('fhir_auth_url'),
-                                'fhir_token_url' => $request->input('fhir_token_url'),
-                                'type' => $request->input('type'),
-                                'cms_pid' => $request->input('cms_pid'),
-                                'refresh_token' => $request->input('refresh_token')
-                            ];
-                            DB::table('oidc_relay')->insert($data);
-                            return 'OK';
-                        }
+                    $query2 = DB::table('oauth_relay')->where('state', '=', $request->input('state'))->first();
+                    if ($query2) {
+                        return 'Not authorized - duplicate state';
                     } else {
-                        return 'Not authorized - no authorization server registered.';
+                        $data = [
+                            'state' => $request->input('state'),
+                            'origin_uri' => $request->input('origin_uri'),
+                            'response_uri' => $request->input('response_uri'),
+                            'fhir_url' => $request->input('fhir_url'),
+                            'fhir_auth_url' => $request->input('fhir_auth_url'),
+                            'fhir_token_url' => $request->input('fhir_token_url'),
+                            'type' => $request->input('type'),
+                            'cms_pid' => $request->input('cms_pid'),
+                            'refresh_token' => $request->input('refresh_token')
+                        ];
+                        DB::table('oidc_relay')->insert($data);
+                        return 'OK';
                     }
                 } else {
                     return 'Not authorized - origin call not coming from the same server.';
