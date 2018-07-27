@@ -1231,7 +1231,7 @@ class HomeController extends Controller
             $url = route('container_create', [$code]);
             $query0 = DB::table('oauth_rp')->where('type', '=', 'google')->first();
             $data2['message_data'] = 'You are invited to create a Trustee Authorization Server.<br>';
-            $data2['message_data'] .= 'Go to <a href="' . $url . '" target="_blank">' . $url . '</a>to get started.<br>';
+            $data2['message_data'] .= 'Go to <a href="' . $url . '" target="_blank">' . $url . '</a> to get started.<br>';
             $data2['message_data'] .= 'Your Invitation Code is: ' . $code;
             $data2['message_data'] .= '<br><br><br>See you soon,<br>From the ' . $owner->org_name . ' Trustee Directory';
             $title = 'Invitation to get a Trustee Authorization Server from ' . $owner->org_name . ' Trustee Directory';

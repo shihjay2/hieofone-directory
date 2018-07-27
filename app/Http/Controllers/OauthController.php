@@ -2626,4 +2626,241 @@ class OauthController extends Controller
             return "Try again.";
         }
     }
+
+    public function oidc_relay(Request $request, $state='')
+    {
+        if ($request->isMethod('post')) {
+            $dns_uri = 'https://dns-api.org/A/' . $request->input('root_uri');
+            $ch = curl_init();
+            curl_setopt($ch,CURLOPT_URL, $dns_uri);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch,CURLOPT_FAILONERROR,1);
+            curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+            curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+            curl_setopt($ch,CURLOPT_TIMEOUT, 60);
+            curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
+            $return = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close ($ch);
+            $return_arr = json_decode($return, true);
+            if ($httpCode !== 404 && $httpCode !== 0) {
+                if ($return_arr[0]['value'] == $_SERVER['REMOTE_ADDR']) {
+                    // called from pNOSH or AS to set state with the origin
+                    $query = DB::table('oauth_rp')->where('as_uri', '=', $request->input('as_uri'))->where('type', '=', 'as')->first();
+                    if ($query) {
+                        $query2 = DB::table('oauth_relay')->where('state', '=', $request->input('state'))->first();
+                        if ($query2) {
+                            return 'Not authorized - duplicate state';
+                        } else {
+                            $data = [
+                                'state' => $request->input('state'),
+                                'origin_uri' => $request->input('origin_uri'),
+                                'response_uri' => $request->input('response_uri'),
+                                'fhir_url' => $request->input('fhir_url'),
+                                'fhir_auth_url' => $request->input('fhir_auth_url'),
+                                'fhir_token_url' => $request->input('fhir_token_url'),
+                                'type' => $request->input('type'),
+                                'cms_pid' => $request->input('cms_pid'),
+                                'refresh_token' => $request->input('refresh_token')
+                            ];
+                            DB::table('oidc_relay')->insert($data);
+                            return 'OK';
+                        }
+                    } else {
+                        return 'Not authorized - no authorization server registered.';
+                    }
+                } else {
+                    return 'Not authorized - origin call not coming from the same server.';
+                }
+            } else {
+                return 'Not authorized - origin call check not working properly.';
+            }
+        } else {
+            if ($state !== '') {
+                $query2 = DB::table('oauth_relay')->where('state', '=', $state)->first();
+                if ($query2) {
+                    DB::table('oauth_relay')->where('state', '=', $state)->delete();
+                    if ($query2->error !== null && $query2->error !== '') {
+                        $return['error'] = $query2->error;
+                    } else {
+                        $return = [
+                            'access_token' => $query2->access_token,
+                            'patient_token' => $query2->patient_token,
+                            'refresh_token' => $query2->refresh_token,
+                            'patient' => $query2->patient
+                        ];
+                    }
+                } else {
+                    $return['error'] = 'Not authorized - state does not exist.';
+                }
+            } else {
+                $return['error'] = 'Not authorized - no state given.';
+            }
+            return $return;
+        }
+    }
+
+    public function oidc_relay_start(Request $request, $state)
+    {
+        Session::put('oidc_state', $state);
+        return redirect()->route('oidc_relay_connect');
+    }
+
+    public function oidc_relay_connect(Request $request)
+    {
+        $state = Session::get('oidc_state');
+        // Check if user comes from associated AS
+        $as = DB::table('oidc_relay')->where('state', '=', $state)->first();
+        if ($as) {
+            if ($as->type == 'epic') {
+                if (env('OPENEPIC_CLIENT_ID') == null) {
+                    $data1['error'] = 'OpenEpic Client ID is not set.';
+                    Session::forget('oidc_state');
+                    DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
+                    return redirect($as->response_uri);
+                }
+                // Sanity checks
+                if ($as->refresh_token == '') {
+                    if ($as->fhir_auth_url == '') {
+                        $data1['error'] = 'fhir_auth_url is not set.';
+                        Session::forget('oidc_state');
+                        DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
+                        return redirect($as->response_uri);
+                    }
+                    if ($as->fhir_token_url == '') {
+                        $data1['error'] = 'fhir_token_url is not set.';
+                        Session::forget('oidc_state');
+                        DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
+                        return redirect($as->response_uri);
+                    }
+                    if ($as->fhir_url == '') {
+                        $data1['error'] = 'fhir_url is not set.';
+                        Session::forget('oidc_state');
+                        DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
+                        return redirect($as->response_uri);
+                    }
+                }
+                $client_id = env('OPENEPIC_CLIENT_ID');
+                if ($as->fhir_url == 'https://open-ic.epic.com/argonaut/api/FHIR/Argonaut/') {
+                    if (env('OPENEPIC_SANDBOX_CLIENT_ID') == null) {
+                        $data1['error'] = 'OpenEpic Sandbox Client ID is not set.';
+                        DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
+                        return redirect($as->response_uri);
+                    }
+                    $client_id = env('OPENEPIC_SANDBOX_CLIENT_ID');
+                }
+                $client_secret = '';
+                $oidc = new OpenIDConnectUMAClient($as->fhir_auth_url, $client_id, $client_secret);
+                $oidc->setSessionName('directory');
+                if ($as->refresh_token !== '') {
+                    $oidc->refreshToken($as->refresh_token);
+                } else {
+                    $oidc->setRedirectURL(route('oidc_relay_connect'));
+                    $oidc->providerConfigParam(['authorization_endpoint' => $as->fhir_auth_url]);
+                    $oidc->providerConfigParam(['token_endpoint' => $as->fhir_token_url]);
+                    $oidc->setAud($as->fhir_url);
+                    $oidc->addScope('patient/*.read');
+                    $oidc->addScope('user/*.*');
+                    $oidc->addScope('openid');
+                    $oidc->addScope('profile');
+                    $oidc->addScope('launch');
+                    $oidc->addScope('launch/patient');
+                    $oidc->addScope('offline_access');
+                    $oidc->addScope('online_access');
+                    $oidc->authenticate();
+                }
+                $data2 = [
+                    'access_token' => $oidc->getAccessToken(),
+                    'patient_token' => $oidc->getPatientToken(),
+                    'patient' => '',
+                    'refresh_token' => ''
+                ];
+            }
+            if ($as->type == 'cms_bluebutton_sandbox') {
+                if (env('CMS_BLUEBUTTON_SANDBOX_CLIENT_ID') == null || env('CMS_BLUEBUTTON_SANDBOX_CLIENT_SECRET') == null) {
+                    $data1['error'] = 'CMS Bluebuton Sandbox credentials are not set.';
+                    DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
+                    return redirect($as->response_uri);
+                }
+                $base_url = 'https://sandbox.bluebutton.cms.gov';
+                $cms_pid = '20140000008325';
+                $token_url = $base_url . '/v1/fhir/Patient/'. $cms_pid;
+                $authorization_endpoint = $base_url . '/v1/o/authorize/';
+                $token_endpoint = $base_url . '/v1/o/token/';
+                $client_id = env('CMS_BLUEBUTTON_SANDBOX_CLIENT_ID');
+                $client_secret = env('CMS_BLUEBUTTON_SANDBOX_CLIENT_SECRET');
+                // $client_id = 'g64gaSFq972Jpk88Ql8ZoO307jsbZyaSXtrVnfql';
+                // $client_secret = 'EiyTnDZnBR1p2OhLWBFpr0qV4SNXDw10IGwtEGf2B8sgJploBJ2NhmaQSqdcSO7eNi4xIxbP5Bk8wPvHnqdlaMLLImYCJF2EzKW5ie7snbNm5Joyphf87RvzDl7r6cO0';
+                $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
+                $oidc->setSessionName('directory');
+                if ($as->refresh_token !== '') {
+                    $oidc->refreshToken($as->refresh_token);
+                } else {
+                    $oidc->setRedirectURL(route('oidc_relay_connect'));
+                    $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
+                    $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
+                    $oidc->addScope('patient/Patient.read');
+                    $oidc->addScope('patient/ExplanationOfBenefit.read');
+                    $oidc->addScope('patient/Coverage.read');
+                    $oidc->addScope('profile');
+                    $oidc->authenticate();
+                }
+                $result_token = json_decode($oidc->getResultToken(), true);
+                $cms_pid = $result_token['patient'];
+                $data2 = [
+                    'access_token' => $oidc->getAccessToken(),
+                    'patient_token' => $oidc->getPatientToken(),
+                    'patient' => $result_token['patient'],
+                    'refresh_token' => $oidc->getRefreshToken(),
+                ];
+            }
+            if ($as->type == 'cms_bluebutton') {
+                if (env('CMS_BLUEBUTTON_CLIENT_ID') == null || env('CMS_BLUEBUTTON_CLIENT_SECRET') == null) {
+                    $data1['error'] = 'CMS Bluebuton credentials are not set.';
+                    DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
+                    return redirect($as->response_uri);
+                }
+                // Sanity checks
+                if ($as->refresh_token == '') {
+                    if ($as->cms_pid == '') {
+                        $data1['error'] = 'cms_pid is not set.';
+                        Session::forget('oidc_state');
+                        DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
+                        return redirect($as->response_uri);
+                    }
+                }
+                $base_url = 'https://api.bluebutton.cms.gov';
+                $token_url = $base_url . '/v1/fhir/Patient/'. $as->cms_pid;
+                $authorization_endpoint = $base_url . '/v1/o/authorize/';
+                $token_endpoint = $base_url . '/v1/o/token/';
+                $client_id = env('CMS_BLUEBUTTON_CLIENT_ID');
+                $client_secret = env('CMS_BLUEBUTTON_CLIENT_SECRET');
+                $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
+                $oidc->setSessionName('directory');
+                if ($as->refresh_token !== '') {
+                    $oidc->refreshToken($as->refresh_token);
+                } else {
+                    $oidc->setRedirectURL(route('oidc_relay_connect'));
+                    $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
+                    $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
+                    $oidc->addScope('patient/Patient.read');
+                    $oidc->addScope('patient/ExplanationOfBenefit.read');
+                    $oidc->addScope('patient/Coverage.read');
+                    $oidc->addScope('profile');
+                    $oidc->authenticate();
+                }
+                $result_token = json_decode($oidc->getResultToken(), true);
+                $cms_pid = $result_token['patient'];
+                $data2 = [
+                    'access_token' => $oidc->getAccessToken(),
+                    'patient_token' => $oidc->getPatientToken(),
+                    'patient' => $result_token['patient'],
+                    'refresh_token' => $oidc->getRefreshToken(),
+                ];
+            }
+            DB::table('oidc_relay')->where('state', '=', $state)->update($data2);
+            Session::forget('oidc_state');
+            return redirect($as->response_uri);
+        }
+    }
 }
