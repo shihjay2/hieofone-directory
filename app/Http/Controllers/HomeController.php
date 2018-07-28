@@ -237,7 +237,11 @@ class HomeController extends Controller
                     break;
                 }
             }
-            $data['content'] .= '<a href="' . route('resource_view', [$resource['_id']]) . '" class="list-group-item"><i class="fa ' . $resources_array[$resource_type]['icon'] . ' fa-fw"></i><span style="margin:10px;">' . $resources_array[$resource_type]['name'] . '</span></a>';
+            if (isset($resources_array[$resource_type]['name'])) {
+                $data['content'] .= '<a href="' . route('resource_view', [$resource['_id']]) . '" class="list-group-item"><i class="fa ' . $resources_array[$resource_type]['icon'] . ' fa-fw"></i><span style="margin:10px;">' . $resources_array[$resource_type]['name'] . '</span></a>';
+            } else {
+                $data['content'] .= '<a href="' . route('resource_view', [$resource['_id']]) . '" class="list-group-item"><i class="fa ' . $resources_array[$resource_type]['icon'] . ' fa-fw"></i><span style="margin:10px;">' . $resource['name'] . '</span></a>';
+            }
         }
         $data['content'] .= '</div>';
         Session::put('uma_pid', $id);
