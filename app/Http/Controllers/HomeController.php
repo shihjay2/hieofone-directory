@@ -321,7 +321,7 @@ class HomeController extends Controller
             $data['title'] = 'Error getting data';
             $data['content'] = 'Description:<br>' . $result;
             $data['name'] = Session::get('owner');
-            $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+            $data['back'] = '<a href="' . route('resources', [Session::get('uma_pid')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
             return view('home', $data);
         }
         $permission_ticket = $result['ticket'];
