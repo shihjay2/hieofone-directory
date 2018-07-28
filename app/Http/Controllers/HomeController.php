@@ -254,7 +254,7 @@ class HomeController extends Controller
      */
     public function resource_view(Request $request, $type)
     {
-        $client = DB::table('oauth_rp')->where('id', '=', Session::get('current_client_id'))->first();
+        $client = DB::table('oauth_rp')->where('id', '=', Session::get('uma_pid'))->first();
 		Session::put('uma_uri', $client->as_uri);
 		Session::put('uma_client_id', $client->client_id);
 		Session::put('uma_client_secret', $client->client_secret);
