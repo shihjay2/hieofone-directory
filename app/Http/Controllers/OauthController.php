@@ -2800,7 +2800,7 @@ class OauthController extends Controller
                     $oidc->addScope('profile');
                     $oidc->authenticate();
                 }
-                $result_token = json_decode($oidc->getResultToken(), true);
+                $result_token = json_decode($oidc->getTokenResponse(), true);
                 $cms_pid = $result_token['patient'];
                 $data2 = [
                     'access_token' => $oidc->getAccessToken(),
@@ -2844,7 +2844,7 @@ class OauthController extends Controller
                     $oidc->addScope('profile');
                     $oidc->authenticate();
                 }
-                $result_token = json_decode($oidc->getResultToken(), true);
+                $result_token = json_decode($oidc->getTokenResponse(), true);
                 $cms_pid = $result_token['patient'];
                 $data2 = [
                     'access_token' => $oidc->getAccessToken(),
