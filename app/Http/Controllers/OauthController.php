@@ -2844,7 +2844,7 @@ class OauthController extends Controller
                     $oidc->addScope('profile');
                     $oidc->authenticate();
                 }
-                $result_token = json_decode($oidc->getTokenResponse(), true);
+                $result_token = json_decode(json_encode($oidc->getTokenResponse()), true);
                 $cms_pid = $result_token['patient'];
                 $data2 = [
                     'access_token' => $oidc->getAccessToken(),
