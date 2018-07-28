@@ -358,14 +358,14 @@ class HomeController extends Controller
                 } else {
                     $data['title'] = 'Error getting data';
                     $data['content'] = 'Description:<br>' . $result1['error'];
-                    $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+                    $data['back'] = '<a href="' . route('resources', [Session::get('uma_pid')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
                     return view('home', $data);
                 }
             }
             if (isset($result1['errors'])) {
                 $data['title'] = 'Error getting data';
                 $data['content'] = 'Description:<br>' . $result1['errors'];
-                $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+                $data['back'] = '<a href="' . route('resources', [Session::get('uma_pid')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
                 return view('home', $data);
             }
             $rpt = $result1['access_token'];
@@ -390,7 +390,7 @@ class HomeController extends Controller
         $data['message_action'] = Session::get('message_action');
         Session::forget('message_action');
         $title_array = $this->fhir_resources();
-        $data['back'] = '<a href="' . route('resources', [Session::get('current_client_id')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
+        $data['back'] = '<a href="' . route('resources', [Session::get('uma_pid')]) . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-chevron-left"></i> Patient Summary</a>';
         $data['content'] = 'None.';
         $data['title'] = $title_array[Session::get('type')]['name'] . ' for ' . Session::get('uma_as_name');
         if (isset($result3['total'])) {
