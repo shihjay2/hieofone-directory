@@ -360,7 +360,7 @@ class OauthController extends Controller
                     foreach ($query1 as $pending) {
                         $link = '<span class="col-sm-5">' . $pending->code . '</span>';
                         $activity = '<span class="col-sm-3"></span>';
-                        $data['content'] .= '<a href="#" class="list-group-item row"><span class="col-sm-3"><i class="fa fa-btn fa-user"></i>Pending Verification</span>' . $link . $activity . '</a>';
+                        $data['content'] .= '<a href="#" class="list-group-item row"><span class="col-sm-3"><i class="fa fa-btn fa-user"></i>Pending Trustee Creation</span>' . $link . $activity . '</a>';
                     }
                 }
                 if ($query) {
@@ -371,17 +371,20 @@ class OauthController extends Controller
                         if ($rs) {
                             foreach ($rs as $rs_row) {
                                 if ($rs_row->rs_public == 0) {
-                                    $link .= '<p><span class="label label-danger">Please Sign In</span></p>';
+                                    // $link .= '<p><span class="label label-danger">Please Sign In</span></p>';
                                 } else {
-                                    $rs_uri = $rs_row->rs_uri;
-                                    if (strpos($rs_row->rs_uri, "/nosh") !== false) {
-                                        $rs_uri . '/uma_auth';
+                                    $rs_name = explode(' ', $rs_row->rs_name);
+                                    if ($rs_name[0] . $rs_name[1] !== 'Directory-') {
+                                        $rs_uri = $rs_row->rs_uri;
+                                        if (strpos($rs_row->rs_uri, "/nosh") !== false) {
+                                            $rs_uri . '/uma_auth';
+                                        }
+                                        if ($rs_count > 0) {
+                                            $link .= '<br>';
+                                        }
+                                        $link .= '<p><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></p>';
+                                        $rs_count++;
                                     }
-                                    if ($rs_count > 0) {
-                                        $link .= '<br>';
-                                    }
-                                    $link .= '<p><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></p>';
-                                    $rs_count++;
                                 }
                             }
                         }
