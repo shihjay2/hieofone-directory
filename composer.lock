@@ -1363,16 +1363,16 @@
         },
         {
             "name": "kordy/ticketit",
-            "version": "v0.4.1",
+            "version": "v0.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thekordy/ticketit.git",
-                "reference": "2913231971aa5cf18b7066cf0e66ba5f044dafc9"
+                "reference": "863f8632acbeb2cda60b5df107ebd9f8574a9ff8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thekordy/ticketit/zipball/2913231971aa5cf18b7066cf0e66ba5f044dafc9",
-                "reference": "2913231971aa5cf18b7066cf0e66ba5f044dafc9",
+                "url": "https://api.github.com/repos/thekordy/ticketit/zipball/863f8632acbeb2cda60b5df107ebd9f8574a9ff8",
+                "reference": "863f8632acbeb2cda60b5df107ebd9f8574a9ff8",
                 "shasum": ""
             },
             "require": {
@@ -1411,7 +1411,7 @@
                 "support",
                 "ticket"
             ],
-            "time": "2018-06-19T19:24:29+00:00"
+            "time": "2018-07-28T17:12:43+00:00"
         },
         {
             "name": "laravel/framework",
@@ -2707,12 +2707,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/shihjay2/OpenID-Connect-UMA-PHP.git",
-                "reference": "a78c36d1b3104247c01b3232b0f9a2fd9f63379a"
+                "reference": "105083756e0321a0418941b850645a1774faa7fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shihjay2/OpenID-Connect-UMA-PHP/zipball/a78c36d1b3104247c01b3232b0f9a2fd9f63379a",
-                "reference": "a78c36d1b3104247c01b3232b0f9a2fd9f63379a",
+                "url": "https://api.github.com/repos/shihjay2/OpenID-Connect-UMA-PHP/zipball/105083756e0321a0418941b850645a1774faa7fa",
+                "reference": "105083756e0321a0418941b850645a1774faa7fa",
                 "shasum": ""
             },
             "require": {
@@ -2749,7 +2749,7 @@
                 "php",
                 "uma"
             ],
-            "time": "2018-07-27T02:19:15+00:00"
+            "time": "2018-07-31T02:35:35+00:00"
         },
         {
             "name": "simplesoftwareio/simple-qrcode",
@@ -3779,16 +3779,16 @@
         },
         {
             "name": "vlucas/phpdotenv",
-            "version": "v2.5.0",
+            "version": "v2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vlucas/phpdotenv.git",
-                "reference": "6ae3e2e6494bb5e58c2decadafc3de7f1453f70a"
+                "reference": "8abb4f9aa89ddea9d52112c65bbe8d0125e2fa8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/6ae3e2e6494bb5e58c2decadafc3de7f1453f70a",
-                "reference": "6ae3e2e6494bb5e58c2decadafc3de7f1453f70a",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/8abb4f9aa89ddea9d52112c65bbe8d0125e2fa8e",
+                "reference": "8abb4f9aa89ddea9d52112c65bbe8d0125e2fa8e",
                 "shasum": ""
             },
             "require": {
@@ -3825,7 +3825,7 @@
                 "env",
                 "environment"
             ],
-            "time": "2018-07-01T10:25:50+00:00"
+            "time": "2018-07-29T20:33:41+00:00"
         },
         {
             "name": "yajra/laravel-datatables-oracle",
