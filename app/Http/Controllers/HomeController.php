@@ -210,6 +210,7 @@ class HomeController extends Controller
 		Session::forget('message_action');
         // Get access token from AS in anticipation for geting the RPT; if no refresh token before, get it too.
         $oidc = new OpenIDConnectUMAClient($client->as_uri, $client->client_id, $client->client_secret);
+        $oidc->startSession();
         $oidc->setSessionName('directory');
         $oidc->setUMA(true);
         $oidc->refreshToken($client->refresh_token);
@@ -335,6 +336,7 @@ class HomeController extends Controller
         $url = route('uma_aat');
         // Requesting party claims
         $oidc = new OpenIDConnectUMAClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
+        $oidc->startSession();
         $oidc->setRedirectURL($url);
         $oidc->rqp_claims($permission_ticket);
 	}
@@ -349,6 +351,7 @@ class HomeController extends Controller
             $client_secret = Session::get('uma_client_secret');
             $url = route('uma_api');
             $oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
+            $oidc->startSession();
             $oidc->setSessionName('directory');
             $oidc->setAccessToken(Session::get('uma_auth_access_token_nosh'));
             $oidc->setRedirectURL($url);
@@ -449,6 +452,7 @@ class HomeController extends Controller
         Session::put('uma_client_secret', $client->client_secret);
         Session::save();
 		$oidc = new OpenIDConnectUMAClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
+        $oidc->startSession();
 		$oidc->requestAAT();
 		Session::put('uma_aat', $oidc->getAccessToken());
 		// Get permission ticket
@@ -478,6 +482,7 @@ class HomeController extends Controller
 			$client_secret = Session::get('uma_client_secret');
 			$url = route('uma_api_search');
 			$oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
+            $oidc->startSession();
 			$oidc->setAccessToken(Session::get('uma_aat'));
 			$oidc->setRedirectURL($url);
 			$result1 = $oidc->rpt_request($permission_ticket);
@@ -585,6 +590,7 @@ class HomeController extends Controller
             $client_name = 'mdNOSH - ' . $practice->practice_name;
             $url1 = route('uma_auth');
             $oidc = new OpenIDConnectUMAClient($as_uri);
+            $oidc->startSession();
             $oidc->setClientName($client_name);
             $oidc->setSessionName('nosh');
             $oidc->addRedirectURLs($url1);
@@ -654,6 +660,7 @@ class HomeController extends Controller
     public function uma_register_auth(Request $request)
     {
         $oidc = new OpenIDConnectUMAClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
+        $oidc->startSession();
         $oidc->setSessionName('directory');
         $oidc->setRedirectURL(route('uma_register_auth'));
         $oidc->setUMA(true);
@@ -705,6 +712,7 @@ class HomeController extends Controller
             return redirect()->route('uma_register_auth');
         }
         $oidc = new OpenIDConnectUMAClient($patient->hieofone_as_url, $patient->hieofone_as_client_id, $patient->hieofone_as_client_secret);
+        $oidc->startSession();
         $oidc->setSessionName('nosh');
         $oidc->setUMA(true);
         $oidc->refreshToken($patient->hieofone_as_refresh_token);

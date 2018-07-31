@@ -2162,6 +2162,7 @@ class OauthController extends Controller
 		$client_id = Session::get('pnosh_client_id');
 		$client_secret = Session::get('pnosh_client_secret');
 		$oidc = new OpenIDConnectUMAClient($open_id_url, $client_id, $client_secret);
+        $oidc->startSession();
 		$oidc->setRedirectURL($url);
 		$oidc->addScope('openid');
 		$oidc->addScope('email');
@@ -2191,6 +2192,7 @@ class OauthController extends Controller
 		$client_id = Session::get('as_client_id');
 		$client_secret = Session::get('as_client_secret');
 		$oidc = new OpenIDConnectUMAClient($open_id_url, $client_id, $client_secret);
+        $oidc->startSession();
         $oidc->setSessionName('directory');
 		$oidc->setRedirectURL($url);
 		$oidc->addScope('openid');
@@ -2322,6 +2324,7 @@ class OauthController extends Controller
                     $client_name = "Directory - " . $owner->org_name;
             		$url1 = route('directory_auth');
             		$oidc = new OpenIDConnectUMAClient($query1->as_uri);
+                    $oidc->startSession();
             		$oidc->setClientName($client_name);
             		// $oidc->setRedirectURL($url1);
                     $oidc->setSessionName('directory');
@@ -2455,6 +2458,7 @@ class OauthController extends Controller
 				$client_name = $owner_query->org_name . " Trustee Directory";
 				$url1 = route('uma_auth');
 				$oidc = new OpenIDConnectUMAClient($as_uri);
+                $oidc->startSession();
 				$oidc->setClientName($client_name);
                 $oidc->setSessionName('directory');
                 $oidc->addRedirectURLs($url1);
@@ -2534,6 +2538,7 @@ class OauthController extends Controller
 				$client_name = $owner_query->org_name . " Trustee Directory";
 				$url1 = route('uma_auth');
 				$oidc = new OpenIDConnectUMAClient($url);
+                $oidc->startSession();
 				$oidc->setClientName($client_name);
                 $oidc->setSessionName('directory');
                 $oidc->addRedirectURLs($url1);
@@ -2748,6 +2753,7 @@ class OauthController extends Controller
                 }
                 $client_secret = '';
                 $oidc = new OpenIDConnectUMAClient($as->fhir_auth_url, $client_id, $client_secret);
+                $oidc->startSession();
                 $oidc->setSessionName('directory');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
@@ -2789,6 +2795,7 @@ class OauthController extends Controller
                 // $client_id = 'g64gaSFq972Jpk88Ql8ZoO307jsbZyaSXtrVnfql';
                 // $client_secret = 'EiyTnDZnBR1p2OhLWBFpr0qV4SNXDw10IGwtEGf2B8sgJploBJ2NhmaQSqdcSO7eNi4xIxbP5Bk8wPvHnqdlaMLLImYCJF2EzKW5ie7snbNm5Joyphf87RvzDl7r6cO0';
                 $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
+                $oidc->startSession();
                 $oidc->setSessionName('directory');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
@@ -2833,6 +2840,7 @@ class OauthController extends Controller
                 $client_id = env('CMS_BLUEBUTTON_CLIENT_ID');
                 $client_secret = env('CMS_BLUEBUTTON_CLIENT_SECRET');
                 $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
+                $oidc->startSession();
                 $oidc->setSessionName('directory');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
