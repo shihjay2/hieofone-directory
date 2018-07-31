@@ -2299,7 +2299,8 @@ class OauthController extends Controller
                     'rs_uri' => $rs_row['uri'],
                     'rs_name' => $rs_row['name'],
                     'rs_public' => $rs_row['public'],
-                    'rs_private' => $rs_row['private']
+                    'rs_private' => $rs_row['private'],
+                    'rs_last_activity' => $rs_row['last_activity']
                 ];
                 DB::table('as_to_rs')->insert($data);
             }
@@ -2397,7 +2398,8 @@ class OauthController extends Controller
                     'rs_uri' => $rs_row['uri'],
                     'rs_name' => $rs_row['name'],
                     'rs_public' => $rs_row['public'],
-                    'rs_private' => $rs_row['private']
+                    'rs_private' => $rs_row['private'],
+                    'rs_last_activity' => $rs_row['last_activity']
                 ];
                 DB::table('as_to_rs')->insert($data);
             }
