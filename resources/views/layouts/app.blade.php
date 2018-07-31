@@ -57,6 +57,8 @@
 									<li><a href="{{ url('/settings') }}">Directory Settings</a></li>
 									<li><a href="{{ url('/default_policies') }}">Default Policies</a></li>
 									<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
+									<li><a href="{{ url('/home') }}">Patients</a></li>
+									<li><a href="{{ url('/invitation_list') }}">Pending Invitiations</a></li>
 								</ul>
 							</li>
 							<li><a href="{{ url('/settings') }}">Settings</a></li>

@@ -60,6 +60,8 @@ Route::get('patients/{create?}', ['as' => 'patients', 'uses' => 'OauthController
 Route::get('clinicians', ['as' => 'clinicians', 'uses' => 'OauthController@clinicians']);
 Route::get('others', ['as' => 'others', 'uses' => 'OauthController@others']);
 Route::any('container_create/{code?}', ['as' => 'container_create', 'uses' => 'OauthController@container_create']);
+Route::any('invite_cancel/{code}/{redirect?}', ['as' => 'invite_cancel', 'uses' => 'OauthController@invite_cancel']);
+Route::get('invitation_list', ['as' => 'invitation_list', 'uses' => 'HomeController@invitation_list']);
 Route::get('key_download/{file}', ['as' => 'key_download', 'uses' => 'OauthController@key_download']);
 Route::any('search_welcome', ['as' => 'search_welcome', 'uses' => 'OauthController@search_welcome']);
 Route::any('metadata/{type}', ['as' => 'metadata', 'uses' => 'OauthController@metadata']);

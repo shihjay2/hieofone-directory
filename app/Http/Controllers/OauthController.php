@@ -637,6 +637,27 @@ class OauthController extends Controller
         }
     }
 
+    public function invite_cancel(Request $request, $code, $redirect=false)
+    {
+        $owner = DB::table('owner')->first();
+        $query = DB::table('invitation')->where('code', '=', $code)->first();
+        if ($query) {
+            DB::table('invitation')->where('code', '=', $code)->delete();
+        }
+        if ($redirect == true) {
+            Session::put('message_action', 'Invitation for ' . $query->email . ' has been canceled.');
+            return redirect()->route('invitation_list');
+        } else {
+            $new_data = [
+                'name' => $owner->org_name,
+                'text' => '',
+                'create' => 'yes',
+                'complete' => 'Your request for a patient container has been canceled.<br>Thank you!'
+            ];
+            return view('patients', $new_data);
+        }
+    }
+
     public function key_download(Request $request, $file)
     {
         $pathToFile = storage_path() . "/app/" . $file;

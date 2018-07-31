@@ -80,6 +80,8 @@ class HomeController extends Controller
 		}
         $data['back'] = '<a href="' . URL::to('all_patients') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-users"></i> All Patients</a>';
         Session::put('last_page', $request->fullUrl());
+        $data['message_action'] = Session::get('message_action');
+		Session::forget('message_action');
         return view('home', $data);
     }
 
@@ -133,6 +135,8 @@ class HomeController extends Controller
 		}
         $data['back'] = '<a href="' . URL::to('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
         Session::put('last_page', $request->fullUrl());
+        $data['message_action'] = Session::get('message_action');
+		Session::forget('message_action');
         return view('home', $data);
     }
 
@@ -1244,6 +1248,8 @@ class HomeController extends Controller
             $query0 = DB::table('oauth_rp')->where('type', '=', 'google')->first();
             $data2['message_data'] = 'You are invited to create a Trustee Authorization Server.<br>';
             $data2['message_data'] .= 'Go to <a href="' . $url . '" target="_blank">' . $url . '</a> to get started.<br>';
+            $data2['message_data'] .= 'Go to <a href="' . route('privacy_policy') . '" target="_blank">' . route('privacy_policy') . '</a> to learn about our Privacy Policy.<br>';
+            $data2['message_data'] .= 'Go to <a href="' . $url . '" target="_blank">' . $url . '</a> to decline.<br>';
             $data2['message_data'] .= 'Your Invitation Code is: ' . $code;
             $data2['message_data'] .= '<br><br><br>See you soon,<br>From the ' . $owner->org_name . ' Trustee Directory';
             $title = 'Invitation to get a Trustee Authorization Server from ' . $owner->org_name . ' Trustee Directory';
@@ -1262,6 +1268,27 @@ class HomeController extends Controller
             $data['post'] = route('make_invitation');
             return view('invite', $data);
         }
+    }
+
+    public function invitation_list(Request $request)
+    {
+        $data['name'] = Session::get('owner');
+        $data['title'] = 'Pending Invitations';
+        $data['content'] = 'No pending invitations.';
+        $query = DB::table('invitation')->where('first_name', '=', 'Pending')->where('last_name', '=', 'Pending')->get();
+        if ($query) {
+            $data['content'] .= '<div class="alert alert-success">Click on an item to cancel the invitation.</div>';
+            $data['content'] .= '<div class="list-group">';
+            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-4"><strong>Email</strong></span><span class="col-sm-4"><strong>Invite Code</strong></span></a>';
+            foreach ($query as $row) {
+                $data['content'] .= '<a href="' . route('invite_cancel', [$row->code, true]) . '" class="list-group-item row"><span class="col-sm-4">' . $row->email . '</span><span class="col-sm-4">' . $row->code . '</span></a>';
+            }
+            $data['content'] .= '</div>';
+        }
+        $data['back'] = '<a href="' . URL::to('all_patients') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-users"></i> All Patients</a>';
+        $data['message_action'] = Session::get('message_action');
+		Session::forget('message_action');
+        return view('home', $data);
     }
 
     public function login_authorize(Request $request)
