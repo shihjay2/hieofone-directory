@@ -79,6 +79,7 @@ Route::post('add_patient', ['as' => 'add_patient', 'middleware' => 'csrf', 'uses
 Route::post('remove_patient', ['as' => 'remove_patient', 'middleware' => 'csrf', 'uses' => 'HomeController@remove_patient']);
 Route::any('search', ['as' => 'search', 'uses' => 'OauthController@search']);
 Route::get('reports', ['as' => 'reports', 'uses' => 'HomeController@reports']);
+Route::get('activity_logs', ['as' => 'activity_logs', 'uses' => 'HomeController@activity_logs']);
 Route::get('resources/{id}', ['as' => 'resources', 'uses' => 'HomeController@resources']);
 Route::get('login_authorize', ['as' => 'login_authorize', 'uses' => 'HomeController@login_authorize']);
 Route::get('login_authorize_action/{type}', ['as' => 'login_authorize_action', 'uses' => 'HomeController@login_authorize_action']);

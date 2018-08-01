@@ -19,6 +19,17 @@ class Controller extends BaseController
 {
 	use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+	protected function activity_log($username, $action)
+	{
+		$data = [
+			'username' => $username,
+			'action' => $action,
+			'created_at' => date('Y-m-d H:i:s')
+		];
+		DB::table('activity_log')->insert($data);
+		return true;
+	}
+
 	protected function as_push_notification($as_uri, $action)
 	{
 		$as = DB::table('oauth_rp')->where('as_uri', '=', $request->input('as_uri'))->first();
