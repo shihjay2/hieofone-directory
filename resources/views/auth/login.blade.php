@@ -213,7 +213,7 @@
 			if ($('#admin_set_id').val() == 'yes') {
 				uport_url += '/admin';
 			}
-			var uport_data = 'name=' + credentials.name + '&uport=' + credentials.address;
+			var uport_data = 'name=' + credentials.name + '&uport=' + credentials.networkAddress;
 			if (typeof credentials.NPI !== 'undefined') {
 				uport_data += '&npi=' + credentials.NPI;
 			}
