@@ -1237,7 +1237,8 @@ class HomeController extends Controller
                 'code' => $code,
                 // 'first_name' => $request->input('first_name'),
                 // 'last_name' => $request->input('last_name'),
-                'owner' => 'no'
+                'owner' => 'no',
+                'client_ids' => 'Invitation Sent'
             ];
             if ($request->has('client_id')) {
                 $data1['client_ids'] = implode(',', $request->input('client_id'));
@@ -1279,9 +1280,9 @@ class HomeController extends Controller
         if ($query) {
             $data['content'] = '<div class="alert alert-success">Click on an item to cancel the invitation.</div>';
             $data['content'] .= '<div class="list-group">';
-            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-4"><strong>Email</strong></span><span class="col-sm-4"><strong>Invite Code</strong></span></a>';
+            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-4"><strong>Email</strong></span><span class="col-sm-3"><strong>Invite Code</strong></span><span class="col-sm-3"><strong>Status</strong></span></a>';
             foreach ($query as $row) {
-                $data['content'] .= '<a href="' . route('invite_cancel', [$row->code, true]) . '" class="list-group-item row"><span class="col-sm-4">' . $row->email . '</span><span class="col-sm-4">' . $row->code . '</span></a>';
+                $data['content'] .= '<a href="' . route('invite_cancel', [$row->code, true]) . '" class="list-group-item row"><span class="col-sm-4">' . $row->email . '</span><span class="col-sm-3">' . $row->code . '</span><span class="col-sm-3"><strong>' . $row->client_ids . '</strong></span></a>';
             }
             $data['content'] .= '</div>';
         }

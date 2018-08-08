@@ -584,7 +584,11 @@ class OauthController extends Controller
                     'password' => 'required',
                     'username' => 'required'
                 ]);
-                $url7 = route('container_create', [$data['code']]);
+                $match1 = DB::table('invitation')->where('email', '=', $request->input('email'))->where('first_name', '=', 'Pending')->where('last_name', '=', 'Pending')->first();
+                if ($match1) {
+                    $data5['client_ids'] = 'Trustee Created';
+                    DB::table('invitation')->where('id', '=', $match1->id)->update($data5);
+                }
                 $data7['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
                 $data7['message_data'] .= "Your Trustee has been created and is waiting for you to initialize it and connect it to this Trustee Directory. Please click or go to:<br>https://";
                 $data7['message_data'] .= $request->input('url');
@@ -627,6 +631,7 @@ class OauthController extends Controller
                     $this->send_mail('auth.emails.generic', $data3, $title3, $to3);
                     $data4['first_name'] = 'Pending';
                     $data4['last_name'] = 'Pending';
+                    $data4['client_ids'] = 'Awaiting Trustee Creation';
                     DB::table('invitation')->where('id', '=', $query->id)->update($data4);
                     $new_data = [
                         'name' => $owner->org_name,
