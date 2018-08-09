@@ -1,0 +1,18 @@
+{
+    "name": "socialiteproviders/doximity",
+    "description": "Doximity OAuth2 Provider for Laravel Socialite",
+    "license": "MIT",
+    "authors": [{
+        "name": "Michael Shihjay Chen",
+        "email": "shihjay2@gmail.com"
+    }],
+    "require": {
+        "php": ">=5.5.9",
+        "socialiteproviders/manager": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SocialiteProviders\\Doximity\\": "src/"
+        }
+    }
+}

@@ -163,6 +163,8 @@ return [
         Jenssegers\Date\DateServiceProvider::class,
         Riari\Forum\ForumServiceProvider::class,
         Riari\Forum\Frontend\ForumFrontendServiceProvider::class,
+        SocialiteProviders\Generators\GeneratorsServiceProvider::class,
+        SocialiteProviders\Manager\ServiceProvider::class
     ],
 
     /*

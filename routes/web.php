@@ -194,7 +194,9 @@ Route::any('google_md/{npi?}', ['as' => 'google_md', 'uses' => 'OauthController@
 Route::any('google_md1', ['as' => 'google_md1', 'uses' => 'OauthController@google_md1']);
 Route::get('account/google', ['as' => 'account/google', 'uses' => 'OauthController@google']);
 Route::get('installgoogle', ['as' => 'installgoogle', 'uses' => 'OauthController@installgoogle']);
-
+Route::get('doximity', ['as' => 'doximity', 'uses' => 'OauthController@doximity']);
+Route::get('doximity_redirect', ['as' => 'doximity_redirect', 'uses' => 'OauthController@doximity_redirect']);
+Route::get('doximity_start', ['as' => 'doximity_start', 'uses' => 'OauthController@doximity_start']);
 // Configuration endpoints
 Route::get('.well-known/openid-configuration', ['as' => 'openid-configuration', function () {
     $scopes = DB::table('oauth_scopes')->get();

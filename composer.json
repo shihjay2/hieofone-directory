@@ -1,36 +1,49 @@
 {
     "name": "hieofone-directory/hieofone-directory",
     "description": "Health Information Exchange of One Directory Server.",
-    "keywords": ["hieofone", "laravel", "uma", "oauth2", "oidc", "php", "javascript", "health", "fhir", "medical"],
+    "keywords": [
+        "hieofone",
+        "laravel",
+        "uma",
+        "oauth2",
+        "oidc",
+        "php",
+        "javascript",
+        "health",
+        "fhir",
+        "medical"
+    ],
     "license": "MIT",
     "type": "project",
-	"authors": [
-		{
-			"name": "Michael Shihjay Chen",
-			"email": "shihjay2@gmail.com",
-			"homepage": "http://noshemr.wordpress.com",
-			"role": "Developer"
-		}
-	],
+    "authors": [
+        {
+            "name": "Michael Shihjay Chen",
+            "email": "shihjay2@gmail.com",
+            "homepage": "http://noshemr.wordpress.com",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": ">=5.5.9",
-        "laravel/framework": "5.6.*",
-        "bshaffer/oauth2-server-php": "^1.10",
         "bshaffer/oauth2-server-httpfoundation-bridge": "^1.3",
+        "bshaffer/oauth2-server-php": "^1.10",
         "doctrine/dbal": "^2.5",
-        "phpseclib/phpseclib": "~2.0",
-        "knplabs/github-api": "~1.7",
-        "laravelcollective/html": "^5.4.0",
-        "laravel/socialite": "~3.0",
         "google/apiclient": "~2.0",
-        "simplesoftwareio/simple-qrcode": "~1.4",
-        "naviocean/laravel-nameparser": "dev-master",
-        "shihjay2/openid-connect-uma-php": "dev-master",
-        "kordy/ticketit": ">=0.4.",
         "graham-campbell/markdown": "10.*",
         "jenssegers/date": "*",
+        "knplabs/github-api": "~1.7",
+        "kordy/ticketit": ">=0.4.",
+        "laravel/framework": "5.6.*",
+        "laravel/socialite": "~3.0",
+        "laravelcollective/html": "^5.4.0",
+        "naviocean/laravel-nameparser": "dev-master",
+        "phpseclib/phpseclib": "~2.0",
         "riari/laravel-forum": "~4.0",
-        "riari/laravel-forum-frontend": "~1.0"
+        "riari/laravel-forum-frontend": "~1.0",
+        "shihjay2/openid-connect-uma-php": "dev-master",
+        "simplesoftwareio/simple-qrcode": "~1.4",
+        "socialiteproviders/generators": "^4.1",
+        "socialiteproviders/manager": "^3.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
@@ -46,7 +59,8 @@
             "database"
         ],
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "SocialiteProviders\\Doximity\\": "SocialiteProviders/Doximity/src/"
         }
     },
     "autoload-dev": {
