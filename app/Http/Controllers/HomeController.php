@@ -1277,8 +1277,7 @@ class HomeController extends Controller
         $data['content'] = 'No pending invitations.';
         $query = DB::table('invitation')->where('first_name', '=', 'Pending')->where('last_name', '=', 'Pending')->get();
         if ($query) {
-            $data['content'] = '<div class="alert alert-success">Click on an item to cancel the invitation.</div>';
-            $data['content'] .= '<ul class="list-group">';
+            $data['content'] = '<ul class="list-group">';
             $data['content'] .= '<li class="list-group-item row"><span class="col-sm-3"><strong>Email</strong></span><span class="col-sm-3"><strong>Invite Code</strong></span><span class="col-sm-3"><strong>Status</strong></span><span class="col-sm-3"><strong>Actions</strong></span></li>';
             foreach ($query as $row) {
                 $data['content'] .= '<li class="list-group-item row"><span class="col-sm-3">' . $row->email . '</span><span class="col-sm-3">' . $row->code . '</span><span class="col-sm-3">' . $row->client_ids . '</span><span class="col-sm-3"><a href="' . route('invite_cancel', [$row->code, true]) . '" data-toggle="tooltip" title="Cancel Invite"><i class="fa fa-btn fa-lg fa-times"></i></a>';
