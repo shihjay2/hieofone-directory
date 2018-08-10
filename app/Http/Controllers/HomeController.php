@@ -1246,7 +1246,6 @@ class HomeController extends Controller
             DB::table('invitation')->insert($data1);
             // Send email to invitee
             $url = route('container_create', [$code]);
-            $query0 = DB::table('oauth_rp')->where('type', '=', 'google')->first();
             $data2['message_data'] = 'You are invited to create a Trustee Authorization Server.<br>';
             $data2['message_data'] .= 'Go to <a href="' . $url . '" target="_blank">' . $url . '</a> to get started.<br>';
             $data2['message_data'] .= 'Go to <a href="' . route('privacy_policy') . '" target="_blank">' . route('privacy_policy') . '</a> to learn about our Privacy Policy.<br>';
@@ -1279,17 +1278,47 @@ class HomeController extends Controller
         $query = DB::table('invitation')->where('first_name', '=', 'Pending')->where('last_name', '=', 'Pending')->get();
         if ($query) {
             $data['content'] = '<div class="alert alert-success">Click on an item to cancel the invitation.</div>';
-            $data['content'] .= '<div class="list-group">';
-            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-4"><strong>Email</strong></span><span class="col-sm-3"><strong>Invite Code</strong></span><span class="col-sm-3"><strong>Status</strong></span></a>';
+            $data['content'] .= '<ul class="list-group">';
+            $data['content'] .= '<li class="list-group-item row"><span class="col-sm-3"><strong>Email</strong></span><span class="col-sm-3"><strong>Invite Code</strong></span><span class="col-sm-3"><strong>Status</strong></span><span class="col-sm-3"><strong>Actions</strong></span></li>';
             foreach ($query as $row) {
-                $data['content'] .= '<a href="' . route('invite_cancel', [$row->code, true]) . '" class="list-group-item row"><span class="col-sm-4">' . $row->email . '</span><span class="col-sm-3">' . $row->code . '</span><span class="col-sm-3"><strong>' . $row->client_ids . '</strong></span></a>';
+                $data['content'] .= '<li class="list-group-item row"><span class="col-sm-4">' . $row->email . '</span><span class="col-sm-3">' . $row->code . '</span><span class="col-sm-3">' . $row->client_ids . '</span><span class="col-sm-3"><a href="' . route('invite_cancel', [$row->code, true]) . '" data-toggle="tooltip" title="Cancel Invite"><i class="fa fa-btn fa-times"></i></a>';
+                $data['content'] .= '<a href="' . route('resent_invitation', [$row->id]) . '" data-toggle="tooltip" title="Resend E-mail Notification"><i class="fa fa-btn fa-retweet"></i></a></span></li>';
             }
-            $data['content'] .= '</div>';
+            $data['content'] .= '</ul>';
         }
         $data['back'] = '<a href="' . URL::to('all_patients') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-users"></i> All Patients</a>';
         $data['message_action'] = Session::get('message_action');
 		Session::forget('message_action');
         return view('home', $data);
+    }
+
+    public function resend_invitation(Request $request, $id)
+    {
+        $owner = DB::table('owner')->first();
+        $invite = DB::table('invitation')->where('id', '=', $id)->first();
+        if ($invite->url == null || $invite->url == '') {
+            $url = route('container_create', [$invite->code]);
+            $data['message_data'] = 'You are invited to create a Trustee Authorization Server.<br>';
+            $data['message_data'] .= 'Go to <a href="' . $url . '" target="_blank">' . $url . '</a> to get started.<br>';
+            $data['message_data'] .= 'Go to <a href="' . route('privacy_policy') . '" target="_blank">' . route('privacy_policy') . '</a> to learn about our Privacy Policy.<br>';
+            $data['message_data'] .= 'Go to <a href="' . route('invite_cancel', [$invite->code]) . '" target="_blank">' . route('invite_cancel', [$invite->code]) . '</a> to decline.<br>';
+            $data['message_data'] .= 'Your Invitation Code is: ' . $invite->code;
+            $data['message_data'] .= '<br><br><br>See you soon,<br>From the ' . $owner->org_name . ' Trustee Directory';
+            $title = 'Invitation to get a Trustee Authorization Server from ' . $owner->org_name . ' Trustee Directory';
+        } else {
+            $data['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
+            $data['message_data'] .= "Your Trustee has been created and is waiting for you to initialize it and connect it to this Trustee Directory. Please click or go to:<br>https://";
+            $data['message_data'] .= $invite->url;
+            $data['message_data'] .= ' to continue.<br>If you have support questions at any time, please go to the <a href="' . url('/') .'/tickets">Support page</a> in the Directory.';
+            // $data['message_data'] .= '<br><br>If you need to login to the terminal through SSH (Secure Shell), you can set your SSH client or terminal to the same URL above, using port 22.<br><br>';
+            // $data['message_data'] .= 'Your usernmae is ' . $request->input('username') . '<br>';
+            // $data['message_data'] .= 'Your temporary password is ' . $request->input('password') . '<br><br>You will be asked to change your password upon your first login via SSH';
+            $title = 'Your Trustee Authorizaion Server has been created!';
+        }
+        $to = $invite->email;
+        $this->send_mail('auth.emails.generic', $data, $title, $to);
+        Session::put('message_action', 'Invitation email resent');
+        return redirect()->route('invitation_list');
     }
 
     public function login_authorize(Request $request)

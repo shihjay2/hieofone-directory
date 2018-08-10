@@ -131,6 +131,7 @@ Route::get('proxy_remove/{sub}', ['as' => 'proxy_remove', 'uses' => 'HomeControl
 Route::any('add_owner', ['as' => 'add_owner', 'uses' => 'HomeController@add_owner']);
 Route::any('make_invitation', ['as' => 'make_invitation', 'uses' => 'HomeController@make_invitation']);
 Route::any('accept_invitation/{id}', ['as' => 'accept_invitation', 'uses' => 'OauthController@accept_invitation']);
+Route::get('resend_invitation/{id}', ['as' => 'resend_invitation', 'uses' => 'HomeController@resend_invitation']);
 Route::any('process_invitation', ['as' => 'process_invitation', 'uses' => 'HomeController@process_invitation']);
 Route::any('password_email', ['as' => 'password_email', 'uses' => 'OauthController@password_email']);
 Route::any('password_reset/{id}', ['as' => 'password_reset', 'uses' => 'OauthController@password_reset']);

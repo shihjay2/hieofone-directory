@@ -587,6 +587,7 @@ class OauthController extends Controller
                 $match1 = DB::table('invitation')->where('email', '=', $request->input('email'))->where('first_name', '=', 'Pending')->where('last_name', '=', 'Pending')->first();
                 if ($match1) {
                     $data5['client_ids'] = 'Trustee Created';
+                    $data5['url'] = $request->input('url');
                     DB::table('invitation')->where('id', '=', $match1->id)->update($data5);
                 }
                 $data7['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
@@ -2922,132 +2923,6 @@ class OauthController extends Controller
         $data['npi'] = $user_details->npi;
         $data['specialty'] = $user_details->specialty;
         return view('doximity', $data);
-
-        // $google_user = DB::table('oauth_users')->where('email', '=', $user->getEmail())->first();
-        // // Get client if from OIDC call
-        // if (Session::get('oauth_response_type') == 'code') {
-        //     $client_id = Session::get('oauth_client_id');
-        // } else {
-        //     $client = DB::table('owner')->first();
-        //     $client_id = $client->client_id;
-        // }
-        // $authorized = DB::table('oauth_clients')->where('client_id', '=', $client_id)->where('authorized', '=', 1)->first();
-        // if ($google_user) {
-        //     // Google email matches
-        //     Session::put('login_origin', 'login_google');
-        //     $local_user = DB::table('users')->where('email', '=', $google_user->email)->first();
-        //     if (Session::has('uma_permission_ticket') && Session::has('uma_redirect_uri') && Session::has('uma_client_id') && Session::has('email')) {
-        //         // If generated from rqp_claims endpoint, do this
-        //         return redirect()->route('rqp_claims');
-        //     } elseif (Session::get('oauth_response_type') == 'code') {
-        //         if ($authorized) {
-        //             Session::put('is_authorized', 'true');
-        //             $this->login_sessions($google_user, $client_id);
-        //             Auth::loginUsingId($local_user->id);
-        //             Session::save();
-        //             return redirect()->route('authorize');
-        //         } else {
-        //             // Get owner permission if owner is logging in from new client/registration server
-        //             if ($owner_query->sub == $google_user->sub) {
-        //                 $this->login_sessions($google_user, $client_id);
-        //                 Auth::loginUsingId($local_user->id);
-        //                 Session::save();
-        //                 return redirect()->route('authorize_resource_server');
-        //             } else {
-        //                 return redirect()->route('login')->withErrors(['tryagain' => 'Unauthorized client.  Please contact the owner of this authorization server for assistance.']);
-        //             }
-        //         }
-        //     } else {
-        //         $this->login_sessions($google_user, $client_id);
-        //         Auth::loginUsingId($local_user->id);
-        //         Session::save();
-        //         return redirect()->route('home');
-        //     }
-        // } else {
-        //     if ($owner_query->any_npi == 1 || $owner_query->login_google == 1) {
-        //         if ($authorized) {
-        //             // Add new user
-        //             Session::put('google_sub' ,$user->getId());
-        //             Session::put('google_name', $user->getName());
-        //             Session::put('google_email', $user->getEmail());
-        //             return redirect()->route('google_md1');
-        //             // return redirect()->route('google_md');
-        //         } else {
-        //             return redirect()->route('login')->withErrors(['tryagain' => 'Unauthorized client.  Please contact the owner of this authorization server for assistance.']);
-        //         }
-        //     } else {
-        //         return redirect()->route('login')->withErrors(['tryagain' => 'Not a registered user.  Any NPI or Any Google not set.  Please contact the owner of this authorization server for assistance.']);
-        //     }
-        // }
-
-        // $client_id = '';
-        // $client_secret = '';
-        // $open_id_url = 'https://auth.doximity.com/oauth/authorize';
-        // $url = route('doximity_redirect');
-        // $oidc = new OpenIDConnectClient($open_id_url, $client_id, $client_secret);
-        // $oidc->setRedirectURL($url);
-        // $oidc->addScope('basic');
-        // $oidc->authenticate();
-        // $firstname = $oidc->requestUserInfo('given_name');
-        // $lastname = $oidc->requestUserInfo('family_name');
-        // $email = $oidc->requestUserInfo('email');
-        // $npi = $oidc->requestUserInfo('npi');
-        // $sub = $oidc->requestUserInfo('sub');
-        // $access_token = $oidc->getAccessToken();
-        // Session::put('email',  $oidc->requestUserInfo('email'));
-        // Session::put('login_origin', 'login_md_nosh');
-        // Session::put('npi', $npi);
-        // if (Session::has('uma_permission_ticket') && Session::has('uma_redirect_uri') && Session::has('uma_client_id') && Session::has('email')) {
-        //     // If generated from rqp_claims endpoint, do this
-        //     return redirect()->route('rqp_claims');
-        // } elseif (Session::get('oauth_response_type') == 'code') {
-        //     $client_id = Session::get('oauth_client_id');
-        //     $authorized = DB::table('oauth_clients')->where('client_id', '=', $client_id)->where('authorized', '=', 1)->first();
-        //     if ($authorized) {
-        //         Session::put('is_authorized', 'true');
-        //         $owner_query = DB::table('owner')->first();
-        //         $proxies = DB::table('owner')->where('sub', '!=', $owner_query->sub)->get();
-        //         $proxy_arr = [];
-        //         if ($proxies) {
-        //             foreach ($proxies as $proxy_row) {
-        //                 $proxy_arr[] = $proxy_row->sub;
-        //             }
-        //         }
-        //         if ($owner_query->login_md_nosh == 1) {
-        //             // Add user if not added already
-        //             $sub_query = DB::table('oauth_users')->where('sub', '=', $sub)->first();
-        //             if (!$sub_query) {
-        //                 $user_data = [
-        //                     'username' => $sub,
-        //                     'password' => sha1($sub),
-        //                     'first_name' => $firstname,
-        //                     'last_name' => $lastname,
-        //                     'sub' => $sub,
-        //                     'email' => $email,
-        //                     'npi' => $npi
-        //                 ];
-        //                 DB::table('oauth_users')->insert($user_data);
-        //                 $user_data1 = [
-        //                     'name' => $sub,
-        //                     'email' => $email
-        //                 ];
-        //                 DB::table('users')->insert($user_data1);
-        //             }
-        //             Session::put('sub', $sub);
-        //             Session::save();
-        //             $user1 = DB::table('users')->where('name', '=', $sub)->first();
-        //             Auth::loginUsingId($user1->id);
-        //             return redirect()->route('authorize');
-        //         } else {
-        //             return redirect()->route('login')->withErrors(['tryagain' => 'Please contact the owner of this authorization server for assistance.']);
-        //         }
-        //     } else {
-        //         return redirect()->route('login')->withErrors(['tryagain' => 'Please contact the owner of this authorization server for assistance.']);
-        //     }
-        // } else {
-        //     $this->oauth_authenticate($oidc->requestUserInfo('email'));
-        //     return redirect()->route('home');
-        // }
     }
 
     public function doximity_start(Request $request)
