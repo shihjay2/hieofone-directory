@@ -1281,7 +1281,7 @@ class HomeController extends Controller
             $data['content'] .= '<ul class="list-group">';
             $data['content'] .= '<li class="list-group-item row"><span class="col-sm-3"><strong>Email</strong></span><span class="col-sm-3"><strong>Invite Code</strong></span><span class="col-sm-3"><strong>Status</strong></span><span class="col-sm-3"><strong>Actions</strong></span></li>';
             foreach ($query as $row) {
-                $data['content'] .= '<li class="list-group-item row"><span class="col-sm-4">' . $row->email . '</span><span class="col-sm-3">' . $row->code . '</span><span class="col-sm-3">' . $row->client_ids . '</span><span class="col-sm-3"><a href="' . route('invite_cancel', [$row->code, true]) . '" data-toggle="tooltip" title="Cancel Invite"><i class="fa fa-btn fa-times"></i></a>';
+                $data['content'] .= '<li class="list-group-item row"><span class="col-sm-3">' . $row->email . '</span><span class="col-sm-3">' . $row->code . '</span><span class="col-sm-3">' . $row->client_ids . '</span><span class="col-sm-3"><a href="' . route('invite_cancel', [$row->code, true]) . '" data-toggle="tooltip" title="Cancel Invite"><i class="fa fa-btn fa-times"></i></a>';
                 $data['content'] .= '<a href="' . route('resend_invitation', [$row->id]) . '" data-toggle="tooltip" title="Resend E-mail Notification"><i class="fa fa-btn fa-retweet"></i></a></span></li>';
             }
             $data['content'] .= '</ul>';
