@@ -352,20 +352,20 @@ class OauthController extends Controller
     		if ($query || $query1) {
                 $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
     			$data['content'] .= '<div class="list-group searchlist">';
-                $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-5"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span></a>';
+                $data['content'] .= '<a class="list-group-item row"><span class="col-xs-3"><strong>Name</strong></span><span class="col-xs-5"><strong>Resources</strong></span><span class="col-xs-3"><strong>Last Activity</strong></span></a>';
                 // usort($query, function($a, $b) {
                 //     return $b['last_act'] <=> $a['last_act'];
                 // });
                 if ($query1) {
                     foreach ($query1 as $pending) {
-                        $link = '<span class="col-sm-5">' . $pending->code . '</span>';
-                        $activity = '<span class="col-sm-3">Status: ' . $pending->client_ids . '</span>';
-                        $data['content'] .= '<a href="#" class="list-group-item row"><span class="col-sm-3"><i class="fa fa-btn fa-user"></i>Pending Trustee Creation</span>' . $link . $activity . '</a>';
+                        $link = '<span class="col-xs-5">' . $pending->code . '</span>';
+                        $activity = '<span class="col-xs-3">Status: ' . $pending->client_ids . '</span>';
+                        $data['content'] .= '<a href="#" class="list-group-item row"><span class="col-xs-3"><i class="fa fa-btn fa-user"></i>Pending Trustee Creation</span>' . $link . $activity . '</a>';
                     }
                 }
                 if ($query) {
                     foreach ($query as $client) {
-                        $link = '<span class="col-sm-5">';
+                        $link = '<span class="col-xs-5">';
                         $rs = DB::table('as_to_rs')->where('as_id', '=', $client->id)->get();
                         $rs_count=0;
                         if ($rs) {
@@ -396,15 +396,15 @@ class OauthController extends Controller
                             $picture = '<img src="' . $client->picture . '" height="30" width="30">';
                         }
                         // $timestamp = mt_rand(1, time());
-                        // $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
-                        $activity = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $client->last_activity) . '</span>';
-                        // $add = '<span class="col-sm-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
+                        // $activity = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
+                        $activity = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $client->last_activity) . '</span>';
+                        // $add = '<span class="col-xs-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
                         // $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
                         // if ($check) {
                         //     $add = '';
                         // }
-                    	// $data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
-                        $data['content'] .= '<a href="' . $client->as_uri . '" class="list-group-item row" target="_blank"><span class="col-sm-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+                    	// $data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-xs-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+                        $data['content'] .= '<a href="' . $client->as_uri . '" class="list-group-item row" target="_blank"><span class="col-xs-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
         			}
                 }
     			$data['content'] .= '</div>';
@@ -2027,17 +2027,17 @@ class OauthController extends Controller
 		if ($query) {
             $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
 			$data['content'] .= '<div class="list-group searchlist">';
-            $data['content'] .= '<a class="list-group-item row"><span class="col-sm-3"><strong>Name</strong></span><span class="col-sm-4"><strong>Resources</strong></span><span class="col-sm-3"><strong>Last Activity</strong></span>';
+            $data['content'] .= '<a class="list-group-item row"><span class="col-xs-3"><strong>Name</strong></span><span class="col-xs-4"><strong>Resources</strong></span><span class="col-xs-3"><strong>Last Activity</strong></span>';
             if ($login == 'yes') {
-                $data['content'] .= '<span class="col-sm-2"><strong>Actions</strong></span>';
+                $data['content'] .= '<span class="col-xs-2"><strong>Actions</strong></span>';
             }
             $data['content'] .= '</a>';
 			foreach ($query as $client) {
                 if ($login == 'yes') {
-    				$link = '<span class="col-sm-4"><p><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri'] . '">Patient Centered Health Record</span></p>';
+    				$link = '<span class="col-xs-4"><p><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri'] . '">Patient Centered Health Record</span></p>';
                     $link .= '<p><span class="label label-danger pnosh_link" nosh-link="' . $client['as_uri2'] . '">' . $client['as_name2'] . '</span></p></span>';
                 } else {
-                    $link = '<span class="col-sm-4"><p><span class="label label-danger">Please Sign In</span></p></span>';
+                    $link = '<span class="col-xs-4"><p><span class="label label-danger">Please Sign In</span></p></span>';
                 }
                 if ($client['picture'] == '' || $client['picture'] == null) {
                     $picture = '<i class="fa fa-btn fa-user"></i>';
@@ -2045,10 +2045,10 @@ class OauthController extends Controller
                     $picture = '<img src="' . $client['picture'] . '" height="30" width="30">';
                 }
 
-                $act = '<span class="col-sm-3">' . date("Y-m-d H:i:s", $client['last_act']) . '</span>';
-            	$data['content'] .= '<a href="' . route('resources', [$client['id']]) . '" class="list-group-item row">' . '<span class="col-sm-3">' . $picture . $client['as_name'] . '</span>' . $link . $act;
+                $act = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $client['last_act']) . '</span>';
+            	$data['content'] .= '<a href="' . route('resources', [$client['id']]) . '" class="list-group-item row">' . '<span class="col-xs-3">' . $picture . $client['as_name'] . '</span>' . $link . $act;
                 if ($login == 'yes') {
-                    $add = '<span class="col-sm-2 directory-add" add-val="' . $client['as_uri'] . '" title="Add to My Patient List and Get Notifications for any Changes"><i class="fa fa-plus fa-lg" style="cursor:pointer;"></i> Follow</span>';
+                    $add = '<span class="col-xs-2 directory-add" add-val="' . $client['as_uri'] . '" title="Add to My Patient List and Get Notifications for any Changes"><i class="fa fa-plus fa-lg" style="cursor:pointer;"></i> Follow</span>';
                     $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client['as_uri'])->first();
                     if ($check) {
                         $add = '';
