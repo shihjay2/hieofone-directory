@@ -359,7 +359,7 @@ class OauthController extends Controller
                 if ($query1) {
                     foreach ($query1 as $pending) {
                         $link = '<span class="col-sm-5">' . $pending->code . '</span>';
-                        $activity = '<span class="col-sm-3"></span>';
+                        $activity = '<span class="col-sm-3">Status: ' . $pending->client_ids . '</span>';
                         $data['content'] .= '<a href="#" class="list-group-item row"><span class="col-sm-3"><i class="fa fa-btn fa-user"></i>Pending Trustee Creation</span>' . $link . $activity . '</a>';
                     }
                 }
