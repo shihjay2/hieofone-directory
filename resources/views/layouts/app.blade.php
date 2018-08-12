@@ -97,10 +97,9 @@
 					@if (Auth::guest())
 						@if (!isset($noheader))
 							<li><a href="{{ url('/patients') }}">Patients</a></li>
-							<li><a href="{{ url('/clinicians') }}">Clinicians</a></li>
+							<li><a href="{{ url('/signup') }}">Clinicians</a></li>
 							<!-- <li><a href="{{ url('/others') }}">Others</a></li> -->
 							<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
-							<li><a href="{{ url('/support') }}">Support</a></li>
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 									Support <span class="caret"></span>
