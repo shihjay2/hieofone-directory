@@ -103,7 +103,7 @@
 				<!-- <p><a href="https://shihjay.xyz/nosh">Click here to access Alice's Health Record again</a></p> -->
 				<p>Problems adding your credentials?</p>
 				<p><a href="{{ route('doximity_start') }}">Try Again</a></p>
-				<p><a href="{{ route('login') }}" id="close_modal2">Finish and Close</a></p>
+				<p><a href="{{ route('login') }}">Finish and Close</a></p>
 			</div>
 		</div>
 	</div>
