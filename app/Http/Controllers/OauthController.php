@@ -27,6 +27,7 @@ use SimpleXMLElement;
 use GuzzleHttp;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Validator;
 
 class OauthController extends Controller
 {
