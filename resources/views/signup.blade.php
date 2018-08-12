@@ -9,19 +9,20 @@
 				<div class="panel-body">
 					<div style="text-align: center;">
 					  <i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>
-					  <p>To register you'll need a smartphone with the <a href="https://uport.me" target="_blank">uPort app</a> installed.</p>
-					  <p>Make sure you add your NPI to your uPort app through the Doximity credential verification site</p>
-					  <p>After you register with the uPort app, the form fields will then populate with your information.<p>
 					</div>
 					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}" id="signup_form">
 						{{ csrf_field() }}
 
                         <div class="form-group">
                             <div class="col-md-8 col-md-offset-2">
-                                <button type="button" class="btn btn-primary btn-block" id="connectUportBtn" onclick="loginBtnClick()">
-                                    <img src="{{ asset('assets/uport-logo-white.svg') }}" height="25" width="25" style="margin-right:5px"></img> Obtain credentials with uPort
-                                </button>
+								<p>For Clinician access to consenting Trusttee health records, you'll need a smartphone with the <a href="https://uport.me" target="_blank">uPort app</a> installed first.
+								<a href="https://uport.me" target="_blank"><img class="img-responsive" src="{{ asset('assets/uPortApp.png') }}"></img></a>
+								<br><p>Then add your NPI to your uPort app through the Doximity credential verification site</p>
                                 <button type="button" class="btn btn-primary btn-block" id="connectUportBtn1"><i class="fa fa-btn fa-plus"></i> Add Doximity Clinician Verification</button>
+								<br><p>After you register with the uPort app, the form fields will then populate with your information.<p>
+                                <button type="button" class="btn btn-primary btn-block" id="connectUportBtn" onclick="loginBtnClick()">
+                                    <img src="{{ asset('assets/uport-logo-white.svg') }}" height="25" width="25" style="margin-right:5px"></img>  Check your uPort Credentials
+                                </button>
                             </div>
                         </div>
 
@@ -151,9 +152,17 @@
 							</div>
 						</div>
 
+						<div class="alert alert-danger">
+							<p>Clinician Note: This information will be logged by the patient's Trustee when you use uPort to sign-in as a clinician.  For your privacy, HIE of One does not store any clinician information.  Your activity is logged with the specific patient's Trustee and timestamped on a blockchain in case of dispute.</p>
+						</div>
+
+						<div class="alert alert-danger">
+							<p>Clinician Note: The patient's Trustee is patient-controlled and may not be available to you in case of dispute.  HIE of One recommends that retain your own records for legal purposes.  You can do that in your existing system or by installing your own NOSH practice management system (coming soon).</p>
+						</div>
+
 						<div class="form-group">
-							<div class="col-md-6 col-md-offset-4">
-								<button type="submit" class="btn btn-primary">
+							<div class="col-md-8 col-md-offset-2">
+								<button type="submit" class="btn btn-primary btn-block">
 									<i class="fa fa-btn fa-sign-in"></i> Sign Up!
 								</button>
 							</div>
@@ -217,7 +226,7 @@
 
 	const loginBtnClick = () => {
 		connect.requestCredentials({
-	      requested: ['name', 'phone', 'country', 'email', 'description', 'NPI', 'specialty'],
+	      requested: ['name', 'email', 'NPI', 'Specialty'],
 	      notifications: true // We want this if we want to recieve credentials
 	    }).then((credentials) => {
 			console.log(credentials);
@@ -225,15 +234,24 @@
             $('#last_name').val(parsed.lastName);
             $('#first_name').val(parsed.firstName);
 			$('#uport_id').val(credentials.address);
-            if (typeof credentials.NPI !== 'undefined') {
+            if (typeof credentials.NPI !== 'undefined' && credentials.NPI !== '') {
                 $('#npi').val(credentials.NPI);
-            }
-            if (typeof credentials.email !== 'undefined') {
-				$('#email').val(credentials.email);
+            } else {
+				$('#npi').closest('.form_group').addClass('has-error');
+                $('#npi').parent().append('<span class="help-block">NPI required</span>');
 			}
-			if (typeof credentials.specialty !== 'undefined') {
-                $('#specialty').val(credentials.specialty);
-            }
+            if (typeof credentials.email !== 'undefined' && credentials.email !== '') {
+				$('#email').val(credentials.email);
+			} else {
+				$('#email').closest('.form_group').addClass('has-error');
+                $('#email').parent().append('<span class="help-block">E-mail address required</span>');
+			}
+			if (typeof credentials.Specialty !== 'undefined' && credentials.Specialty !== '') {
+                $('#specialty').val(credentials.Specialty);
+            } else {
+				$('#specialty').closest('.form_group').addClass('has-error');
+                $('#specialty').parent().append('<span class="help-block">Speciality required</span>');
+			}
 			$('#signup_form').show();
 		}, console.err);
 	};

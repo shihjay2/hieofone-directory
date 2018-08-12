@@ -188,6 +188,6 @@ var NameParse = (function(){
 	return NameParse;
 })();
 
-if (module) {
-  module.exports = NameParse;
-}
+// if (module) {
+//   module.exports = NameParse;
+// }

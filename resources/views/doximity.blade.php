@@ -138,7 +138,7 @@
 
 	const loginBtnClick = () => {
 		connect.requestCredentials({
-	      requested: ['name', 'phone', 'country', 'email', 'description', 'NPI'],
+	      requested: ['name', 'email'],
 	      notifications: true // We want this if we want to recieve credentials
 	    }).then((credentials) => {
 			console.log(credentials);
@@ -207,13 +207,18 @@
 
 	const attest = () => {
 		connect.requestCredentials({
-	      requested: ['name', 'phone', 'country', 'email', 'description'],
+	      requested: ['name', 'email'],
 	      notifications: true // We want this if we want to recieve credentials
 	    }).then((credentials) => {
 			console.log(credentials);
 			connect.attestCredentials({
 			  sub: credentials.address,
-			  claim: { "NPI": "{{ $npi }}", "Specialty": "{{ $specialty }}" },
+			  claim: { "NPI": "{{ $npi }}" },
+			  exp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000
+			})
+			connect.attestCredentials({
+			  sub: credentials.address,
+			  claim: { "Specialty": "{{ $specialty }}" },
 			  exp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000
 			})
 			$('#modal2').modal('show');
