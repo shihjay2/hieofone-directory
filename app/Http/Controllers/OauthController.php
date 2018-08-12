@@ -520,10 +520,17 @@ class OauthController extends Controller
         $query = DB::table('owner')->first();
         if ($query) {
             if ($request->isMethod('post')) {
-                $this->validate($request, [
+                $validator = Validator::make($request->all(), [
                     'email' => 'required',
                     'code' => 'required'
                 ]);
+                if ($validator->fails()) {
+                    return redirect()->route('patients', ['yes'])->withErrors($validator)->withInput();
+                }
+                // $this->validate($request, [
+                //     'email' => 'required',
+                //     'code' => 'required'
+                // ]);
                 // $data['code'] = $this->gen_uuid();
                 // $data['email'] = $request->input('email');
                 // DB::table('invitation')->insert($data);
