@@ -237,19 +237,19 @@
             if (typeof credentials.NPI !== 'undefined' && credentials.NPI !== '') {
                 $('#npi').val(credentials.NPI);
             } else {
-				$('#npi').closest('.form_group').addClass('has-error');
+				$('#npi').closest('.form-group').addClass('has-error');
                 $('#npi').parent().append('<span class="help-block">NPI required</span>');
 			}
             if (typeof credentials.email !== 'undefined' && credentials.email !== '') {
 				$('#email').val(credentials.email);
 			} else {
-				$('#email').closest('.form_group').addClass('has-error');
+				$('#email').closest('.form-group').addClass('has-error');
                 $('#email').parent().append('<span class="help-block">E-mail address required</span>');
 			}
 			if (typeof credentials.Specialty !== 'undefined' && credentials.Specialty !== '') {
                 $('#specialty').val(credentials.Specialty);
             } else {
-				$('#specialty').closest('.form_group').addClass('has-error');
+				$('#specialty').closest('.form-group').addClass('has-error');
                 $('#specialty').parent().append('<span class="help-block">Speciality required</span>');
 			}
 			$('#signup_form').show();
