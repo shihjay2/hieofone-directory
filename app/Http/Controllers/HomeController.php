@@ -1235,8 +1235,8 @@ class HomeController extends Controller
                 'email' => $request->input('email'),
                 'expires' => date('Y-m-d H:i:s', time() + $access_lifetime),
                 'code' => $code,
-                // 'first_name' => $request->input('first_name'),
-                // 'last_name' => $request->input('last_name'),
+                'first_name' => 'Pending',
+                'last_name' => 'Pending',
                 'owner' => 'no',
                 'client_ids' => 'Invitation Sent'
             ];
