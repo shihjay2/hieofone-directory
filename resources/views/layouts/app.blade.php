@@ -75,7 +75,15 @@
 							<li><a href="{{ url('/home') }}">My Patients</a></li>
 						@endif
 						<li><a href="{{ url('/forum') }}">Forum</a></li>
-						<li><a href="{{ url('/tickets') }}">Support</a></li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+								Support <span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu" role="menu">
+								<li><a href="http://bit.ly/TrusteeForum " target="_blank"><i class="fa fa-fw fa-question"></i>F.A.Q</a></li>
+								<li><a href="{{ url('/tickets') }}"><i class="fa fa-fw fa-list"></i>Support</a></li>
+							</ul>
+						</li>
 						<li><a href="{{ url('/reports') }}">Reports</a></li>
 						@if (Session::get('is_owner') == 'no')
 							<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
@@ -93,6 +101,15 @@
 							<!-- <li><a href="{{ url('/others') }}">Others</a></li> -->
 							<li><a href="{{ url('/privacy_policy') }}">Privacy Policy</a></li>
 							<li><a href="{{ url('/support') }}">Support</a></li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+									Support <span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="http://bit.ly/TrusteeForum " target="_blank"><i class="fa fa-fw fa-question"></i>F.A.Q</a></li>
+									<li><a href="{{ url('/support') }}"><i class="fa fa-fw fa-list"></i>Support Form</a></li>
+								</ul>
+							</li>
 							<!-- <li><a href="{{ url('/signup') }}">Sign Up</a></li> -->
 							@if (isset($demo))
 								<li class="dropdown">

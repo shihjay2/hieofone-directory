@@ -12,7 +12,8 @@
 				<div class="panel-heading">Support</div>
 				<div class="panel-body" style="text-align: center;">
 					<p>Welome to the Directory for {{ $name }}.</p>
-					<p>If you are a visitor and do not have a Trustee Authorizaion Server with us, please fill out this form and we will get back to you.</p>
+					<p>To start, please <a href="http://bit.ly/TrusteeForum" target="_blank">see this document</a> for any general questions about Trustee.</p> 
+					<p>If you are a visitor and do not have a Trustee Authorizaion Server with us and have a specific question, please fill out this form and we will get back to you.</p>
 					<p>If you have a Trustee Authorization Server with us, please <a href="{{ url('/') . '/tickets' }}">click here</a> to file a ticket</p>
 					@if (isset($message_action))
 						<div class="alert alert-danger">

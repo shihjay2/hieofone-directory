@@ -34,12 +34,12 @@
 							<strong>{!! $message_action !!}</strong>
 						</div>
 					@endif
-					<p style="text-align: center;">Enter your e-mail address to get your own Trustee.  You will be receiving a confirmation e-mail for further instructions.</p>
+					<p style="text-align: center;">Please <a href="{{ url('/support') }}">contact Support</a> if you don't have an Invitation Code.  You will be receiving a confirmation e-mail for further instructions.</p>
 					<div class="alert alert-danger" style="text-align: center;"><i class="fa fa-btn fa-exclamation-triangle"></i> Trustees are in Beta Status. For testing only.</div>
 					<div style="text-align: center;">
 						<i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>
 					</div>
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/container_create') }}">
+					<form class="form-horizontal" role="form" method="POST" action="{{ url('/patients') }}">
 						{{ csrf_field() }}
 						<div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
 							<label for="email" class="col-md-4 control-label">E-Mail Address</label>

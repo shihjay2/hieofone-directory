@@ -519,22 +519,57 @@ class OauthController extends Controller
     {
         $query = DB::table('owner')->first();
         if ($query) {
-            $description = $query->description;
-            if ($query->description == '') {
-                $description = 'This is some test text you can enter';
+            if ($request->isMethod('post')) {
+                $this->validate($request, [
+                    'email' => 'required',
+                    'code' => 'required'
+                ]);
+                // $data['code'] = $this->gen_uuid();
+                // $data['email'] = $request->input('email');
+                // DB::table('invitation')->insert($data);
+                $match = DB::table('invitation')->where('email', '=', $request->input('email'))->where('code', '=', $request->input('code'))->first();
+                if ($match) {
+                    if ($match->first_name == 'Pending' && $match->last_name == 'Pending') {
+                        Session::put('message_action', 'You have already requested a Trustee Authorizaion Server.  Please wait for an email soon when it is ready.');
+                        return redirect()->route('patients', ['yes']);
+                    }
+                    $url = route('container_create', [$data['code']]);
+                    $data1['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
+                    $data1['message_data'] .= "Please confirm your e-mail so we know you're a real human.<br>";
+                    $data1['message_data'] .= 'To finish this process, please click on the following link or point your web browser to:<br>';
+                    $data1['message_data'] .= $url;
+                    $title1 = 'Complete your Trustee Patient Container creation from the ' . $owner->org_name . ' Trustee Directory';
+                    $to1 = $request->input('email');
+                    $this->send_mail('auth.emails.generic', $data1, $title1, $to1);
+                    $new_data = [
+                        'name' => $owner->org_name,
+                        'text' => '',
+                        'create' => 'yes',
+                        'complete' => 'Your request for a patient container has been received.<br>You will be receiving a confirmation e-mail to verify if you hare a human.<br>Thank you!'
+                    ];
+                    return view('patients', $new_data);
+                } else {
+                    Session::put('message_action', 'Your e-mail address and code do not match.  Try again.');
+                    return redirect()->route('patients', ['yes']);
+                }
+            } else {
+                $description = $query->description;
+                if ($query->description == '') {
+                    $description = 'This is some test text you can enter';
+                }
+                $data = [
+                    'name' => $query->org_name,
+                    'text' => $description,
+                    'create' => 'no',
+                    'complete' => 'no'
+                ];
+                if ($create !== '') {
+                    $data['create'] = 'yes';
+                }
+                $data['message_action'] = Session::get('message_action');
+                Session::forget('message_action');
+                return view('patients', $data);
             }
-            $data = [
-                'name' => $query->org_name,
-                'text' => $description,
-                'create' => 'no',
-                'complete' => 'no'
-            ];
-            if ($create !== '') {
-                $data['create'] = 'yes';
-            }
-            $data['message_action'] = Session::get('message_action');
-            Session::forget('message_action');
-            return view('patients', $data);
         } else {
             return redirect()->route('install');
         }
