@@ -2980,6 +2980,7 @@ class OauthController extends Controller
         $data['start'] = 'true';
         $data['npi'] = '';
         $data['specialty'] = '';
+        $data['finish'] = route('login');
         return view('doximity', $data);
     }
 }
