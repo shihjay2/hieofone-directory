@@ -157,16 +157,16 @@
 						</div>
 
 						<div class="alert alert-danger">
-							<p>Clinician Note: The patient's Trustee is patient-controlled and may not be available to you in case of dispute.  HIE of One recommends that retain your own records for legal purposes.  You can do that in your existing system or by installing your own NOSH practice management system (coming soon).</p>
+							<p>Clinician Note: The patient's Trustee is patient-controlled and may not be available to you in case of dispute.  HIE of One recommends you retain your own records for legal purposes.  You can do that in your existing system or by installing your own NOSH practice management system (coming soon).</p>
 						</div>
 
-						<div class="form-group">
+						<!-- <div class="form-group">
 							<div class="col-md-8 col-md-offset-2">
 								<button type="submit" class="btn btn-primary btn-block">
 									<i class="fa fa-btn fa-sign-in"></i> Sign Up!
 								</button>
 							</div>
-						</div>
+						</div> -->
 					</form>
 				</div>
 			</div>
@@ -189,7 +189,7 @@
 			</div>
 			<div class="modal-footer">
 				<!-- <button type="button" class="btn btn-default" data-dismiss="modal" onClick="attest()"><i class="fa fa-btn fa-check"></i> Proceed</button> -->
-				<a href="https://cloud.noshchartingsystem.com/doximity/" target="_blank" class="btn btn-default" id="doximity_modal"><i class="fa fa-btn fa-hand-o-right"></i> Get from Doximity</a>
+				<a href="{{ route('doximity_start') }}" target="_blank" class="btn btn-default" id="doximity_modal"><i class="fa fa-btn fa-hand-o-right"></i> Get from Doximity</a>
 				<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-btn fa-times"></i> Close</button>
 			  </div>
 		</div>

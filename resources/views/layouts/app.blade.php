@@ -111,7 +111,7 @@
 							</li>
 							<!-- <li><a href="{{ url('/signup') }}">Sign Up</a></li> -->
 							@if (isset($demo))
-								<li class="dropdown">
+								<!-- <li class="dropdown">
 									<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 										Demo User <span class="caret"></span>
 									</a>
@@ -120,9 +120,9 @@
 										<li><a href=""><i class="fa fa-btn fa-cogs"></i>My Information</a></li>
 										<li><a href=""><i class="fa fa-btn fa-sign-out"></i>Sign Out</a></li>
 									</ul>
-								</li>
+								</li> -->
 							@else
-								<li class="dropdown">
+								<!-- <li class="dropdown">
 									<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 										Demo Pages <span class="caret"></span>
 									</a>
@@ -130,7 +130,7 @@
 										<li><a href="{{ url('/demo_patient_list') }}"><i class="fa fa-btn fa-list"></i>Public Patient List</a></li>
 										<li><a href="{{ url('/demo_patient_list/yes') }}"><i class="fa fa-btn fa-list"></i>Patient List after Login</a></li>
 									</ul>
-								</li>
+								</li> -->
 								<li><a href="{{ url('/login') }}">Sign In</a></li>
 							@endif
 						@endif
