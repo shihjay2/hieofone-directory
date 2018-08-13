@@ -2158,6 +2158,7 @@ class OauthController extends Controller
                 'name' => $owner->org_name
 			];
 			return view('signup', $data2);
+            Session::put('last_page', $request->fullUrl());
 		}
 		return redirect()->route('home');
 	}
@@ -2965,6 +2966,12 @@ class OauthController extends Controller
         $user_details = Socialite::driver('doximity')->userFromToken($user->token);
         $data['npi'] = $user_details->npi;
         $data['specialty'] = $user_details->specialty;
+        if (Session::has('last_page')) {
+            $data['finish'] = Session::get('last_page');
+            Session::forget('last_page');
+        } else {
+            $data['finish'] = route('login');
+        }
         return view('doximity', $data);
     }
 

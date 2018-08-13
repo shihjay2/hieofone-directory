@@ -216,11 +216,11 @@
 			  claim: { "NPI": "{{ $npi }}" },
 			  exp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000
 			})
-			connect.attestCredentials({
-			  sub: credentials.address,
-			  claim: { "Specialty": "{{ $specialty }}" },
-			  exp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000
-			})
+			// connect.attestCredentials({
+			//   sub: credentials.address,
+			//   claim: { "Specialty": "{{ $specialty }}" },
+			//   exp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000
+			// })
 			$('#modal2').modal('show');
 		});
 	}

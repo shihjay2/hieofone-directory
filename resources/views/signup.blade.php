@@ -116,7 +116,7 @@
 							</div>
 						</div>
 
-						<div class="form-group{{ $errors->has('specialty') ? ' has-error' : '' }}">
+						<!-- <div class="form-group{{ $errors->has('specialty') ? ' has-error' : '' }}">
 							<label for="specialty" class="col-md-4 control-label">Specialty</label>
 
 							<div class="col-md-6">
@@ -128,7 +128,7 @@
 									</span>
 								@endif
 							</div>
-						</div>
+						</div> -->
 
 						<div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
 							<label for="email" class="col-md-4 control-label">E-Mail Address</label>
@@ -232,7 +232,8 @@
 
 	const loginBtnClick = () => {
 		connect.requestCredentials({
-	      requested: ['name', 'email', 'NPI', 'Specialty'],
+		  requested: ['name', 'email', 'NPI'],
+	      // requested: ['name', 'email', 'NPI', 'Specialty'],
 	      notifications: true // We want this if we want to recieve credentials
 	    }).then((credentials) => {
 			console.log(credentials);
@@ -252,12 +253,12 @@
 				$('#email').closest('.form-group').addClass('has-error');
                 $('#email').parent().append('<span class="help-block">E-mail address required</span>');
 			}
-			if (typeof credentials.Specialty !== 'undefined' && credentials.Specialty !== '') {
-                $('#specialty').val(credentials.Specialty);
-            } else {
-				$('#specialty').closest('.form-group').addClass('has-error');
-                $('#specialty').parent().append('<span class="help-block">Speciality required</span>');
-			}
+			// if (typeof credentials.Specialty !== 'undefined' && credentials.Specialty !== '') {
+            //     $('#specialty').val(credentials.Specialty);
+            // } else {
+			// 	$('#specialty').closest('.form-group').addClass('has-error');
+            //     $('#specialty').parent().append('<span class="help-block">Speciality required</span>');
+			// }
 			$('#signup_form').show();
 		}, console.err);
 	};
