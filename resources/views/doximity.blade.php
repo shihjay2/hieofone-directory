@@ -128,10 +128,10 @@
 	});
 	// Setup
 	const Connect = window.uportconnect.Connect;
-	const appName = 'Doximity Credentials';
+	const appName = 'Doximity';
 	const connect = new Connect(appName, {
-		'clientId': '2ohNU4wT7Y7YqJ5kLMw2of1bdCnuFB1tZmr',
-		'signer': window.uportconnect.SimpleSigner('9d3aef4e1e1a80877fe501151f9372de2e34cb2744e875c5e1b1af5a73f4eb7e'),
+		'clientId': '2okWub26m6S7ibjna7j1QEb9tya2LfQieSE',
+		'signer': window.uportconnect.SimpleSigner('58e9a23b542693004be35db8233389baf6646e9e88b2110ac737559ae9f8b9f9'),
 		'network': 'rinkeby'
 	});
 	const web3 = connect.getWeb3();

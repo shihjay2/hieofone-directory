@@ -16,7 +16,13 @@
                         <div class="form-group">
                             <div class="col-md-8 col-md-offset-2">
 								<p>For Clinician access to consenting Trustee health records, you'll need a smartphone with the <a href="https://uport.me" target="_blank">uPort app</a> installed first.
-								<a href="https://uport.me" target="_blank"><img class="img-responsive" src="{{ asset('assets/uPortApp.png') }}"></img></a>
+								<div>
+									<a href="https://itunes.apple.com/us/app/uport-id/id1123434510?mt=8" target="_blank">
+										<img class="auth-app-badge" src="{{ asset('assets/AppleApp.svg') }}" alt="Apple App Logo" style="padding:6%">
+									</a>
+									<a href='https://play.google.com/store/apps/details?id=com.uportMobile&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1' target="_blank"><img alt='Get it on Google Play' src="{{ asset('assets/google-play-badge.png') }}"/ style="height:60px;"></a>
+								</div>
+								<!-- <a href="https://uport.me" target="_blank"><img class="img-responsive" src="{{ asset('assets/uPortApp.png') }}"></img></a> -->
 								<br><p>Then add your NPI to your uPort app through the Doximity credential verification site</p>
                                 <button type="button" class="btn btn-primary btn-block" id="connectUportBtn1"><i class="fa fa-btn fa-plus"></i> Add Doximity Clinician Verification</button>
 								<br><p>After you register with the uPort app, the form fields will then populate with your information.<p>
