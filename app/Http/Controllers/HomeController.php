@@ -1283,7 +1283,7 @@ class HomeController extends Controller
                 $data['content'] .= '<li class="list-group-item row"><span class="col-xs-5">' . $row->email . '</span>';
                 $data['content'] .= '<span class="col-xs-2"><a href="' . route('invite_cancel', [$row->code, true]) . '" data-toggle="tooltip" title="Cancel Invite"><i class="fa fa-btn fa-lg fa-times"></i></a>';
                 $data['content'] .= '<a href="' . route('resend_invitation', [$row->id]) . '" data-toggle="tooltip" title="Resend E-mail Notification"><i class="fa fa-btn fa-lg fa-retweet"></i></a></span>';
-                $data['contnet'] .= '<span class="col-xs-2">' . $row->code . '</span><span class="col-xs-3">' . $row->client_ids . '</span></li>';
+                $data['content'] .= '<span class="col-xs-2">' . $row->code . '</span><span class="col-xs-3">' . $row->client_ids . '</span></li>';
             }
             $data['content'] .= '</ul>';
         }
