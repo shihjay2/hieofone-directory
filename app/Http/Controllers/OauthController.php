@@ -538,7 +538,7 @@ class OauthController extends Controller
                 $match = DB::table('invitation')->where('email', '=', $request->input('email'))->where('code', '=', $request->input('code'))->first();
                 if ($match) {
                     if ($match->first_name == 'Pending' && $match->last_name == 'Pending') {
-                        Session::put('message_action', 'You have already requested a Trustee Authorizaion Server.  Please wait for an email soon when it is ready.');
+                        Session::put('message_action', 'You have already requested a Trustee Authorization Server.  Please wait for an email soon when it is ready.');
                         return redirect()->route('patients', ['yes']);
                     }
                     $url = route('container_create', [$data['code']]);
@@ -598,7 +598,7 @@ class OauthController extends Controller
                 $match = DB::table('invitation')->where('email', '=', $request->input('email'))->where('code', '=', $request->input('code'))->first();
                 if ($match) {
                     if ($match->first_name == 'Pending' && $match->last_name == 'Pending') {
-                        Session::put('message_action', 'You have already requested a Trustee Authorizaion Server.  Please wait for an email soon when it is ready.');
+                        Session::put('message_action', 'You have already requested a Trustee Authorization Server.  Please wait for an email soon when it is ready.');
                         return redirect()->route('patients', ['yes']);
                     }
                     $url = route('container_create', [$data['code']]);
@@ -640,7 +640,7 @@ class OauthController extends Controller
                 // $data7['message_data'] .= '<br><br>If you need to login to the terminal through SSH (Secure Shell), you can set your SSH client or terminal to the same URL above, using port 22.<br><br>';
                 // $data7['message_data'] .= 'Your usernmae is ' . $request->input('username') . '<br>';
                 // $data7['message_data'] .= 'Your temporary password is ' . $request->input('password') . '<br><br>You will be asked to change your password upon your first login via SSH';
-                $title7 = 'Your Trustee Authorizaion Server has been created!';
+                $title7 = 'Your Trustee Authorization Server has been created!';
                 $to7 = $request->input('email');
                 $this->send_mail('auth.emails.generic', $data7, $title7, $to7);
                 return 'Message has been sent to the patient';
