@@ -399,8 +399,8 @@ class OauthController extends Controller
                         // $timestamp = mt_rand(1, time());
                         // $activity = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
                         // $activity = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $client->last_activity) . '</span>';
-                        $activity_date = new Date($client->last_activity);
-                        $activity = '<span class="col-xs-3">' . $activity_date->diffForHumans(null, false, false, 6) . '</span>';
+                        // $activity_date = new Date($client->last_activity);
+                        $activity = '<span class="col-xs-3">' . Date::createFromTimestamp($client->last_activity)->diffForHumans(null, false, false, 6) . '</span>';
                         // $add = '<span class="col-xs-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
                         // $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
                         // if ($check) {
