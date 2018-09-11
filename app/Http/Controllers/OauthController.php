@@ -2356,7 +2356,8 @@ class OauthController extends Controller
     			'type' => 'as',
     			'as_uri' => $as_uri,
                 'last_activity' => $request->input('last_update'),
-                'as_name' => $request->input('name')
+                'as_name' => $request->input('name'),
+                'email' => $request->input('email')
     		];
             $query = DB::table('oauth_rp')->where('as_uri', '=', $as_uri)->first();
     		if ($query) {
@@ -2719,45 +2720,50 @@ class OauthController extends Controller
     public function oidc_relay(Request $request, $state='')
     {
         if ($request->isMethod('post')) {
-            $dns_uri = 'https://dns-api.org/A/' . $request->input('root_uri');
-            $ch = curl_init();
-            curl_setopt($ch,CURLOPT_URL, $dns_uri);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-            curl_setopt($ch,CURLOPT_FAILONERROR,1);
-            curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
-            curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-            curl_setopt($ch,CURLOPT_TIMEOUT, 60);
-            curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
-            $return = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close ($ch);
-            $return_arr = json_decode($return, true);
-            if ($httpCode !== 404 && $httpCode !== 0) {
-                if ($return_arr[0]['value'] == $_SERVER['REMOTE_ADDR']) {
-                    // called from pNOSH or AS to set state with the origin
-                    $query2 = DB::table('oidc_relay')->where('state', '=', $request->input('state'))->first();
-                    if ($query2) {
-                        return 'Not authorized - duplicate state';
+            $query = DB::table('oauth_rp')->where('as_uri', '=', 'https://' . $request->input('root_uri'))->first();
+            if ($query) {
+                $dns_uri = 'https://dns-api.org/A/' . $request->input('root_uri');
+                $ch = curl_init();
+                curl_setopt($ch,CURLOPT_URL, $dns_uri);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+                curl_setopt($ch,CURLOPT_FAILONERROR,1);
+                curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+                curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($ch,CURLOPT_TIMEOUT, 60);
+                curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
+                $return = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close ($ch);
+                $return_arr = json_decode($return, true);
+                if ($httpCode !== 404 && $httpCode !== 0) {
+                    if ($return_arr[0]['value'] == $_SERVER['REMOTE_ADDR']) {
+                        // called from pNOSH or AS to set state with the origin
+                        $query2 = DB::table('oidc_relay')->where('state', '=', $request->input('state'))->first();
+                        if ($query2) {
+                            return 'Not authorized - duplicate state';
+                        } else {
+                            $data = [
+                                'state' => $request->input('state'),
+                                'origin_uri' => $request->input('origin_uri'),
+                                'response_uri' => $request->input('response_uri'),
+                                'fhir_url' => $request->input('fhir_url'),
+                                'fhir_auth_url' => $request->input('fhir_auth_url'),
+                                'fhir_token_url' => $request->input('fhir_token_url'),
+                                'type' => $request->input('type'),
+                                'cms_pid' => $request->input('cms_pid'),
+                                'refresh_token' => $request->input('refresh_token')
+                            ];
+                            DB::table('oidc_relay')->insert($data);
+                            return 'OK';
+                        }
                     } else {
-                        $data = [
-                            'state' => $request->input('state'),
-                            'origin_uri' => $request->input('origin_uri'),
-                            'response_uri' => $request->input('response_uri'),
-                            'fhir_url' => $request->input('fhir_url'),
-                            'fhir_auth_url' => $request->input('fhir_auth_url'),
-                            'fhir_token_url' => $request->input('fhir_token_url'),
-                            'type' => $request->input('type'),
-                            'cms_pid' => $request->input('cms_pid'),
-                            'refresh_token' => $request->input('refresh_token')
-                        ];
-                        DB::table('oidc_relay')->insert($data);
-                        return 'OK';
+                        return 'Not authorized - origin call not coming from the same server.';
                     }
                 } else {
-                    return 'Not authorized - origin call not coming from the same server.';
+                    return 'Not authorized - origin call check not working properly.';
                 }
             } else {
-                return 'Not authorized - origin call check not working properly.';
+                return 'Not authorized - origin call is not registered to the directory.';
             }
         } else {
             if ($state !== '') {
@@ -2836,6 +2842,7 @@ class OauthController extends Controller
                 $client_secret = '';
                 $oidc = new OpenIDConnectUMAClient($as->fhir_auth_url, $client_id, $client_secret);
                 $oidc->startSession();
+                $oidc->setState($state);
                 $oidc->setSessionName('directory');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
@@ -2878,6 +2885,7 @@ class OauthController extends Controller
                 // $client_secret = 'EiyTnDZnBR1p2OhLWBFpr0qV4SNXDw10IGwtEGf2B8sgJploBJ2NhmaQSqdcSO7eNi4xIxbP5Bk8wPvHnqdlaMLLImYCJF2EzKW5ie7snbNm5Joyphf87RvzDl7r6cO0';
                 $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
                 $oidc->startSession();
+                $oidc->setState($state);
                 $oidc->setSessionName('directory');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
@@ -2923,6 +2931,7 @@ class OauthController extends Controller
                 $client_secret = env('CMS_BLUEBUTTON_CLIENT_SECRET');
                 $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
                 $oidc->startSession();
+                $oidc->setState($state);
                 $oidc->setSessionName('directory');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
@@ -2943,6 +2952,19 @@ class OauthController extends Controller
                     'patient_token' => $oidc->getPatientToken(),
                     'patient' => $result_token['patient'],
                     'refresh_token' => $oidc->getRefreshToken(),
+                ];
+            }
+            if ($as->type == 'google') {
+                config(['services.google.client_id' => env('GOOGLE_KEY')]);
+                config(['services.google.client_secret' => env('GOOGLE_SECRET')]);
+                config(['services.google.redirect' => env('GOOGLE_REDIRECT_URI')]);
+                $user = Socialite::driver('google')->with(['state' => $state])->user();
+                $token = $user->token;
+                $data2 = [
+                    'access_token' => $user->token,
+                    'patient_token' => '',
+                    'patient' => '',
+                    'refresh_token' => $user->refreshToken
                 ];
             }
             DB::table('oidc_relay')->where('state', '=', $state)->update($data2);

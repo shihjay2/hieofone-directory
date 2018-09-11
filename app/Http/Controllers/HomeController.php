@@ -72,7 +72,7 @@ class HomeController extends Controller
                     // $activity = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
                     $activity = '<span class="col-xs-3">' . Date::createFromTimestamp($client->last_activity)->diffForHumans(null, false, false, 6) . '</span>';
                     $remove = '<span class="col-xs-2"><span style="margin:10px"></span><i class="fa fa-minus fa-lg directory-remove" remove-val="' . $client->as_uri . '" title="Remove from My Patient List" style="cursor:pointer;"></i></span>';
-                    $data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-xs-3">' . $picture . $client->as_name . '</span>' . $link . $activity . $remove . '</a>';
+                    $data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-xs-3">' . $picture . $client->as_name . '<br>' . $client->email . '</span>' . $link . $activity . $remove . '</a>';
     			}
     			$data['content'] .= '</div>';
             } else {
@@ -130,7 +130,11 @@ class HomeController extends Controller
                 if ($check) {
                     $add = '';
                 }
-            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-xs-3">' . $picture . $client->as_name . '</span>' . $link . $activity . $add . '</a>';
+                $as_name = $client->as_name;
+                if (Session::get('is_owner') == 'yes') {
+                    $as_name .= '<br>' . $client->email;
+                }
+            	$data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-xs-3">' . $picture . $as_name . '</span>' . $link . $activity . $add . '</a>';
 			}
 			$data['content'] .= '</div>';
 		}
