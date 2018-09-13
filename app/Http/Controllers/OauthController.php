@@ -3009,7 +3009,7 @@ class OauthController extends Controller
             if ($as->type == 'epic') {
                 $test_url = $as->fhir_url . 'Patient/' . $data2['patient_token'];
                 $fhir_result = $this->fhir_request($test_url,false,$data2['access_token']);
-                return $fhir_result;
+                return $test_url;
             }
 
             // if ($as->type !== 'google') {
