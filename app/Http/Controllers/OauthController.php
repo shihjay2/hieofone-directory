@@ -2822,7 +2822,7 @@ class OauthController extends Controller
                     'epic' => 'OpenEpic'
                 ];
                 $data['type'] = $type_arr[$query->type];
-                $data['post'] = route('oidc_relay_start', [$start]);
+                $data['post'] = route('oidc_relay_start', [$state]);
             } else {
                 $response = [
                     'error' => "not_found",
