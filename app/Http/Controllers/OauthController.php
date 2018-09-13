@@ -2815,7 +2815,7 @@ class OauthController extends Controller
             }
         } else  {
             if ($query) {
-                $data['url'] = $query->origin_url;
+                $data['url'] = $query->origin_uri;
                 $type_arr = [
                     'cms_bluebutton_sandbox' => 'Meidcare.gov (Sandbox)',
                     'cms_bluebutton' => 'Medicare.gov',
