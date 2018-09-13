@@ -3006,12 +3006,18 @@ class OauthController extends Controller
                 ];
             }
             // Check if user is associated with the originating authorization server
-            if ($as->type !== 'google') {
-                $email = $oidc->getAccessTokenPayload();
-            } else {
-                $email = $user->getEmail();
+            if ($as->type == 'epic') {
+                $test_url = $as->fhir_url . 'Patient/' . $oidc->getPatientToken();
             }
-            return $email;
+            $fhir_result = $this->fhir_request($test_url,false,$data2['access_token']);
+            return $fhir_result;
+            // if ($as->type !== 'google') {
+            //     $email = $oidc->getAccessTokenPayload();
+            // } else {
+            //     $email = $user->getEmail();
+            // }
+            // return $email;
+
 
             if ($as->type !== 'cms_bluebutton_sandbox') {
                 if ($as->type !== 'google') {
