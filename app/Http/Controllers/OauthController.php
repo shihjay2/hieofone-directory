@@ -3006,6 +3006,13 @@ class OauthController extends Controller
                 ];
             }
             // Check if user is associated with the originating authorization server
+            if ($as->type !== 'google') {
+                $email = $oidc->requestUserInfo('email');
+            } else {
+                $email = $user->getEmail();
+            }
+            return $email;
+
             if ($as->type !== 'cms_bluebutton_sandbox') {
                 if ($as->type !== 'google') {
                     $email = $oidc->requestUserInfo('email');
