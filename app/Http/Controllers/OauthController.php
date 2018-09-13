@@ -2751,7 +2751,8 @@ class OauthController extends Controller
                                 'fhir_token_url' => $request->input('fhir_token_url'),
                                 'type' => $request->input('type'),
                                 'cms_pid' => $request->input('cms_pid'),
-                                'refresh_token' => $request->input('refresh_token')
+                                'refresh_token' => $request->input('refresh_token'),
+                                'email' => $query->email
                             ];
                             DB::table('oidc_relay')->insert($data);
                             return 'OK';
@@ -2773,12 +2774,16 @@ class OauthController extends Controller
                     if ($query2->error !== null && $query2->error !== '') {
                         $return['error'] = $query2->error;
                     } else {
-                        $return = [
-                            'access_token' => $query2->access_token,
-                            'patient_token' => $query2->patient_token,
-                            'refresh_token' => $query2->refresh_token,
-                            'patient' => $query2->patient
-                        ];
+                        if ($query2->access_token !== null && $query2->access_token !== '') {
+                            $return = [
+                                'access_token' => $query2->access_token,
+                                'patient_token' => $query2->patient_token,
+                                'refresh_token' => $query2->refresh_token,
+                                'patient' => $query2->patient
+                            ];
+                        } else {
+                            $return['error'] = 'Authorization canceled.';
+                        }
                     }
                 } else {
                     $return['error'] = 'Not authorized - state does not exist.';
@@ -2792,8 +2797,41 @@ class OauthController extends Controller
 
     public function oidc_relay_start(Request $request, $state)
     {
-        Session::put('oidc_state', $state);
-        return redirect()->route('oidc_relay_connect');
+        $query = DB::table('oidc_relay')->where('state', '=', $state)->first();
+        if ($request->isMethod('post')) {
+            if ($query) {
+                if ($request->input('submit') == 'allow') {
+                    Session::put('oidc_state', $state);
+                    return redirect()->route('oidc_relay_connect');
+                } else {
+                    return redirect($query->response_uri);
+                }
+            } else {
+                $response = [
+                    'error' => "not_found",
+                    'error_description' => "OIDC client corresponding to state: " . $state . " not found"
+                ];
+                return Response::json($response, 404);
+            }
+        } else  {
+            if ($query) {
+                $data['url'] = $query->origin_url;
+                $type_arr = [
+                    'cms_bluebutton_sandbox' => 'Meidcare.gov (Sandbox)',
+                    'cms_bluebutton' => 'Medicare.gov',
+                    'epic' => 'OpenEpic'
+                ];
+                $data['type'] = $type_arr[$query->type];
+                $data['post'] = route('oidc_relay_start', [$start]);
+            } else {
+                $response = [
+                    'error' => "not_found",
+                    'error_description' => "OIDC client corresponding to state: " . $state . " not found"
+                ];
+                return Response::json($response, 404);
+            }
+            return view('oidc_relay_start', $data);
+        }
     }
 
     public function oidc_relay_connect(Request $request)
@@ -2967,6 +3005,18 @@ class OauthController extends Controller
                     'refresh_token' => $user->refreshToken
                 ];
             }
+            // Check if user is associated with the originating authorization server
+            if ($as->type !== 'cms_bluebutton_sandbox') {
+                if ($as->type !== 'google') {
+                    $email = $oidc->requestUserInfo('email');
+                } else {
+                    $email = $user->getEmail();
+                }
+                if ($email !== $as->email) {
+                    Session::forget('oidc_state');
+                    return redirect($as->response_uri);
+                }
+            }
             DB::table('oidc_relay')->where('state', '=', $state)->update($data2);
             Session::forget('oidc_state');
             return redirect($as->response_uri);
@@ -3006,5 +3056,13 @@ class OauthController extends Controller
         $data['specialty'] = '';
         $data['finish'] = route('login');
         return view('doximity', $data);
+    }
+
+    public function uport_ether_notify(Request $request)
+    {
+        $data_message['message_data'] = 'uPort ID: ' . $request->input('address') . '<br>Name: ' . $request->input('name');
+        $to = env('UPORT_ETHER_NOTIFY');
+        $this->send_mail('auth.emails.generic', $data_message, 'Test E-mail', $to);
+        return 'OK';
     }
 }

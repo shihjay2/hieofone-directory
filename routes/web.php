@@ -72,6 +72,7 @@ Route::any('login', ['as' => 'login', 'uses' => 'OauthController@login']);
 Route::any('logout', ['as' => 'logout', 'uses' => 'OauthController@logout']);
 Route::post('login_uport/{admin?}', ['as' => 'login_uport', 'middleware' => 'csrf', 'uses' => 'OauthController@login_uport']);
 Route::any('uport_user_add', ['as' => 'uport_user_add', 'uses' => 'OauthController@uport_user_add']);
+Route::post('uport_ether_notify', ['as' => 'uport_ether_notify', 'middleware' => 'csrf', 'uses' => 'OauthController@uport_ether_notify']);
 Route::any('remote_logout', ['as' => 'remote_logout', 'uses' => 'OauthController@remote_logout']);
 Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
 Route::get('all_patients', ['as' => 'all_patients', 'uses' => 'HomeController@all_patients']);
@@ -111,7 +112,7 @@ Route::any('signup_confirmation/{code}', ['as' => 'signup_confirmation', 'uses' 
 Route::any('signup_hieofone', ['as' => 'signup_hieofone', 'uses' => 'OauthController@signup_hieofone']);
 Route::any('support', ['as' => 'support', 'uses' => 'OauthController@support']);
 Route::any('oidc_relay/{state?}', ['as' => 'oidc_relay', 'uses' => 'OauthController@oidc_relay']);
-Route::get('oidc_relay_start/{state}', ['as' => 'oidc_relay_start', 'uses' => 'OauthController@oidc_relay_start']);
+Route::any('oidc_relay_start/{state}', ['as' => 'oidc_relay_start', 'uses' => 'OauthController@oidc_relay_start']);
 Route::any('oidc_relay_connect', ['as' => 'oidc_relay_connect', 'uses' => 'OauthController@oidc_relay_connect']);
 // Route::get('change_permission/{id}', ['as' => 'change_permission', 'uses' => 'HomeController@change_permission']);
 // Route::get('change_permission_add_edit/{id}', ['as' => 'change_permission_add_edit', 'uses' => 'HomeController@change_permission_add_edit']);

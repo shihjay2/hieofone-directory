@@ -98,8 +98,10 @@
 				<h4>Doximity Credentials to uPort</h4>
 			</div>
 			<div id="modal1_body" class="modal-body" style="height:30vh;overflow-y:auto;">
-				<p>You should have successfully added Doximity credentials to your uPort</p>
+				<p>You should have successfully added Doximity credentials to your uPort.</p>
+				<p>The crediential expires in 1 month.  Return to this site to renew it.</p>
 				<p>You can verify this by clicking on Verifications in your uPort App with a verification coming from HIE of One with NPI and Speciality claims added.</p>
+				<p>
 				<!-- <p><a href="https://shihjay.xyz/nosh">Click here to access Alice's Health Record again</a></p> -->
 				<p>Problems adding your credentials?</p>
 				<p><a href="{{ route('doximity_start') }}">Try Again</a></p>
@@ -216,6 +218,23 @@
 			  claim: { "NPI": "{{ $npi }}" },
 			  exp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000
 			})
+			var uport_email_url = '<?php echo route("uport_ether_notify"); ?>';
+			var uport_email_data = 'name=' + credentials.name + '&uport=' + credentials.address;
+			$.ajax({
+				type: "POST",
+				url: uport_email_url,
+				data: uport_email_data,
+				dataType: 'json',
+				beforeSend: function(request) {
+					return request.setRequestHeader("X-CSRF-Token", $("meta[name='csrf-token']").attr('content'));
+				},
+				success: function(data){
+					if (data.message !== 'OK') {
+						toastr.error(data.message);
+						// console.log(data);
+					}
+				}
+			});
 			// connect.attestCredentials({
 			//   sub: credentials.address,
 			//   claim: { "Specialty": "{{ $specialty }}" },
