@@ -3007,7 +3007,7 @@ class OauthController extends Controller
             }
             // Check if user is associated with the originating authorization server
             if ($as->type !== 'google') {
-                $email = $oidc->requestUserInfo('email');
+                $email = $oidc->getAccessTokenPayload();
             } else {
                 $email = $user->getEmail();
             }
