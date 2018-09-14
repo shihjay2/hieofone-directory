@@ -459,7 +459,7 @@ class OauthController extends Controller
 
     public function privacy_policy(Request $request)
     {
-        $data['date'] = 'May 16, 2018';
+        $data['date'] = 'September 13, 2018';
         $data['name'] = Session::get('owner');
         return view('privacy_policy', $data);
     }

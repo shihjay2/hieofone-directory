@@ -18,7 +18,12 @@
 					<p>You may be asked to provide your personal information anytime you are in contact with Directory or a Directory affiliated company. Directory and its affiliates may share this personal information with each other and use it consistent with this Privacy Policy. They may also combine it with other information to provide and improve our products, services, content, and advertising. You are not required to provide the personal information that we have requested, but, if you chose not to do so, in many cases we will not be able to provide you with our products or services or respond to any queries you may have. Here are some examples of the types of personal information Directory may collect and how we may use it:</p>
 					<h4>What personal information we collect</h4>
 					<ul>
-						<li>When you create a Trustee(R) app, participate in an online Directory, contact us or participate in an online survey, we may collect a variety of information, including your name, phone number, email address, contact preferences, and credit card information.</li>
+						<li>When you create a Trustee<i class="fa fa-registered"></i> app, participate in an online Directory, contact us or participate in an online survey, we may collect a variety of information, including your name, phone number, email address, contact preferences, and credit card information.</li>
+					</ul>
+					<h4>What personal information we can access during support</h4>
+					<ul>
+						<li>In our role as your Trustee support organization, the staff of HIE of One has access to your Trustee and the personal information it contains. We do not collect or store this information beyond the time it takes to resolve a support incident. Our administrative and support staff is trained in this privacy policy. Your information is not shared with third-parties.</li>
+						<li>Your Trustee and the personal information it contains is hosted without encryption at an established cloud service provider. This could expose your personal information to support staff at the cloud service provider.</li>
 					</ul>
 					<h4>How we use your personal information</h4>
 					<ul>
@@ -27,6 +32,10 @@
 						<li>We may use your personal information, including date of birth, to verify identity, assist with identification of users, and to determine appropriate services.</li>
 						<li>From time to time, we may use your personal information to send important notices, such as communications about purchases and changes to our terms, conditions, and policies. Because this information is important to your interaction with Directory, you may not opt out of receiving these communications.</li>
 						<li>We may also use personal information for internal purposes such as auditing, data analysis, and research to improve Directory’s products, services, and customer communications.</li>
+					</ul>
+					<h4>Access consent policies for your personal information</h4>
+					<ul>
+						<li>Directory initializes your Trustee consent policies such that any provider with a valid National Provider Identifier (NPI) can get access to your personal information. You can disable this consent policy, but if you do, you will need to specifically invite each provider that is to have access to your personal information one by one.</li>
 					</ul>
 					<hr><h3>Collection and Use of Non-Personal Information</h3>
 					<p>We also collect data in a form that does not, on its own, permit direct association with any specific individual. We may collect, use, transfer, and disclose non-personal information for any purpose. The following are some examples of non-personal information that we collect and how we may use it:</p>
@@ -58,7 +67,7 @@
 					<h3>Integrity and Retention of Personal Information</h3>
 					<p>Directory makes it easy for you to keep your personal information accurate, complete, and up to date. We will retain your personal information for the period necessary to fulfill the purposes outlined in this Privacy Policy unless a longer retention period is required or permitted by law.</p>
 					<hr><h3>Access to Personal Information</h3>
-					<p>You can help ensure that your contact information and preferences are accurate, complete, and up to date by logging in to your account at <a href="https://directory.hieofone.org/" target="_blank">https://directory.hieofone.org</a>. For other personal information we hold, we will provide you with access (including a copy) for any purpose including to request that we correct the data if it is inaccurate or delete the data if Directory is not required to retain it by law or for legitimate business purposes. We may decline to process requests that are frivolous/vexatious, jeopardize the privacy of others, are extremely impractical, or for which access is not otherwise required by local law. Access, correction, or deletion requests can be made through the Privacy Contact Form.</p>
+					<p>You can help ensure that your contact information and preferences are accurate, complete, and up to date by logging in to your account at <a href="https://dir.hieofone.org/" target="_blank">https://dir.hieofone.org</a>. For other personal information we hold, we will provide you with access (including a copy) for any purpose including to request that we correct the data if it is inaccurate or delete the data if Directory is not required to retain it by law or for legitimate business purposes. We may decline to process requests that are frivolous/vexatious, jeopardize the privacy of others, are extremely impractical, or for which access is not otherwise required by local law. Access, correction, or deletion requests can be made through the Privacy Contact Form.</p>
 					<hr><h3>Children & Education</h3>
 					<p>We understand the importance of taking extra precautions to protect the privacy and safety of children using Directory products and services. Children under the age of 13, or equivalent minimum age in the relevant jurisdiction, are not permitted to create their own Trustees, unless their parent provided verifiable consent or as part of the child account creation process.</p>
 					<p>If we learn that we have collected the personal information of a child under 13, or equivalent minimum age depending on jurisdiction, outside the above circumstances we will take steps to delete the information as soon as possible.</p>
