@@ -3006,30 +3006,27 @@ class OauthController extends Controller
                 ];
             }
             // Check if user is associated with the originating authorization server
-            if ($as->type == 'epic') {
-                $test_url = $as->fhir_url . 'Patient/' . $data2['patient_token'];
-                $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
-                return $fhir_result;
-            }
-
-            // if ($as->type !== 'google') {
-            //     $email = $oidc->getAccessTokenPayload();
-            // } else {
-            //     $email = $user->getEmail();
-            // }
-            // return $email;
-
-
             if ($as->type !== 'cms_bluebutton_sandbox') {
-                if ($as->type !== 'google') {
-                    $email = $oidc->requestUserInfo('email');
-                } else {
+                if ($as->type == 'epic') {
+                    $test_url = $as->fhir_url . 'Patient/' . $data2['patient_token'];
+                    $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
+                    foreach ($fhir_result['telecom'] as $telecom) {
+                        if ($telecom['system'] == 'email') {
+                            $email == $telecom['value'];
+                        }
+                    }
+                }
+                if ($as->type == 'google') {
                     $email = $user->getEmail();
                 }
                 if ($email !== $as->email) {
                     Session::forget('oidc_state');
                     return redirect($as->response_uri);
                 }
+            } else {
+                $test_url = $base_url . '/v1/connect/userinfo';
+                $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
+                return $fhir_result;
             }
             DB::table('oidc_relay')->where('state', '=', $state)->update($data2);
             Session::forget('oidc_state');
