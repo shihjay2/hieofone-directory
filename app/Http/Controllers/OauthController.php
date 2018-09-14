@@ -459,8 +459,9 @@ class OauthController extends Controller
 
     public function privacy_policy(Request $request)
     {
+        $query = DB::table('owner')->first();
         $data['date'] = 'September 13, 2018';
-        $data['name'] = Session::get('owner');
+        $data['name'] = $query->org_name;
         return view('privacy_policy', $data);
     }
 
