@@ -3007,6 +3007,7 @@ class OauthController extends Controller
             }
             // Check if user is associated with the originating authorization server
             if ($as->type !== 'cms_bluebutton_sandbox') {
+                $email = '';
                 if ($as->type == 'epic') {
                     $test_url = $as->fhir_url . 'Patient/' . $data2['patient_token'];
                     $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
@@ -3016,6 +3017,11 @@ class OauthController extends Controller
                         }
                     }
                 }
+                if ($as->type == 'cms_bluebutton') {
+                    $test_url = $base_url . '/v1/connect/userinfo';
+                    $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
+                    $email = $fhir_result['email'];
+                }
                 if ($as->type == 'google') {
                     $email = $user->getEmail();
                 }
@@ -3023,10 +3029,6 @@ class OauthController extends Controller
                     Session::forget('oidc_state');
                     return redirect($as->response_uri);
                 }
-            } else {
-                $test_url = $base_url . '/v1/connect/userinfo';
-                $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
-                return $fhir_result;
             }
             DB::table('oidc_relay')->where('state', '=', $state)->update($data2);
             Session::forget('oidc_state');
