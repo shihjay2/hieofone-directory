@@ -352,8 +352,8 @@ class OauthController extends Controller
             $query1 = DB::table('invitation')->where('first_name', '=', 'Pending')->where('last_name', '=', 'Pending')->get();
     		if ($query || $query1) {
                 $data['content'] = '<form role="form"><div class="form-group"><input class="form-control" id="searchinput" type="search" placeholder="Filter Results..." /></div>';
-    			$data['content'] .= '<div class="list-group searchlist">';
-                $data['content'] .= '<a class="list-group-item row"><span class="col-xs-3"><strong>Name</strong></span><span class="col-xs-5"><strong>Resources</strong></span><span class="col-xs-3"><strong>Last Activity</strong></span></a>';
+    			$data['content'] .= '<ul class="list-group searchlist">';
+                $data['content'] .= '<li class="list-group-item row"><span class="col-xs-3"><strong>Name</strong></span><span class="col-xs-5"><strong>Resources</strong></span><span class="col-xs-3"><strong>Last Activity</strong></span></li>';
                 // usort($query, function($a, $b) {
                 //     return $b['last_act'] <=> $a['last_act'];
                 // });
@@ -408,10 +408,10 @@ class OauthController extends Controller
                         //     $add = '';
                         // }
                     	// $data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-xs-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
-                        $data['content'] .= '<a href="' . $client->as_uri . '" class="list-group-item row" target="_blank"><span class="col-xs-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
+                        $data['content'] .= '<li><span class="col-xs-3"><a href="' . $client->as_uri . '" class="list-group-item row" target="_blank">' . $picture . $client->as_name . '</a></span>' . $link . $activity . '</li>';
         			}
                 }
-    			$data['content'] .= '</div>';
+    			$data['content'] .= '</ul>';
     		}
             // $data['back'] = '<a href="' . URL::to('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
             return view('home', $data);
