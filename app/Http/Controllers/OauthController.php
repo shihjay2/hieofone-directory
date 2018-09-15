@@ -383,7 +383,8 @@ class OauthController extends Controller
                                         if ($rs_count > 0) {
                                             $link .= '<br>';
                                         }
-                                        $link .= '<p><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></p>';
+                                        $link .= '<p><a class="btn btn-danger " href="' . $rs_uri . '" target="_blank">' . $rs_row->rs_name . '</a></p>';
+                                        // $link .= '<p><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></p>';
                                         $rs_count++;
                                     }
                                 }

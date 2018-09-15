@@ -41,7 +41,7 @@
 							<label for="url" class="col-md-4 control-label">Web Address (URL):</label>
 
 							<div class="col-md-6">
-								<input id="url" type="text" class="form-control" name="url" value="shihjay.xyz" data-toggle="tooltip" title="shihjay.xyz">
+								<input id="url" type="text" class="form-control" name="url">
 
 								@if ($errors->has('url'))
 									<span class="help-block">
