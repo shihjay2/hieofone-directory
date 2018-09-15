@@ -361,7 +361,7 @@ class OauthController extends Controller
                     foreach ($query1 as $pending) {
                         $link = '<span class="col-xs-5">' . $pending->code . '</span>';
                         $activity = '<span class="col-xs-3">Status: ' . $pending->client_ids . '</span>';
-                        $data['content'] .= '<a href="#" class="list-group-item row"><span class="col-xs-3"><i class="fa fa-btn fa-user"></i>Pending Trustee Creation</span>' . $link . $activity . '</a>';
+                        $data['content'] .= '<li class="list-group-item row"><span class="col-xs-3"><i class="fa fa-btn fa-user"></i>Pending Trustee Creation</span>' . $link . $activity . '</li>';
                     }
                 }
                 if ($query) {
@@ -408,7 +408,7 @@ class OauthController extends Controller
                         //     $add = '';
                         // }
                     	// $data['content'] .= '<a href="' . route('resources', [$client->id]) . '" class="list-group-item row"><span class="col-xs-3">' . $picture . $client->as_name . '</span>' . $link . $activity . '</a>';
-                        $data['content'] .= '<li><span class="col-xs-3"><a href="' . $client->as_uri . '" class="list-group-item row" target="_blank">' . $picture . $client->as_name . '</a></span>' . $link . $activity . '</li>';
+                        $data['content'] .= '<li class="list-group-item row"><span class="col-xs-3"><a href="' . $client->as_uri . '" target="_blank">' . $picture . $client->as_name . '</a></span>' . $link . $activity . '</li>';
         			}
                 }
     			$data['content'] .= '</ul>';
