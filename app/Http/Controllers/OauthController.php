@@ -369,6 +369,7 @@ class OauthController extends Controller
                         $link = '<span class="col-xs-5">';
                         $rs = DB::table('as_to_rs')->where('as_id', '=', $client->id)->get();
                         $rs_count=0;
+                        $last_activity_display = false;
                         if ($rs) {
                             foreach ($rs as $rs_row) {
                                 if ($rs_row->rs_public == 0) {
@@ -386,6 +387,11 @@ class OauthController extends Controller
                                         $link .= '<p><a class="btn btn-danger btn-sm" href="' . $rs_uri . '" target="_blank">' . $rs_row->rs_name . '</a></p>';
                                         // $link .= '<p><span class="label label-danger pnosh_link" nosh-link="' . $rs_uri . '">' . $rs_row->rs_name . '</span></p>';
                                         $rs_count++;
+                                        if ($rs_row->rs_last_activity !== 0) {
+                                            if ($last_activity_display == false) {
+                                                $last_activity_display = true;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -402,7 +408,7 @@ class OauthController extends Controller
                         // $activity = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $client->last_activity) . '</span>';
                         // $activity_date = new Date($client->last_activity);
                         $activity = '<span class="col-xs-3"></span>';
-                        if ($rs_row->rs_last_activity !== '0') {
+                        if ($last_activity_display == true) {
                             $activity = '<span class="col-xs-3">' . Date::createFromTimestamp($client->last_activity)->diffForHumans(null, false, false, 6) . '</span>';
                         }
                         // $add = '<span class="col-xs-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
