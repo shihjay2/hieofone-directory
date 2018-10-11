@@ -401,7 +401,10 @@ class OauthController extends Controller
                         // $activity = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $timestamp) . '</span>';
                         // $activity = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $client->last_activity) . '</span>';
                         // $activity_date = new Date($client->last_activity);
-                        $activity = '<span class="col-xs-3">' . Date::createFromTimestamp($client->last_activity)->diffForHumans(null, false, false, 6) . '</span>';
+                        $activity = '<span class="col-xs-3"></span>';
+                        if ($rs_row->last_activity !== '0') {
+                            $activity = '<span class="col-xs-3">' . Date::createFromTimestamp($client->last_activity)->diffForHumans(null, false, false, 6) . '</span>';
+                        }
                         // $add = '<span class="col-xs-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
                         // $check = DB::table('rp_to_users')->where('username', '=', Session::get('username'))->where('as_uri', '=', $client->as_uri)->first();
                         // if ($check) {
@@ -2819,7 +2822,7 @@ class OauthController extends Controller
             if ($query) {
                 $data['url'] = $query->origin_uri;
                 $type_arr = [
-                    'cms_bluebutton_sandbox' => 'Meidcare.gov (Sandbox)',
+                    'cms_bluebutton_sandbox' => 'Medicare.gov (Sandbox)',
                     'cms_bluebutton' => 'Medicare.gov',
                     'epic' => 'OpenEpic'
                 ];
@@ -3008,30 +3011,30 @@ class OauthController extends Controller
                 ];
             }
             // Check if user is associated with the originating authorization server
-            if ($as->type !== 'cms_bluebutton_sandbox') {
-                $email = '';
-                if ($as->type == 'epic') {
-                    $test_url = $as->fhir_url . 'Patient/' . $data2['patient_token'];
-                    $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
-                    foreach ($fhir_result['telecom'] as $telecom) {
-                        if ($telecom['system'] == 'email') {
-                            $email == $telecom['value'];
-                        }
-                    }
-                }
-                if ($as->type == 'cms_bluebutton') {
-                    $test_url = $base_url . '/v1/connect/userinfo';
-                    $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
-                    $email = $fhir_result['email'];
-                }
-                if ($as->type == 'google') {
-                    $email = $user->getEmail();
-                }
-                if ($email !== $as->email) {
-                    Session::forget('oidc_state');
-                    return redirect($as->response_uri);
-                }
-            }
+            // if ($as->type !== 'cms_bluebutton_sandbox') {
+            //     $email = '';
+            //     if ($as->type == 'epic') {
+            //         $test_url = $as->fhir_url . 'Patient/' . $data2['patient_token'];
+            //         $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
+            //         foreach ($fhir_result['telecom'] as $telecom) {
+            //             if ($telecom['system'] == 'email') {
+            //                 $email == $telecom['value'];
+            //             }
+            //         }
+            //     }
+            //     if ($as->type == 'cms_bluebutton') {
+            //         $test_url = $base_url . '/v1/connect/userinfo';
+            //         $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
+            //         $email = $fhir_result['email'];
+            //     }
+            //     if ($as->type == 'google') {
+            //         $email = $user->getEmail();
+            //     }
+            //     if ($email !== $as->email) {
+            //         Session::forget('oidc_state');
+            //         return redirect($as->response_uri);
+            //     }
+            // }
             DB::table('oidc_relay')->where('state', '=', $state)->update($data2);
             Session::forget('oidc_state');
             return redirect($as->response_uri);
