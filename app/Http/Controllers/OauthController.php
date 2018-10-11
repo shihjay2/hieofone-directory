@@ -402,7 +402,7 @@ class OauthController extends Controller
                         // $activity = '<span class="col-xs-3">' . date("Y-m-d H:i:s", $client->last_activity) . '</span>';
                         // $activity_date = new Date($client->last_activity);
                         $activity = '<span class="col-xs-3"></span>';
-                        if ($rs_row->last_activity !== '0') {
+                        if ($rs_row->rs_last_activity !== '0') {
                             $activity = '<span class="col-xs-3">' . Date::createFromTimestamp($client->last_activity)->diffForHumans(null, false, false, 6) . '</span>';
                         }
                         // $add = '<span class="col-xs-1"><span style="margin:10px"></span><i class="fa fa-plus fa-lg directory-add" add-val="' . $client->as_uri . '" title="Add to My Patient List" style="cursor:pointer;"></i></span>';
