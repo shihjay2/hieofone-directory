@@ -374,6 +374,11 @@ class OauthController extends Controller
                             foreach ($rs as $rs_row) {
                                 if ($rs_row->rs_public == 0) {
                                     // $link .= '<p><span class="label label-danger">Please Sign In</span></p>';
+                                    if ($rs_row->rs_last_activity !== 0) {
+                                        if ($last_activity_display == false) {
+                                            $last_activity_display = true;
+                                        }
+                                    }
                                 } else {
                                     $rs_name = explode(' ', $rs_row->rs_name);
                                     if ($rs_name[0] . $rs_name[1] !== 'Directory-') {
