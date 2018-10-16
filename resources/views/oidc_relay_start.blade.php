@@ -22,9 +22,9 @@
 						<p>
 							By clicking on Proceed, you understand that the application with the URL of {!! $url !!} will obtain and store any information about you once you have successfully authenticated with {{ $type }}.
 						</p>
-						<p>
-							Ensure that your registered email address at {{ $type }} is the same as what you have registered on your Trustee
-						</p>
+						<!-- <p> -->
+							<!-- Ensure that your registered email address at {{ $type }} is the same as what you have registered on your Trustee -->
+						<!-- </p> -->
 					</div>
 					<form class="form-horizontal" role="form" method="POST" action="{!! $post !!}">
 						<div class="form-group">
