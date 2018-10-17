@@ -3012,14 +3012,36 @@ class OauthController extends Controller
                 config(['services.google.client_id' => env('GOOGLE_KEY')]);
                 config(['services.google.client_secret' => env('GOOGLE_SECRET')]);
                 config(['services.google.redirect' => env('GOOGLE_REDIRECT_URI')]);
-                $user = Socialite::driver('google')->scopes(['openid', 'email'])->stateless()->user();
+                $client_id = env('GOOGLE_KEY');
+                $client_secret = env('GOOGLE_SECRET');
+
+                $google_url = 'https://accounts.google.com/o/oauth2/auth';
+                $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
+                $oidc->startSession();
+                $oidc->setState($state);
+                $oidc->setSessionName('directory');
+                $oidc->setRedirectURL(env('GOOGLE_REDIRECT_URI'));
+                // $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
+                // $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
+                // $oidc->addScope('patient/Patient.read');
+                // $oidc->addScope('patient/ExplanationOfBenefit.read');
+                // $oidc->addScope('patient/Coverage.read');
+                // $oidc->addScope('profile');
+                $oidc->authenticate();
+                // $user = Socialite::driver('google')->scopes(['openid', 'email'])->stateless()->user();
                 // $user = Socialite::driver('google')->with(['state' => $state])->user();
-                $token = $user->token;
+                // $token = $user->token;
+                // $data2 = [
+                //     'access_token' => $user->token,
+                //     'patient_token' => '',
+                //     'patient' => '',
+                //     'refresh_token' => $user->refreshToken
+                // ];
                 $data2 = [
-                    'access_token' => $user->token,
+                    'access_token' => $oidc->getAccessToken(),
                     'patient_token' => '',
                     'patient' => '',
-                    'refresh_token' => $user->refreshToken
+                    'refresh_token' => '',
                 ];
             }
             // Check if user is associated with the originating authorization server
