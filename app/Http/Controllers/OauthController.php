@@ -3015,14 +3015,16 @@ class OauthController extends Controller
                 $client_id = env('GOOGLE_KEY');
                 $client_secret = env('GOOGLE_SECRET');
 
-                $google_url = 'https://accounts.google.com/o/oauth2/auth';
+                $google_url = 'https://accounts.google.com/o/oauth2';
+                $authorization_endpoint = $google_url . '/auth';
+                $token_endpoint = $google_url . '/token';
                 $oidc = new OpenIDConnectUMAClient($google_url, $client_id, $client_secret);
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
                 $oidc->setRedirectURL(env('GOOGLE_REDIRECT_URI'));
-                // $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
-                // $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
+                $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
+                $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
                 // $oidc->addScope('patient/Patient.read');
                 // $oidc->addScope('patient/ExplanationOfBenefit.read');
                 // $oidc->addScope('patient/Coverage.read');
