@@ -3012,7 +3012,7 @@ class OauthController extends Controller
                 config(['services.google.client_id' => env('GOOGLE_KEY')]);
                 config(['services.google.client_secret' => env('GOOGLE_SECRET')]);
                 config(['services.google.redirect' => env('GOOGLE_REDIRECT_URI')]);
-                $user = Socialite::driver('google')->stateless()->user();
+                $user = Socialite::driver('google')->scopes(['openid', 'email'])->stateless()->user();
                 // $user = Socialite::driver('google')->with(['state' => $state])->user();
                 $token = $user->token;
                 $data2 = [
