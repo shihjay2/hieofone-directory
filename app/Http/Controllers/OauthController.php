@@ -3016,7 +3016,7 @@ class OauthController extends Controller
                 $client_secret = env('GOOGLE_SECRET');
 
                 $google_url = 'https://accounts.google.com/o/oauth2/auth';
-                $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
+                $oidc = new OpenIDConnectUMAClient($google_url, $client_id, $client_secret);
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
