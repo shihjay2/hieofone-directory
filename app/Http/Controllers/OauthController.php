@@ -3020,6 +3020,8 @@ class OauthController extends Controller
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
                 $oidc->setRedirectURL(env('GOOGLE_REDIRECT_URI'));
+                $oidc->addScope('profile');
+                $oidc->addScope('email');
                 $oidc->authenticate();
                 // $user = Socialite::driver('google')->scopes(['openid', 'email'])->stateless()->user();
                 // $user = Socialite::driver('google')->with(['state' => $state])->user();
