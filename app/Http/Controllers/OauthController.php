@@ -3024,9 +3024,9 @@ class OauthController extends Controller
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
                 $oidc->setRedirectURL(env('GOOGLE_REDIRECT_URI'));
-                $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
-                $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
-                $oidc->providerConfigParam(['jwks_uri' => $certs_endpoint]);
+                // $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
+                // $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
+                // $oidc->providerConfigParam(['jwks_uri' => $certs_endpoint]);
                 // $oidc->addScope('patient/Patient.read');
                 // $oidc->addScope('patient/ExplanationOfBenefit.read');
                 // $oidc->addScope('patient/Coverage.read');
