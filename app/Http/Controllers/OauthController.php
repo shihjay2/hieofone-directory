@@ -2835,7 +2835,8 @@ class OauthController extends Controller
                 $type_arr = [
                     'cms_bluebutton_sandbox' => 'Medicare.gov (Sandbox)',
                     'cms_bluebutton' => 'Medicare.gov',
-                    'epic' => 'OpenEpic'
+                    'epic' => 'OpenEpic',
+                    'google' => 'Google'
                 ];
                 $data['type'] = $type_arr[$query->type];
                 $data['post'] = route('oidc_relay_start', [$state]);
