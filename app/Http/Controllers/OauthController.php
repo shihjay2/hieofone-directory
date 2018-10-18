@@ -3015,7 +3015,7 @@ class OauthController extends Controller
                 $client_id = env('GOOGLE_KEY');
                 $client_secret = env('GOOGLE_SECRET');
 
-                $google_url = 'https://accounts.google.com/o/oauth2';
+                $google_url = 'https://accounts.google.com';
                 $authorization_endpoint = $google_url . '/auth';
                 $token_endpoint = $google_url . '/token';
                 $certs_endpoint = $google_url . '/certs';
