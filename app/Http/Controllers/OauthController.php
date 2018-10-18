@@ -3014,23 +3014,12 @@ class OauthController extends Controller
                 config(['services.google.redirect' => env('GOOGLE_REDIRECT_URI')]);
                 $client_id = env('GOOGLE_KEY');
                 $client_secret = env('GOOGLE_SECRET');
-
                 $google_url = 'https://accounts.google.com/';
-                $authorization_endpoint = $google_url . '/auth';
-                $token_endpoint = $google_url . '/token';
-                $certs_endpoint = $google_url . '/certs';
                 $oidc = new OpenIDConnectUMAClient($google_url, $client_id, $client_secret);
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
                 $oidc->setRedirectURL(env('GOOGLE_REDIRECT_URI'));
-                // $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
-                // $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
-                // $oidc->providerConfigParam(['jwks_uri' => $certs_endpoint]);
-                // $oidc->addScope('patient/Patient.read');
-                // $oidc->addScope('patient/ExplanationOfBenefit.read');
-                // $oidc->addScope('patient/Coverage.read');
-                // $oidc->addScope('profile');
                 $oidc->authenticate();
                 // $user = Socialite::driver('google')->scopes(['openid', 'email'])->stateless()->user();
                 // $user = Socialite::driver('google')->with(['state' => $state])->user();
