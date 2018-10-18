@@ -129,7 +129,7 @@ class Controller extends BaseController
         return $gender;
     }
 
-	protected function default_policy_type()
+	protected function default_policy_type_old()
 	{
 		$return = [
 			'login_direct',
@@ -141,6 +141,89 @@ class Controller extends BaseController
 			'private_publish_directory',
 			'last_activity'
 		];
+		return $return;
+	}
+
+	protected function default_policy_type($key=true)
+	{
+		$return = [
+			'login_direct' => [
+				'label' => 'Anyone signed-in directly to this Authorization Server sees and controls Everything',
+				'description' => '<p>Any party that you invite directly to be an authorized user to this Authorization Server has access to your Protected Health Information (PHI).  For example, this can be a spouse, partner, family members, guardian, or attorney.</p>'
+			],
+			// 'login_md_nosh',
+			'any_npi' => [
+				'label' => 'Anyone that has a Doximity-verfied National Provider Identifier (NPI) sees these Resources',
+				'description' => '<p>All individual HIPAA covered healthcare providers have a National Provider Identifier, including:</p>
+					<ul>
+						<li>Physicians</li>
+						<li>Pharmacists</li>
+						<li>Physician assistants</li>
+						<li>Midwives</li>
+						<li>Nurse practitioners</li>
+						<li>Nurse anesthetists</li>
+						<li>Dentsits</li>
+						<li>Denturists</li>
+						<li>Chiropractors</li>
+						<li>Podiatrists</li>
+						<li>Naturopathic physicians</li>
+						<li>Clinical social workers</li>
+						<li>Professional counselors</li>
+						<li>Psychologists</li>
+						<li>Physical therapists</li>
+						<li>Occupational therapists</li>
+						<li>Pharmacy technicians</li>
+						<li>Atheletic trainers</li>
+					</ul>
+					<p>By setting this as a default, you allow any healthcare provider, known or unknown at any given time, to access and edit your protected health information.</p>'
+			],
+			// 'login_google',
+			// 'login_uport',
+			'public_publish_directory' => [
+				'label' => 'Anyone can see and link to your Trustee in a Directory',
+				'description' => '<p>Any party that has access to a Directory that you participate in can see where this resource is found.</p>'
+			],
+			// 'private_publish_directory' => [
+			// 	'label' => 'Only previously authorized users can see where this resource is located in a Directory',
+			// 	'description' => '<p>Only previously authorized users that has access to a Directory that you participate in can see where this resource is found.</p>'
+			// ],
+			'last_activity' => [
+				'label' => 'Publish the most recent date and time when this Trustee was active to a Directory',
+				'description' => '<p>Activity of a Trustee refers to when a client attempts to view/edit a resource, adding/updating/removing a resource server, or registering new clients.</p>'
+			]
+		];
+		if ($key == true) {
+			return array_keys($return);
+		} else {
+			return $return;
+		}
+	}
+
+	protected function policy_build($set=false)
+	{
+		$arr = $this->default_policy_type(false);
+		$return = '';
+		if ($set == false) {
+			$query = DB::table('owner')->first();
+		} else {
+			$query = DB::table('oauth_clients')->where('client_id', '=', Session::get('current_client_id'))->first();
+		}
+		foreach ($arr as $row_k => $row_v) {
+			$return .= '<div class="form-group"><div class="col-sm-offset-2 col-sm-10"><div class="checkbox"><label>';
+			$return .= '<input type="checkbox" name="consent_' . $row_k . '"';
+			if ($set == false) {
+				$val = $query->{$row_k};
+			} else {
+				$consent = 'consent_' . $row_k;
+				$val = $query->{$consent};
+			}
+			if ($val == 1) {
+				$return .= ' checked';
+			}
+			$return .= '>' . $row_v['label'] . '</label><button type="button" class="btn btn-info" data-toggle="collapse" data-target="#' . $row_k . '_detail" style="margin-left:20px">Details</button></div>';
+			$return .= '<div id="' . $row_k . '_detail" class="collapse">' . $row_v['description'] . '</div>';
+			$return .= '</div></div>';
+		}
 		return $return;
 	}
 
