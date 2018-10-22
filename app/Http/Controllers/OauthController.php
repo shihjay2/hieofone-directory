@@ -2035,6 +2035,7 @@ class OauthController extends Controller
 
     public function test1(Request $request)
     {
+        
     }
 
     public function demo_patient_list(Request $request, $login='no')
