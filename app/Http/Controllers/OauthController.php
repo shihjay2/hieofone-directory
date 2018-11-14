@@ -2035,7 +2035,7 @@ class OauthController extends Controller
 
     public function test1(Request $request)
     {
-        
+
     }
 
     public function demo_patient_list(Request $request, $login='no')
@@ -2858,6 +2858,7 @@ class OauthController extends Controller
         // Check if user comes from associated AS
         $as = DB::table('oidc_relay')->where('state', '=', $state)->first();
         if ($as) {
+            $oidc_check = '';
             if ($as->type == 'epic') {
                 if (env('OPENEPIC_CLIENT_ID') == null) {
                     $data1['error'] = 'OpenEpic Client ID is not set.';
@@ -2923,6 +2924,14 @@ class OauthController extends Controller
                     'patient' => '',
                     'refresh_token' => ''
                 ];
+                $oidc_check = $data2['patient_token'];
+                // $test_url = $as->fhir_url . 'Patient/' . $data2['patient_token'];
+                // $fhir_result = $this->fhir_request($test_url,false,$data2['access_token'],true);
+                // foreach ($fhir_result['telecom'] as $telecom) {
+                //     if ($telecom['system'] == 'email') {
+                //         $email == $telecom['value'];
+                //     }
+                // }
             }
             if ($as->type == 'cms_bluebutton_sandbox') {
                 if (env('CMS_BLUEBUTTON_SANDBOX_CLIENT_ID') == null || env('CMS_BLUEBUTTON_SANDBOX_CLIENT_SECRET') == null) {
@@ -2963,6 +2972,7 @@ class OauthController extends Controller
                     'patient' => $result_token['patient'],
                     'refresh_token' => $oidc->getRefreshToken(),
                 ];
+                $oidc_check = $result_token['patient'];
             }
             if ($as->type == 'cms_bluebutton') {
                 if (env('CMS_BLUEBUTTON_CLIENT_ID') == null || env('CMS_BLUEBUTTON_CLIENT_SECRET') == null) {
@@ -3009,6 +3019,7 @@ class OauthController extends Controller
                     'patient' => $result_token['patient'],
                     'refresh_token' => $oidc->getRefreshToken(),
                 ];
+                $oidc_check = $result_token['patient'];
             }
             if ($as->type == 'google') {
                 config(['services.google.client_id' => env('GOOGLE_KEY')]);
@@ -3040,9 +3051,42 @@ class OauthController extends Controller
                     'patient' => '',
                     'refresh_token' => '',
                 ];
+                $google_user = Socialite::driver('google')->userFromToken($data2['access_token']);
+                $oidc_check = $google_user->getId();
             }
             // Check if user is associated with the originating authorization server
-            // if ($as->type !== 'cms_bluebutton_sandbox') {
+            if ($as->type == 'cms_bluebutton') {
+                $oidc_relay_client = DB::table('oauth_rp')->where('email', '=', $as->email)->first();
+                if (!empty($oidc_relay_client->proxy_verify)) {
+                    $proxy_verify = json_decode($oidc_relay_client->proxy_verify, true);
+                    if (isset($proxy_verify[$as->type])) {
+                        // Verify patient id
+                        if ($proxy_verify[$as->type] !== $oidc_check) {
+                            $data3['error'] = 'Credentials associated with the authorization server do not match.  Process cancelled.';
+                            DB::table('oidc_relay')->where('state', '=', $state)->update($data3);
+                            Session::forget('oidc_state');
+                            return redirect($as->response_uri);
+                        }
+                    } else {
+                        // First time add
+                        if ($oidc_check !== '') {
+                            $proxy_verify[$as->type] = $oidc_check;
+                            $data3['proxy_verify'] = json_encode($proxy_verify);
+                            DB::table('oauth_rp')->where('id', '=', $oidc_relay_client->id)->update($data3);
+                        } else {
+                            // error
+                            $data3['error'] = 'First-time credentials could not be set.  Process cancelled.';
+                            DB::table('oidc_relay')->where('state', '=', $state)->update($data3);
+                            Session::forget('oidc_state');
+                            return redirect($as->response_uri);
+                        }
+                    }
+                } else {
+                    // First time add
+                    $proxy_verify[$as->type] = $oidc_check;
+                    $data3['proxy_verify'] = json_encode($proxy_verify);
+                    DB::table('oauth_rp')->where('id', '=', $oidc_relay_client->id)->update($data3);
+                }
             //     $email = '';
             //     if ($as->type == 'epic') {
             //         $test_url = $as->fhir_url . 'Patient/' . $data2['patient_token'];
@@ -3065,7 +3109,7 @@ class OauthController extends Controller
             //         Session::forget('oidc_state');
             //         return redirect($as->response_uri);
             //     }
-            // }
+            }
             DB::table('oidc_relay')->where('state', '=', $state)->update($data2);
             Session::forget('oidc_state');
             return redirect($as->response_uri);
