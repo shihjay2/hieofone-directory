@@ -2981,21 +2981,21 @@ class OauthController extends Controller
                     return redirect($as->response_uri);
                 }
                 // Sanity checks
-                if ($as->refresh_token == '') {
-                    if ($as->cms_pid == '') {
-                        $data1['error'] = 'cms_pid is not set.';
-                        Session::forget('oidc_state');
-                        DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
-                        return redirect($as->response_uri);
-                    }
-                }
+                // if ($as->refresh_token == '') {
+                //     if ($as->cms_pid == '') {
+                //         $data1['error'] = 'cms_pid is not set.';
+                //         Session::forget('oidc_state');
+                //         DB::table('oidc_relay')->where('state', '=', $state)->update($data1);
+                //         return redirect($as->response_uri);
+                //     }
+                // }
                 $base_url = 'https://api.bluebutton.cms.gov';
-                $token_url = $base_url . '/v1/fhir/Patient/'. $as->cms_pid;
+                // $token_url = $base_url . '/v1/fhir/Patient/'. $as->cms_pid;
                 $authorization_endpoint = $base_url . '/v1/o/authorize/';
                 $token_endpoint = $base_url . '/v1/o/token/';
                 $client_id = env('CMS_BLUEBUTTON_CLIENT_ID');
                 $client_secret = env('CMS_BLUEBUTTON_CLIENT_SECRET');
-                $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
+                $oidc = new OpenIDConnectUMAClient($authorization_endpoint, $client_id, $client_secret);
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
