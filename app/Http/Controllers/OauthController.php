@@ -3009,6 +3009,9 @@ class OauthController extends Controller
                 $oidc->addScope('profile');
                 if ($as->refresh_token !== '') {
                     $json = $oidc->refreshToken($as->refresh_token);
+                    if (isset($json['error'])) {
+                        $oidc->authenticate();
+                    }
                     // $oidc->authenticate();
                 } else {
                     $oidc->authenticate();
