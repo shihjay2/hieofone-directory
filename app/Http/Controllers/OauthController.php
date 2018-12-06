@@ -3063,6 +3063,8 @@ class OauthController extends Controller
                         // Verify patient id
                         if ($proxy_verify[$as->type] !== $oidc_check) {
                             $data3['error'] = 'Credentials associated with the authorization server do not match.  Process cancelled.';
+                            $data3['error'] .= '  First: ' . $proxy_verify[$as->type];
+                            $data3['error'] .= '.  Second: ' . $oidc_check;
                             DB::table('oidc_relay')->where('state', '=', $state)->update($data3);
                             Session::forget('oidc_state');
                             return redirect($as->response_uri);
