@@ -3002,6 +3002,7 @@ class OauthController extends Controller
                 $oidc->setRedirectURL(route('oidc_relay_connect'));
                 $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
                 $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
+                $oidc->providerConfigParam(['token_endpoint_auth_methods_supported' => ['client_secret_basic']]);
                 $oidc->addScope('patient/Patient.read');
                 $oidc->addScope('patient/ExplanationOfBenefit.read');
                 $oidc->addScope('patient/Coverage.read');
