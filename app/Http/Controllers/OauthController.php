@@ -3007,8 +3007,8 @@ class OauthController extends Controller
                 $oidc->addScope('patient/Coverage.read');
                 $oidc->addScope('profile');
                 if ($as->refresh_token !== '') {
-                    // $oidc->refreshToken($as->refresh_token);
-                    $oidc->authenticate();
+                    $oidc->refreshToken($as->refresh_token);
+                    // $oidc->authenticate();
                 } else {
                     $oidc->authenticate();
                 }
@@ -3066,7 +3066,7 @@ class OauthController extends Controller
                             $data3['error'] = 'Credentials associated with the authorization server do not match.  Process cancelled.';
                             $data3['error'] .= '  First: ' . $proxy_verify[$as->type];
                             $data3['error'] .= '.  Second: ' . $oidc_check;
-                            $data3['error'] .= '. Access token: ' . $data2['access_token'];
+                            $data3['error'] .= '. Access token: ' . $result_token;
                             DB::table('oidc_relay')->where('state', '=', $state)->update($data3);
                             Session::forget('oidc_state');
                             return redirect($as->response_uri);
