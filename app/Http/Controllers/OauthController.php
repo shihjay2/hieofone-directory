@@ -3007,7 +3007,8 @@ class OauthController extends Controller
                 $oidc->addScope('patient/Coverage.read');
                 $oidc->addScope('profile');
                 if ($as->refresh_token !== '') {
-                    $oidc->refreshToken($as->refresh_token);
+                    // $oidc->refreshToken($as->refresh_token);
+                    $oidc->authenticate();
                 } else {
                     $oidc->authenticate();
                 }
