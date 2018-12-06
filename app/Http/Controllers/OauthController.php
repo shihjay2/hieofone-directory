@@ -2901,12 +2901,12 @@ class OauthController extends Controller
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
+                $oidc->setRedirectURL(route('oidc_relay_connect'));
+                $oidc->providerConfigParam(['authorization_endpoint' => $as->fhir_auth_url]);
+                $oidc->providerConfigParam(['token_endpoint' => $as->fhir_token_url]);
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
                 } else {
-                    $oidc->setRedirectURL(route('oidc_relay_connect'));
-                    $oidc->providerConfigParam(['authorization_endpoint' => $as->fhir_auth_url]);
-                    $oidc->providerConfigParam(['token_endpoint' => $as->fhir_token_url]);
                     $oidc->setAud($as->fhir_url);
                     $oidc->addScope('patient/*.read');
                     $oidc->addScope('user/*.*');
