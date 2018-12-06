@@ -2904,18 +2904,18 @@ class OauthController extends Controller
                 $oidc->setRedirectURL(route('oidc_relay_connect'));
                 $oidc->providerConfigParam(['authorization_endpoint' => $as->fhir_auth_url]);
                 $oidc->providerConfigParam(['token_endpoint' => $as->fhir_token_url]);
+                $oidc->setAud($as->fhir_url);
+                $oidc->addScope('patient/*.read');
+                $oidc->addScope('user/*.*');
+                $oidc->addScope('openid');
+                $oidc->addScope('profile');
+                $oidc->addScope('launch');
+                $oidc->addScope('launch/patient');
+                $oidc->addScope('offline_access');
+                $oidc->addScope('online_access');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
                 } else {
-                    $oidc->setAud($as->fhir_url);
-                    $oidc->addScope('patient/*.read');
-                    $oidc->addScope('user/*.*');
-                    $oidc->addScope('openid');
-                    $oidc->addScope('profile');
-                    $oidc->addScope('launch');
-                    $oidc->addScope('launch/patient');
-                    $oidc->addScope('offline_access');
-                    $oidc->addScope('online_access');
                     $oidc->authenticate();
                 }
                 $data2 = [
@@ -2952,16 +2952,16 @@ class OauthController extends Controller
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
+                $oidc->setRedirectURL(route('oidc_relay_connect'));
+                $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
+                $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
+                $oidc->addScope('patient/Patient.read');
+                $oidc->addScope('patient/ExplanationOfBenefit.read');
+                $oidc->addScope('patient/Coverage.read');
+                $oidc->addScope('profile');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
                 } else {
-                    $oidc->setRedirectURL(route('oidc_relay_connect'));
-                    $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
-                    $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
-                    $oidc->addScope('patient/Patient.read');
-                    $oidc->addScope('patient/ExplanationOfBenefit.read');
-                    $oidc->addScope('patient/Coverage.read');
-                    $oidc->addScope('profile');
                     $oidc->authenticate();
                 }
                 $result_token = json_decode(json_encode($oidc->getTokenResponse()), true);
@@ -2999,16 +2999,16 @@ class OauthController extends Controller
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
+                $oidc->setRedirectURL(route('oidc_relay_connect'));
+                $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
+                $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
+                $oidc->addScope('patient/Patient.read');
+                $oidc->addScope('patient/ExplanationOfBenefit.read');
+                $oidc->addScope('patient/Coverage.read');
+                $oidc->addScope('profile');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
                 } else {
-                    $oidc->setRedirectURL(route('oidc_relay_connect'));
-                    $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
-                    $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
-                    $oidc->addScope('patient/Patient.read');
-                    $oidc->addScope('patient/ExplanationOfBenefit.read');
-                    $oidc->addScope('patient/Coverage.read');
-                    $oidc->addScope('profile');
                     $oidc->authenticate();
                 }
                 $result_token = json_decode(json_encode($oidc->getTokenResponse()), true);
