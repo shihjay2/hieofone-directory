@@ -2903,21 +2903,20 @@ class OauthController extends Controller
                 $oidc->setSessionName('directory');
                 if ($as->refresh_token !== '') {
                     $oidc->refreshToken($as->refresh_token);
-                } else {
-                    $oidc->setRedirectURL(route('oidc_relay_connect'));
-                    $oidc->providerConfigParam(['authorization_endpoint' => $as->fhir_auth_url]);
-                    $oidc->providerConfigParam(['token_endpoint' => $as->fhir_token_url]);
-                    $oidc->setAud($as->fhir_url);
-                    $oidc->addScope('patient/*.read');
-                    $oidc->addScope('user/*.*');
-                    $oidc->addScope('openid');
-                    $oidc->addScope('profile');
-                    $oidc->addScope('launch');
-                    $oidc->addScope('launch/patient');
-                    $oidc->addScope('offline_access');
-                    $oidc->addScope('online_access');
-                    $oidc->authenticate();
                 }
+                $oidc->setRedirectURL(route('oidc_relay_connect'));
+                $oidc->providerConfigParam(['authorization_endpoint' => $as->fhir_auth_url]);
+                $oidc->providerConfigParam(['token_endpoint' => $as->fhir_token_url]);
+                $oidc->setAud($as->fhir_url);
+                $oidc->addScope('patient/*.read');
+                $oidc->addScope('user/*.*');
+                $oidc->addScope('openid');
+                $oidc->addScope('profile');
+                $oidc->addScope('launch');
+                $oidc->addScope('launch/patient');
+                $oidc->addScope('offline_access');
+                $oidc->addScope('online_access');
+                $oidc->authenticate();
                 $data2 = [
                     'access_token' => $oidc->getAccessToken(),
                     'patient_token' => $oidc->getPatientToken(),
