@@ -113,7 +113,7 @@
 @endsection
 
 @section('view.scripts')
-<!-- <script src="{{ asset('assets/js/web3.js') }}"></script> -->
+<script src="{{ asset('assets/js/web3.js') }}"></script>
 <!-- <script src="https://unpkg.com/uport-connect/dist/uport-connect.js"></script> -->
 <script src="{{ asset('assets/js/uport-connect.js') }}"></script>
 <script src="{{ asset('assets/js/toastr.min.js') }}"></script>
@@ -137,6 +137,7 @@
 		// 'signer': window.uportconnect.SimpleSigner('58e9a23b542693004be35db8233389baf6646e9e88b2110ac737559ae9f8b9f9'),
 		network: 'rinkeby'
 	});
+	const Web3 = require('web3');
 	const provider = uport.getProvider();
 	const web3 = new Web3(provider);
 
