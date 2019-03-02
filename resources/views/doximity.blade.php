@@ -130,7 +130,7 @@
 		});
 	});
 	// Setup
-	const Connect = window.uportconnect.Connect;
+	const Connect = window.uportconnect;
 	const appName = 'Doximity';
 	const connect = new Connect(appName, {
 		clientId: '2okWub26m6S7ibjna7j1QEb9tya2LfQieSE',
