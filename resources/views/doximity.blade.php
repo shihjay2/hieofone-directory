@@ -113,7 +113,7 @@
 @endsection
 
 @section('view.scripts')
-<script src="{{ asset('assets/js/web3.js') }}"></script>
+<!-- <script src="{{ asset('assets/js/web3.js') }}"></script> -->
 <!-- <script src="https://unpkg.com/uport-connect/dist/uport-connect.js"></script> -->
 <script src="{{ asset('assets/js/uport-connect.js') }}"></script>
 <script src="{{ asset('assets/js/toastr.min.js') }}"></script>
