@@ -132,10 +132,10 @@
 	// Setup
 	const Connect = window.uportconnect.Connect;
 	const appName = 'Doximity';
-	const connect = new Connect(appName, [
-		'clientId': '2okWub26m6S7ibjna7j1QEb9tya2LfQieSE',
+	const connect = new Connect(appName, {
+		clientId: '2okWub26m6S7ibjna7j1QEb9tya2LfQieSE',
 		// 'signer': window.uportconnect.SimpleSigner('58e9a23b542693004be35db8233389baf6646e9e88b2110ac737559ae9f8b9f9'),
-		'network': 'rinkeby'
+		network: 'rinkeby'
 	]);
 	const web3 = connect.getWeb3();
 
