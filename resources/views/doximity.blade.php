@@ -130,18 +130,18 @@
 		});
 	});
 	// Setup
-	const Connect = window.uportconnect.Connect;
+	const Connect = window.uportconnect;
 	const appName = 'Doximity';
-	const connect = new Connect(appName, {
+	const uport = new Connect(appName, {
 		clientId: '2okWub26m6S7ibjna7j1QEb9tya2LfQieSE',
 		// 'signer': window.uportconnect.SimpleSigner('58e9a23b542693004be35db8233389baf6646e9e88b2110ac737559ae9f8b9f9'),
 		network: 'rinkeby'
 	});
-	const provider = connect.getProvider();
+	const provider = uport.getProvider();
 	const web3 = new Web3(provider);
 
 	const loginBtnClick = () => {
-		connect.requestCredentials({
+		uport.requestCredentials({
 	      requested: ['name', 'email'],
 	      notifications: true // We want this if we want to recieve credentials
 	    }).then((credentials) => {
@@ -210,12 +210,12 @@
 	};
 
 	const attest = () => {
-		connect.requestCredentials({
+		uport.requestCredentials({
 	      requested: ['name', 'email'],
 	      notifications: true // We want this if we want to recieve credentials
 	    }).then((credentials) => {
 			console.log(credentials);
-			connect.attestCredentials({
+			uport.attestCredentials({
 			  sub: credentials.address,
 			  claim: { "NPI": "{{ $npi }}" },
 			  exp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000
