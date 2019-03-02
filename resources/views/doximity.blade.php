@@ -137,7 +137,8 @@
 		// 'signer': window.uportconnect.SimpleSigner('58e9a23b542693004be35db8233389baf6646e9e88b2110ac737559ae9f8b9f9'),
 		network: 'rinkeby'
 	});
-	const web3 = connect.getWeb3();
+	const provider = connect.getProvider();
+	const web3 = new Web3(provider);
 
 	const loginBtnClick = () => {
 		connect.requestCredentials({
