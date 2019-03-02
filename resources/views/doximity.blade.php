@@ -114,8 +114,8 @@
 
 @section('view.scripts')
 <script src="{{ asset('assets/js/web3.js') }}"></script>
-<script src="https://unpkg.com/uport-connect/dist/uport-connect.js"></script>
-<!-- <script src="{{ asset('assets/js/uport-connect.js') }}"></script> -->
+<!-- <script src="https://unpkg.com/uport-connect/dist/uport-connect.js"></script> -->
+<script src="{{ asset('assets/js/uport-connect.js') }}"></script>
 <script src="{{ asset('assets/js/toastr.min.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -134,7 +134,7 @@
 	const appName = 'Doximity';
 	const connect = new Connect(appName, {
 		'clientId': '2okWub26m6S7ibjna7j1QEb9tya2LfQieSE',
-		'signer': window.uportconnect.SimpleSigner('58e9a23b542693004be35db8233389baf6646e9e88b2110ac737559ae9f8b9f9'),
+		// 'signer': window.uportconnect.SimpleSigner('58e9a23b542693004be35db8233389baf6646e9e88b2110ac737559ae9f8b9f9'),
 		'network': 'rinkeby'
 	});
 	const web3 = connect.getWeb3();
