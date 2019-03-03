@@ -52,7 +52,9 @@
 						<div class="form-group" id="doximity" doximity="start">
 					@else
 						<div class="form-group" id="doximity" doximity="uport">
-							<i class="fa fa-spinner fa-spin fa-pulse fa-2x fa-fw"></i><span id="modaltext" style="margin:10px">Loading...</span>
+							<div class="row">
+								<i class="fa fa-spinner fa-spin fa-pulse fa-2x fa-fw"></i><span id="modaltext" style="margin:10px">Loading uPort...</span>
+							</div>
 					@endif
 						<div class="col-md-6 col-md-offset-3">
 							<!-- <button type="button" class="btn btn-primary btn-block" id="connectUportBtn" onclick="loginBtnClick()"> -->
@@ -107,16 +109,6 @@
 				<p>Problems adding your credentials?</p>
 				<p><a href="{{ route('doximity_start') }}">Try Again</a></p>
 				<p><a href="{{ $finish }}">Finish and Close</a></p>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="modal" id="loadingModal" role="dialog">
-	<div class="modal-dialog">
-	  <!-- Modal content-->
-		<div class="modal-content">
-			<div class="modal-body">
-				<i class="fa fa-spinner fa-spin fa-pulse fa-2x fa-fw"></i><span id="modaltext" style="margin:10px">Loading...</span>
 			</div>
 		</div>
 	</div>
