@@ -151,7 +151,7 @@
 		uport.onResponse('disclosureReq').then((res) => {
 			var did = res.payload.did;
 			var credentials = res.payload.verified;
-			console.log(credentials);
+			console.log(res.payload);
 			var uport_url = '<?php echo route("login_uport"); ?>';
 			var uport_data = 'name=' + credentials.name + '&uport=' + credentials.address;
 			if (typeof credentials.NPI !== 'undefined') {
@@ -223,7 +223,7 @@
 		uport.onResponse('disclosureReq').then((res) => {
 			var did = res.payload.did;
 			var credentials = res.payload.verified;
-			console.log(credentials);
+			console.log(res.payload);
 			uport.sendVerification({
 			  claim: { "NPI": "{{ $npi }}" },
 			  exp: Math.floor(new Date().getTime() / 1000) + 30 * 24 * 60 * 60
