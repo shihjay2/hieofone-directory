@@ -116,6 +116,7 @@
 <script src="{{ asset('assets/js/web3.js') }}"></script>
 <!-- <script src="https://unpkg.com/uport-connect/dist/uport-connect.js"></script> -->
 <script src="{{ asset('assets/js/uport-connect.js') }}"></script>
+<!-- <script src="{{ asset('assets/js/uport-credentials.js') }}"></script> -->
 <script src="{{ asset('assets/js/toastr.min.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -140,13 +141,17 @@
 	// const Web3 = window.web3;
 	// const provider = uport.getProvider();
 	// const web3 = new Web3(uport.getProvider())
-	// const web3 = new Web3(window.web3.currentProvider);
+	const web3 = new Web3(window.web3.currentProvider);
+	const credentials = new Credentials();
 
 	const loginBtnClick = () => {
-		uport.requestCredentials({
+		uport.requestDisclosure({
 	      requested: ['name', 'email'],
 	      notifications: true // We want this if we want to recieve credentials
-	    }).then((credentials) => {
+	  	});
+		uport.onResponse('disclosureReq').then((res) => {
+			var did = res.payload.did;
+			var credentials = res.payload.verified;
 			console.log(credentials);
 			var uport_url = '<?php echo route("login_uport"); ?>';
 			var uport_data = 'name=' + credentials.name + '&uport=' + credentials.address;
@@ -212,15 +217,17 @@
 	};
 
 	const attest = () => {
-		uport.requestCredentials({
+		uport.requestDisclosure({
 	      requested: ['name', 'email'],
 	      notifications: true // We want this if we want to recieve credentials
-	    }).then((credentials) => {
+	  	});
+		uport.onResponse('disclosureReq').then((res) => {
+			var did = res.payload.did;
+			var credentials = res.payload.verified;
 			console.log(credentials);
-			uport.attestCredentials({
-			  sub: credentials.address,
+			uport.sendVerification({
 			  claim: { "NPI": "{{ $npi }}" },
-			  exp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000
+			  exp: Math.floor(new Date().getTime() / 1000) + 30 * 24 * 60 * 60
 			})
 			var uport_email_url = '<?php echo route("uport_ether_notify"); ?>';
 			var uport_email_data = 'name=' + credentials.name + '&uport=' + credentials.address;
