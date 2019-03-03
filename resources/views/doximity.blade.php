@@ -226,6 +226,7 @@
 	      notifications: true // We want this if we want to recieve credentials
 	  	});
 		uport.onResponse('disclosureReq').then((res) => {
+			$('#loadingModal').modal('hide');
 			var did = res.payload.did;
 			var credentials = res.payload.verified;
 			console.log(res.payload);
@@ -234,7 +235,7 @@
 			  exp: Math.floor(new Date().getTime() / 1000) + 30 * 24 * 60 * 60
 			})
 			var uport_email_url = '<?php echo route("uport_ether_notify"); ?>';
-			var uport_email_data = 'name=' + res.payload.name + '&uport=' + credentials.did;
+			var uport_email_data = 'name=' + res.payload.name + '&uport=' + res.payload.did;
 			$.ajax({
 				type: "POST",
 				url: uport_email_url,
