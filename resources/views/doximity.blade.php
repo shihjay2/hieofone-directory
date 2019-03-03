@@ -137,9 +137,21 @@
 			$('#modal2').modal('hide');
 			return false;
 		});
-		var target = document.querySelector("#uport-wrapper");
+		var target = $("body");
 		var observer = new MutationObserver(function(mutations) {
-	        $('#loadingModal').modal('hide');
+			mutations.forEach(function( mutation ) {
+				var newNodes = mutation.addedNodes;
+				if (newNodes !== null) {
+					var $nodes = $( newNodes ); // jQuery set
+					$nodes.each(function() {
+						var $node = $(this);
+						var node_id = $node.attr('id');
+						if (node_id == 'uport-wrapper' ) {
+							$('#loadingModal').modal('hide');
+						}
+					});
+				}
+			});
 	    });
 		var config = { attributes: true, childList: true, characterData: true };
     	observer.observe(target, config);
