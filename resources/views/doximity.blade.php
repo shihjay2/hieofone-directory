@@ -52,6 +52,7 @@
 						<div class="form-group" id="doximity" doximity="start">
 					@else
 						<div class="form-group" id="doximity" doximity="uport">
+							<i class="fa fa-spinner fa-spin fa-pulse fa-2x fa-fw"></i><span id="modaltext" style="margin:10px">Loading...</span>
 					@endif
 						<div class="col-md-6 col-md-offset-3">
 							<!-- <button type="button" class="btn btn-primary btn-block" id="connectUportBtn" onclick="loginBtnClick()"> -->
@@ -137,24 +138,6 @@
 			$('#modal2').modal('hide');
 			return false;
 		});
-		var target = document.documentElement || document.body;
-		var observer = new MutationObserver(function(mutations) {
-			mutations.forEach(function( mutation ) {
-				var newNodes = mutation.addedNodes;
-				if (newNodes !== null) {
-					var $nodes = $(newNodes);
-					$nodes.each(function() {
-						var $node = $(this);
-						var node_id = $node.attr('id');
-						if (node_id == 'uport-wrapper' ) {
-							$('#loadingModal').modal('hide');
-						}
-					});
-				}
-			});
-	    });
-		var config = { attributes: true, childList: true, characterData: true };
-    	observer.observe(target, config);
 	});
 	// Setup
 	const Connect = window.uportconnect;
@@ -238,7 +221,7 @@
 	};
 
 	const attest = () => {
-		$('#loadingModal').modal('show');
+		// $('#loadingModal').modal('show');
 		uport.requestDisclosure({
 			requested: ['name', 'email', 'address', 'NPI'],
 			notifications: true // We want this if we want to recieve credentials
