@@ -137,12 +137,12 @@
 			$('#modal2').modal('hide');
 			return false;
 		});
-		var target = $("body");
+		var target = document.documentElement || document.body;
 		var observer = new MutationObserver(function(mutations) {
 			mutations.forEach(function( mutation ) {
 				var newNodes = mutation.addedNodes;
 				if (newNodes !== null) {
-					var $nodes = $( newNodes ); // jQuery set
+					var $nodes = $(newNodes);
 					$nodes.each(function() {
 						var $node = $(this);
 						var node_id = $node.attr('id');
