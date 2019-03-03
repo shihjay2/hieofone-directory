@@ -137,19 +137,25 @@
 			$('#modal2').modal('hide');
 			return false;
 		});
+		var target = document.querySelector("#uport-wrapper");
+		var observer = new MutationObserver(function(mutations) {
+	        $('#loadingModal').modal('hide');
+	    });
+		var config = { attributes: true, childList: true, characterData: true };
+    	observer.observe(target, config);
 	});
 	// Setup
 	const Connect = window.uportconnect;
 	const appName = 'Doximity';
 	const uport = new Connect(appName, {
-		clientId: '2okWub26m6S7ibjna7j1QEb9tya2LfQieSE',
+		// clientId: '2okWub26m6S7ibjna7j1QEb9tya2LfQieSE',
 		network: 'rinkeby'
 	});
 	const web3 = new Web3(window.web3.currentProvider);
 
 	const loginBtnClick = () => {
 		uport.requestDisclosure({
-	      requested: ['name', 'email'],
+	      requested: ['name', 'email', 'address'],
 	      notifications: true // We want this if we want to recieve credentials
 	  	});
 		uport.onResponse('disclosureReq').then((res) => {
@@ -220,9 +226,9 @@
 	};
 
 	const attest = () => {
-		// $('#loadingModal').modal('show');
+		$('#loadingModal').modal('show');
 		uport.requestDisclosure({
-			requested: ['name', 'email', 'NPI'],
+			requested: ['name', 'email', 'address', 'NPI'],
 			notifications: true // We want this if we want to recieve credentials
 	  	});
 		uport.onResponse('disclosureReq').then((res) => {
