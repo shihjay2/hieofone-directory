@@ -52,7 +52,7 @@
 						<div class="form-group" id="doximity" doximity="start">
 					@else
 						<div class="form-group" id="doximity" doximity="uport">
-							<div class="row">
+							<div style="text-align: center;">
 								<i class="fa fa-spinner fa-spin fa-pulse fa-2x fa-fw"></i><span id="modaltext" style="margin:10px">Loading uPort...</span>
 							</div>
 					@endif
@@ -215,7 +215,7 @@
 	const attest = () => {
 		// $('#loadingModal').modal('show');
 		uport.requestDisclosure({
-			requested: ['name', 'email', 'address', 'NPI'],
+			requested: ['name', 'email', 'MNID', 'NPI'],
 			notifications: true // We want this if we want to recieve credentials
 	  	});
 		uport.onResponse('disclosureReq').then((res) => {
