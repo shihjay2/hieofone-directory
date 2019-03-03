@@ -220,13 +220,13 @@
 	};
 
 	const attest = () => {
-		$('#loadingModal').modal('show');
+		// $('#loadingModal').modal('show');
 		uport.requestDisclosure({
-	      requested: ['name', 'email', 'NPI'],
-	      notifications: true // We want this if we want to recieve credentials
+			requested: ['name', 'email', 'NPI'],
+			notifications: true // We want this if we want to recieve credentials
 	  	});
 		uport.onResponse('disclosureReq').then((res) => {
-			$('#loadingModal').modal('hide');
+			// $('#loadingModal').modal('hide');
 			var did = res.payload.did;
 			var credentials = res.payload.verified;
 			console.log(res.payload);
@@ -235,7 +235,7 @@
 			  exp: Math.floor(new Date().getTime() / 1000) + 30 * 24 * 60 * 60
 			})
 			var uport_email_url = '<?php echo route("uport_ether_notify"); ?>';
-			var uport_email_data = 'name=' + res.payload.name + '&uport=' + res.payload.did;
+			var uport_email_data = 'name=' + res.payload.name + '&address=' + res.payload.did;
 			$.ajax({
 				type: "POST",
 				url: uport_email_url,
@@ -251,12 +251,7 @@
 					}
 				}
 			});
-			// connect.attestCredentials({
-			//   sub: credentials.address,
-			//   claim: { "Specialty": "{{ $specialty }}" },
-			//   exp: new Date().getTime() + 30 * 24 * 60 * 60 * 1000
-			// })
-			$('#loadingModal').modal('hide');
+			// $('#loadingModal').modal('hide');
 			$('#modal2').modal('show');
 		});
 	}
