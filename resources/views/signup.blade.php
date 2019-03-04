@@ -221,34 +221,31 @@
 		});
 	});
     // Setup
-	const Connect = window.uportconnect.Connect;
-	const appName = 'hieofone';
+	const Connect = window.uportconnect;
+	const appName = 'HIE of One Directory';
 	const connect = new Connect(appName, {
-		'clientId': '2ohNU4wT7Y7YqJ5kLMw2of1bdCnuFB1tZmr',
-		'signer': window.uportconnect.SimpleSigner('9d3aef4e1e1a80877fe501151f9372de2e34cb2744e875c5e1b1af5a73f4eb7e'),
 		'network': 'rinkeby'
 	});
-	const web3 = connect.getWeb3();
 
 	const loginBtnClick = () => {
-		connect.requestCredentials({
-		  requested: ['name', 'email', 'NPI'],
-	      // requested: ['name', 'email', 'NPI', 'Specialty'],
-	      notifications: true // We want this if we want to recieve credentials
-	    }).then((credentials) => {
+		uport.requestDisclosure({
+			requested: ['name', 'email', 'NPI'],
+			notifications: true // We want this if we want to recieve credentials
+	  	});
+		uport.onResponse('disclosureReq').then((res) => {
 			console.log(credentials);
-            var parsed = NameParse.parse(credentials.name);
+            var parsed = NameParse.parse(res.payload.name);
             $('#last_name').val(parsed.lastName);
             $('#first_name').val(parsed.firstName);
 			$('#uport_id').val(credentials.address);
-            if (typeof credentials.NPI !== 'undefined' && credentials.NPI !== '') {
-                $('#npi').val(credentials.NPI);
+            if (typeof res.payload.NPI !== 'undefined' && res.payload.NPI !== '') {
+                $('#npi').val(res.payload.NPI);
             } else {
 				$('#npi').closest('.form-group').addClass('has-error');
                 $('#npi').parent().append('<span class="help-block">NPI required</span>');
 			}
-            if (typeof credentials.email !== 'undefined' && credentials.email !== '') {
-				$('#email').val(credentials.email);
+            if (typeof res.payload.email !== 'undefined' && res.payload.email !== '') {
+				$('#email').val(res.payload.email);
 			} else {
 				$('#email').closest('.form-group').addClass('has-error');
                 $('#email').parent().append('<span class="help-block">E-mail address required</span>');
