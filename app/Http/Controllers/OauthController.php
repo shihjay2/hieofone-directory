@@ -3138,17 +3138,13 @@ class OauthController extends Controller
         config(['services.doximity.client_id' => env('DOXIMITY_CLIENT_ID')]);
         config(['services.doximity.client_secret' => env('DOXIMITY_CLIENT_SECRET')]);
         config(['services.doximity.redirect' => secure_url('doximity_redirect')]);
-        $user = Socialite::driver('doximity')->stateless()->user();
+        $user = Socialite::driver('doximity')->user();
         $user_details = Socialite::driver('doximity')->userFromToken($user->token);
         $data['npi'] = $user_details->npi;
         $data['specialty'] = $user_details->specialty;
-        if (Session::has('last_page')) {
-            $data['finish'] = Session::get('last_page');
-            Session::forget('last_page');
-        } else {
-            $data['finish'] = route('login');
-        }
-        return view('doximity', $data);
+        Session::put('doximity_npi', $user_details->npi);
+        Session::put('doximity_specialty', $user_detils->specialty);
+        return redirect()->route('doximity_uport');
     }
 
     public function doximity_start(Request $request)
@@ -3157,6 +3153,21 @@ class OauthController extends Controller
         $data['npi'] = '';
         $data['specialty'] = '';
         $data['finish'] = route('login');
+        return view('doximity', $data);
+    }
+
+    public function doximity_uport(Request $request)
+    {
+        $data['npi'] = Session::get('doximity_npi');
+        $data['specialty'] = Session::get('doximity_specialty');
+        Session::forget('doximity_npi');
+        Session::forget('doximity_specialty');
+        if (Session::has('last_page')) {
+            $data['finish'] = Session::get('last_page');
+            Session::forget('last_page');
+        } else {
+            $data['finish'] = route('login');
+        }
         return view('doximity', $data);
     }
 
