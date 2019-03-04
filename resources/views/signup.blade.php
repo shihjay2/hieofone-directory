@@ -10,6 +10,9 @@
 					<div style="text-align: center;">
 					  <i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>
 					</div>
+					<div id="uport_indicator" style="text-align: center;display:none;">
+						<i class="fa fa-spinner fa-spin fa-pulse fa-2x fa-fw"></i><span id="modaltext" style="margin:10px">Loading uPort...</span><br><br>
+					</div>
 					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}" id="signup_form">
 						{{ csrf_field() }}
 
@@ -228,6 +231,7 @@
 	});
 
 	const loginBtnClick = () => {
+		$("#uport_indicator").show();
 		uport.requestDisclosure({
 			requested: ['name', 'email', 'NPI'],
 			notifications: true // We want this if we want to recieve credentials
