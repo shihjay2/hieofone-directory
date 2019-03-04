@@ -237,7 +237,6 @@
 			notifications: true // We want this if we want to recieve credentials
 	  	});
 		uport.onResponse('disclosureReq').then((res) => {
-			console.log(credentials);
             var parsed = NameParse.parse(res.payload.name);
             $('#last_name').val(parsed.lastName);
             $('#first_name').val(parsed.firstName);
