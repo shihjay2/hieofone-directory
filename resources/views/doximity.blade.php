@@ -120,17 +120,7 @@
 <script src="{{ asset('assets/js/uport-connect.js') }}"></script>
 <script src="{{ asset('assets/js/toastr.min.js') }}"></script>
 <script type="text/javascript">
-	$(document).ready(function() {
-		$('[data-toggle="tooltip"]').tooltip();
-		var start = $('#doximity').attr('doximity');
-		if (start == 'uport') {
-			attest();
-		}
-		$('#close_modal2').click(function() {
-			$('#modal2').modal('hide');
-			return false;
-		});
-	});
+
 	// Setup
 	const Connect = window.uportconnect;
 	const appName = 'Doximity';
@@ -244,5 +234,16 @@
 			$('#modal2').modal('show');
 		});
 	}
+	$(document).ready(function() {
+		$('[data-toggle="tooltip"]').tooltip();
+		var start = $('#doximity').attr('doximity');
+		if (start == 'uport') {
+			attest();
+		}
+		$('#close_modal2').click(function() {
+			$('#modal2').modal('hide');
+			return false;
+		});
+	});
 </script>
 @endsection
