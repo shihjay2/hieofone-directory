@@ -13,7 +13,7 @@
 					<div id="uport_indicator" style="text-align: center;display:none;">
 						<i class="fa fa-spinner fa-spin fa-pulse fa-2x fa-fw"></i><span id="modaltext" style="margin:10px">Loading uPort...</span><br><br>
 					</div>
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}" id="signup_form">
+					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}" id="signup_form" style="display:none;">
 						{{ csrf_field() }}
 
                         <div class="form-group">
@@ -260,6 +260,7 @@
             //     $('#specialty').parent().append('<span class="help-block">Speciality required</span>');
 			// }
 			$('#signup_form').show();
+			$("#uport_indicator").hide();
 		}, console.err);
 	};
 
