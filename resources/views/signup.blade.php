@@ -223,8 +223,8 @@
     // Setup
 	const Connect = window.uportconnect;
 	const appName = 'HIE of One Directory';
-	const connect = new Connect(appName, {
-		'network': 'rinkeby'
+	const uport = new Connect(appName, {
+		network: 'rinkeby'
 	});
 
 	const loginBtnClick = () => {
