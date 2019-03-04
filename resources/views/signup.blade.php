@@ -13,7 +13,7 @@
 					<div id="uport_indicator" style="text-align: center;display:none;">
 						<i class="fa fa-spinner fa-spin fa-pulse fa-2x fa-fw"></i><span id="modaltext" style="margin:10px">Loading uPort...</span><br><br>
 					</div>
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}" id="signup_form" style="display:none;">
+					<form class="form-horizontal" role="form" method="POST" action="{{ url('/signup') }}" id="signup_form">
 						{{ csrf_field() }}
 
                         <div class="form-group">
@@ -77,7 +77,7 @@
 							</div>
 						</div> -->
 
-						<div class="form-group{{ $errors->has('first_name') ? ' has-error' : '' }}">
+						<div class="form-group{{ $errors->has('first_name') ? ' has-error' : '' }} signup_form">
 							<label for="first_name" class="col-md-4 control-label">First Name</label>
 
 							<div class="col-md-6">
@@ -91,7 +91,7 @@
 							</div>
 						</div>
 
-						<div class="form-group{{ $errors->has('last_name') ? ' has-error' : '' }}">
+						<div class="form-group{{ $errors->has('last_name') ? ' has-error' : '' }} signup_form">
 							<label for="last_name" class="col-md-4 control-label">Last Name</label>
 
 							<div class="col-md-6">
@@ -105,7 +105,7 @@
 							</div>
 						</div>
 
-						<div class="form-group{{ $errors->has('npi') ? ' has-error' : '' }}">
+						<div class="form-group{{ $errors->has('npi') ? ' has-error' : '' }} signup_form">
 							<label for="npi" class="col-md-4 control-label">NPI</label>
 
 							<div class="col-md-6">
@@ -133,7 +133,7 @@
 							</div>
 						</div> -->
 
-						<div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+						<div class="form-group{{ $errors->has('email') ? ' has-error' : '' }} signup_form">
 							<label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
 							<div class="col-md-6">
@@ -147,7 +147,7 @@
 							</div>
 						</div>
 
-						<div class="form-group{{ $errors->has('uport_id') ? ' has-error' : '' }}">
+						<div class="form-group{{ $errors->has('uport_id') ? ' has-error' : '' }} signup_form">
 							<label for="uport_id" class="col-md-4 control-label">uPort Address</label>
 
 							<div class="col-md-6">
@@ -222,6 +222,7 @@
 		$('#doximity_modal').click(function(){
 			$('#modal1').modal('hide');
 		});
+		$('.signup_form').hide();
 	});
     // Setup
 	const Connect = window.uportconnect;
@@ -259,7 +260,7 @@
 			// 	$('#specialty').closest('.form-group').addClass('has-error');
             //     $('#specialty').parent().append('<span class="help-block">Speciality required</span>');
 			// }
-			$('#signup_form').show();
+			$('.signup_form').show();
 			$("#uport_indicator").hide();
 		}, console.err);
 	};
