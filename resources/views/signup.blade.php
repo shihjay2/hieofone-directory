@@ -241,7 +241,7 @@
             var parsed = NameParse.parse(res.payload.name);
             $('#last_name').val(parsed.lastName);
             $('#first_name').val(parsed.firstName);
-			$('#uport_id').val(credentials.address);
+			$('#uport_id').val(res.payload.did);
             if (typeof res.payload.NPI !== 'undefined' && res.payload.NPI !== '') {
                 $('#npi').val(res.payload.NPI);
             } else {
