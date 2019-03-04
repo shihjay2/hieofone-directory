@@ -100,7 +100,7 @@
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				<h4>Doximity Credentials to uPort</h4>
 			</div>
-			<div id="modal1_body" class="modal-body" style="height:30vh;overflow-y:auto;">
+			<div id="modal1_body" class="modal-body" style="height:60vh;overflow-y:auto;">
 				<p>You should have successfully added Doximity credentials to your uPort.</p>
 				<p>The crediential expires in 1 month.  Return to this site to renew it.</p>
 				<p>You can verify this by clicking on Verifications in your uPort App with a verification coming from HIE of One with NPI and Speciality claims added.</p>
