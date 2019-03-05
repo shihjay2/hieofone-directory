@@ -56,6 +56,9 @@
 								</div>
 							@endif
 						</div>
+						<div id="uport_indicator" style="text-align: center;display:none;">
+							<i class="fa fa-spinner fa-spin fa-pulse fa-2x fa-fw"></i><span id="modaltext" style="margin:10px">Loading uPort...</span><br><br>
+						</div>
 					</div>
 					<input type="hidden" id="admin_set_id" value="no">
 					<form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">
@@ -194,31 +197,29 @@
 		});
 	});
 	// Setup
-	const Connect = window.uportconnect.Connect;
+	const Connect = window.uportconnect;
 	const appName = 'Trustee Directory';
-	const connect = new Connect(appName, {
-		'clientId': '2ohNU4wT7Y7YqJ5kLMw2of1bdCnuFB1tZmr',
-		'signer': window.uportconnect.SimpleSigner('9d3aef4e1e1a80877fe501151f9372de2e34cb2744e875c5e1b1af5a73f4eb7e'),
+	const uport = new Connect(appName, {
 		'network': 'rinkeby'
 	});
-	const web3 = connect.getWeb3();
 
 	const loginBtnClick = () => {
-		connect.requestCredentials({
-	      requested: ['name', 'phone', 'country', 'email', 'description', 'NPI'],
-	      notifications: true // We want this if we want to recieve credentials
-	    }).then((credentials) => {
-			console.log(credentials);
+		$('#uport_indicator').show();
+		uport.requestDisclosure({
+			requested: ['name', 'email', 'NPI'],
+			notifications: true // We want this if we want to recieve credentials
+	    });
+	    uport.onResponse('disclosureReq').then((res) => {
 			var uport_url = '<?php echo route("login_uport"); ?>';
 			if ($('#admin_set_id').val() == 'yes') {
 				uport_url += '/admin';
 			}
-			var uport_data = 'name=' + credentials.name + '&uport=' + credentials.networkAddress;
-			if (typeof credentials.NPI !== 'undefined') {
-				uport_data += '&npi=' + credentials.NPI;
+			var uport_data = 'name=' + res.payload.name + '&uport=' + res.payload.did;
+			if (typeof res.payload.NPI !== 'undefined') {
+				uport_data += '&npi=' + res.payload.NPI;
 			}
-			if (typeof credentials.email !== 'undefined') {
-				uport_data += '&email=' + credentials.email;
+			if (typeof res.payload.email !== 'undefined') {
+				uport_data += '&email=' + res.payload.email;
 			}
 			console.log(uport_data);
 			$.ajax({
