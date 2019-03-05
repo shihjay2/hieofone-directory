@@ -76,88 +76,89 @@
 								@endif
 							</div>
 						</div> -->
+						<div class="signup_form" style="display:none">
+							<div class="form-group{{ $errors->has('first_name') ? ' has-error' : '' }}">
+								<label for="first_name" class="col-md-4 control-label">First Name</label>
 
-						<div class="form-group{{ $errors->has('first_name') ? ' has-error' : '' }} signup_form">
-							<label for="first_name" class="col-md-4 control-label">First Name</label>
+								<div class="col-md-6">
+									<input id="first_name" class="form-control" name="first_name" value="{{ old('first_name') }}" readonly>
 
-							<div class="col-md-6">
-								<input id="first_name" class="form-control" name="first_name" value="{{ old('first_name') }}" readonly>
-
-								@if ($errors->has('first_name'))
-									<span class="help-block">
-										<strong>{{ $errors->first('first_name') }}</strong>
-									</span>
-								@endif
+									@if ($errors->has('first_name'))
+										<span class="help-block">
+											<strong>{{ $errors->first('first_name') }}</strong>
+										</span>
+									@endif
+								</div>
 							</div>
-						</div>
 
-						<div class="form-group{{ $errors->has('last_name') ? ' has-error' : '' }} signup_form">
-							<label for="last_name" class="col-md-4 control-label">Last Name</label>
+							<div class="form-group{{ $errors->has('last_name') ? ' has-error' : '' }}">
+								<label for="last_name" class="col-md-4 control-label">Last Name</label>
 
-							<div class="col-md-6">
-								<input id="last_name" class="form-control" name="last_name" value="{{ old('last_name') }}" readonly>
+								<div class="col-md-6">
+									<input id="last_name" class="form-control" name="last_name" value="{{ old('last_name') }}" readonly>
 
-								@if ($errors->has('last_name'))
-									<span class="help-block">
-										<strong>{{ $errors->first('last_name') }}</strong>
-									</span>
-								@endif
+									@if ($errors->has('last_name'))
+										<span class="help-block">
+											<strong>{{ $errors->first('last_name') }}</strong>
+										</span>
+									@endif
+								</div>
 							</div>
-						</div>
 
-						<div class="form-group{{ $errors->has('npi') ? ' has-error' : '' }} signup_form">
-							<label for="npi" class="col-md-4 control-label">NPI</label>
+							<div class="form-group{{ $errors->has('npi') ? ' has-error' : '' }}">
+								<label for="npi" class="col-md-4 control-label">NPI</label>
 
-							<div class="col-md-6">
-								<input id="npi" class="form-control" name="npi" value="{{ old('npi') }}" readonly>
+								<div class="col-md-6">
+									<input id="npi" class="form-control" name="npi" value="{{ old('npi') }}" readonly>
 
-								@if ($errors->has('npi'))
-									<span class="help-block">
-										<strong>{{ $errors->first('npi') }}</strong>
-									</span>
-								@endif
+									@if ($errors->has('npi'))
+										<span class="help-block">
+											<strong>{{ $errors->first('npi') }}</strong>
+										</span>
+									@endif
+								</div>
 							</div>
-						</div>
 
-						<!-- <div class="form-group{{ $errors->has('specialty') ? ' has-error' : '' }}">
-							<label for="specialty" class="col-md-4 control-label">Specialty</label>
+							<!-- <div class="form-group{{ $errors->has('specialty') ? ' has-error' : '' }}">
+								<label for="specialty" class="col-md-4 control-label">Specialty</label>
 
-							<div class="col-md-6">
-								<input id="specialty" class="form-control" name="specialty" value="{{ old('specialty') }}" readonly>
+								<div class="col-md-6">
+									<input id="specialty" class="form-control" name="specialty" value="{{ old('specialty') }}" readonly>
 
-								@if ($errors->has('specialty'))
-									<span class="help-block">
-										<strong>{{ $errors->first('specialty') }}</strong>
-									</span>
-								@endif
+									@if ($errors->has('specialty'))
+										<span class="help-block">
+											<strong>{{ $errors->first('specialty') }}</strong>
+										</span>
+									@endif
+								</div>
+							</div> -->
+
+							<div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+								<label for="email" class="col-md-4 control-label">E-Mail Address</label>
+
+								<div class="col-md-6">
+									<input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" readonly>
+
+									@if ($errors->has('email'))
+										<span class="help-block">
+											<strong>{{ $errors->first('email') }}</strong>
+										</span>
+									@endif
+								</div>
 							</div>
-						</div> -->
 
-						<div class="form-group{{ $errors->has('email') ? ' has-error' : '' }} signup_form">
-							<label for="email" class="col-md-4 control-label">E-Mail Address</label>
+							<div class="form-group{{ $errors->has('uport_id') ? ' has-error' : '' }}">
+								<label for="uport_id" class="col-md-4 control-label">uPort Address</label>
 
-							<div class="col-md-6">
-								<input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" readonly>
+								<div class="col-md-6">
+									<input id="uport_id" class="form-control" name="uport_id" value="{{ old('uport_id') }}" readonly>
 
-								@if ($errors->has('email'))
-									<span class="help-block">
-										<strong>{{ $errors->first('email') }}</strong>
-									</span>
-								@endif
-							</div>
-						</div>
-
-						<div class="form-group{{ $errors->has('uport_id') ? ' has-error' : '' }} signup_form">
-							<label for="uport_id" class="col-md-4 control-label">uPort Address</label>
-
-							<div class="col-md-6">
-								<input id="uport_id" class="form-control" name="uport_id" value="{{ old('uport_id') }}" readonly>
-
-								@if ($errors->has('uport_id'))
-									<span class="help-block">
-										<strong>{{ $errors->first('uport_id') }}</strong>
-									</span>
-								@endif
+									@if ($errors->has('uport_id'))
+										<span class="help-block">
+											<strong>{{ $errors->first('uport_id') }}</strong>
+										</span>
+									@endif
+								</div>
 							</div>
 						</div>
 
