@@ -2904,6 +2904,7 @@ class OauthController extends Controller
                 $oidc->setRedirectURL(route('oidc_relay_connect'));
                 $oidc->providerConfigParam(['authorization_endpoint' => $as->fhir_auth_url]);
                 $oidc->providerConfigParam(['token_endpoint' => $as->fhir_token_url]);
+                $oidc->providerConfigParam(['token_endpoint_auth_methods_supported' => []]);
                 $oidc->setAud($as->fhir_url);
                 $oidc->addScope('patient/*.read');
                 $oidc->addScope('user/*.*');
