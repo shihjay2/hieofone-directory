@@ -428,6 +428,8 @@ class OauthController extends Controller
     			$data['content'] .= '</ul>';
     		}
             // $data['back'] = '<a href="' . URL::to('home') . '" class="btn btn-default" role="button"><i class="fa fa-btn fa-user"></i> My Patients</a>';
+            $data['message_action'] = Session::get('message_action');
+    		Session::forget('message_action');
             return view('home', $data);
         } else {
             return redirect()->route('install');
