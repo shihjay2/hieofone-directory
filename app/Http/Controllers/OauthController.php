@@ -2809,22 +2809,35 @@ class OauthController extends Controller
         if ($request->isMethod('post')) {
             $query = DB::table('oauth_rp')->where('as_uri', '=', 'https://' . $request->input('root_uri'))->first();
             if ($query) {
-                // $dns_uri = 'https://dns-api.org/A/' . $request->input('root_uri');
-                // $ch = curl_init();
-                // curl_setopt($ch,CURLOPT_URL, $dns_uri);
-                // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-                // curl_setopt($ch,CURLOPT_FAILONERROR,1);
-                // curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
-                // curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-                // curl_setopt($ch,CURLOPT_TIMEOUT, 60);
-                // curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
-                // $return = curl_exec($ch);
-                // $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                // curl_close ($ch);
-                // $return_arr = json_decode($return, true);
-                // if ($httpCode !== 404 && $httpCode !== 0) {
-                //     if ($return_arr[0]['value'] == $_SERVER['REMOTE_ADDR']) {
-                //         // called from pNOSH or AS to set state with the origin
+                $dir_url = url('/');
+                $dir_url = str_replace(array('http://','https://'), '', $dir_url);
+                $root_url = explode('/', $dir_url);
+                $root_url1 = explode('.', $root_url[0]);
+                if (isset($root_url1[1])) {
+                    $root_url1 = array_slice($root_url1, -2, 2, false);
+                    $final_root_url = implode('.', $root_url1);
+                } else {
+                    $final_root_url = $root_url[0];
+                }
+                if ($final_root_url == 'hieofone.org') {
+                    $final_root_url = 'shihjay.xyz';
+                }
+                $dns_uri = 'https://dns.' . $final_root_url . '/A/' . $request->input('root_uri');
+                $ch = curl_init();
+                curl_setopt($ch,CURLOPT_URL, $dns_uri);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+                curl_setopt($ch,CURLOPT_FAILONERROR,1);
+                curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+                curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($ch,CURLOPT_TIMEOUT, 60);
+                curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
+                $return = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close ($ch);
+                $return_arr = json_decode($return, true);
+                if ($httpCode !== 404 && $httpCode !== 0) {
+                    if ($return_arr[0]['value'] == $_SERVER['REMOTE_ADDR']) {
+                        // called from pNOSH or AS to set state with the origin
                         $query2 = DB::table('oidc_relay')->where('state', '=', $request->input('state'))->first();
                         if ($query2) {
                             return 'Not authorized - duplicate state';
@@ -2844,12 +2857,12 @@ class OauthController extends Controller
                             DB::table('oidc_relay')->insert($data);
                             return 'OK';
                         }
-                    // } else {
-                    //     return 'Not authorized - origin call not coming from the same server.';
-                    // }
-                // } else {
-                //     return 'Not authorized - origin call check not working properly.';
-                // }
+                    } else {
+                        return 'Not authorized - origin call not coming from the same server.';
+                    }
+                } else {
+                    return 'Not authorized - origin call check not working properly.';
+                }
             } else {
                 return 'Not authorized - origin call is not registered to the directory.';
             }
