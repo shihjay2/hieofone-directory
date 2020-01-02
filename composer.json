@@ -33,7 +33,6 @@
         "graham-campbell/markdown": "^11.1",
         "jenssegers/date": "*",
         "knplabs/github-api": "^2.1",
-        "kordy/ticketit": "^0.4.8",
         "laravel/framework": "^6.0",
         "laravel/socialite": "^4.0",
         "laravelcollective/html": "^6.0.0",

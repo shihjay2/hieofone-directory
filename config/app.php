@@ -159,7 +159,6 @@ return [
         Laravel\Socialite\SocialiteServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
 		SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
-        Kordy\Ticketit\TicketitServiceProvider::class,
         GrahamCampbell\Markdown\MarkdownServiceProvider::class,
         Jenssegers\Date\DateServiceProvider::class,
         SocialiteProviders\Generators\GeneratorsServiceProvider::class,

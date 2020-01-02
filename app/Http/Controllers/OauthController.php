@@ -2309,19 +2309,19 @@ class OauthController extends Controller
                 $text .= $request->input('message_text');
                 $html .= '<p>' . $request->input('message_text') . '</p>';
             }
-            $data = [
-                'subject' => 'Guest Support',
-                'content' => $text,
-                'html' => $html,
-                'status_id' => '1',
-                'priority_id' => '1',
-                'user_id' => '1',
-                'agent_id' => '1',
-                'category_id' => '1',
-                'created_at' => Date::now(),
-                'updated_at' => Date::now()
-            ];
-            $id = DB::table('ticketit')->insertGetId($data);
+            // $data = [
+            //     'subject' => 'Guest Support',
+            //     'content' => $text,
+            //     'html' => $html,
+            //     'status_id' => '1',
+            //     'priority_id' => '1',
+            //     'user_id' => '1',
+            //     'agent_id' => '1',
+            //     'category_id' => '1',
+            //     'created_at' => Date::now(),
+            //     'updated_at' => Date::now()
+            // ];
+            // $id = DB::table('ticketit')->insertGetId($data);
             $data3['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
             $data3['message_data'] .= "You have a guest support question from " . $request->input('email') . "<br>";
             $data3['message_data'] .= "View it at " . url('/') . '/tickets/' . $id;

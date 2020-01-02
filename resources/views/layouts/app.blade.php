@@ -82,7 +82,6 @@
 							</a>
 							<ul class="dropdown-menu" role="menu">
 								<li><a href="http://bit.ly/TrusteeForum" target="_blank"><i class="fa fa-fw fa-question"></i>F.A.Q</a></li>
-								<li><a href="{{ url('/tickets') }}"><i class="fa fa-fw fa-list"></i>Support</a></li>
 							</ul>
 						</li>
 						<li><a href="{{ url('/reports') }}">Reports</a></li>
