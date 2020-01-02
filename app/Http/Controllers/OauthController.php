@@ -6,14 +6,19 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Artisan;
 use Auth;
+use Cache\Adapter\Filesystem\FilesystemCachePool;
 use Crypt;
 use Date;
 use DB;
 use File;
 use Google_Client;
+use GuzzleHttp;
 use Hash;
 use Illuminate\Http\Request;
-use NaviOcean\Laravel\NameParser;
+use Illuminate\Support\Arr;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use ADCI\FullNameParser\Parser;
 use OAuth2\HttpFoundationBridge\Request as BridgeRequest;
 use OAuth2\Response as BridgeResponse;
 use Response;
@@ -24,7 +29,6 @@ use phpseclib\Crypt\RSA;
 use Session;
 use Shihjay2\OpenIDConnectUMAClient;
 use SimpleXMLElement;
-use GuzzleHttp;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Validator;
@@ -38,43 +42,40 @@ class OauthController extends Controller
 
     public function github_all()
     {
-        $client = new \Github\Client(
-            new \Github\HttpClient\CachedHttpClient(array('cache_dir' => '/tmp/github-api-cache'))
-        );
-        $client = new \Github\HttpClient\CachedHttpClient();
-        $client->setCache(
-            new \Github\HttpClient\Cache\FilesystemCache('/tmp/github-api-cache')
-        );
-        $client = new \Github\Client($client);
+        $filesystemAdapter = new Local(storage_path('app/public/'));
+        $filesystem = new Filesystem($filesystemAdapter);
+        $pool = new FilesystemCachePool($filesystem);
+        $pool->setFolder('/tmp/github-api-cache');
+        $client = new \Github\Client();
+        $client->addCache($pool);
         $result = $client->api('repo')->commits()->all('shihjay2', 'hieofone-directory', array('sha' => 'master'));
+        $client->removeCache();
         return $result;
     }
 
     public function github_release()
     {
-        $client = new \Github\Client(
-            new \Github\HttpClient\CachedHttpClient(array('cache_dir' => '/tmp/github-api-cache'))
-        );
-        $client = new \Github\HttpClient\CachedHttpClient();
-        $client->setCache(
-            new \Github\HttpClient\Cache\FilesystemCache('/tmp/github-api-cache')
-        );
-        $client = new \Github\Client($client);
-        $result = $client->api('repo')->releases()->latest('shihjay2', 'hieofone-directory');
+        $filesystemAdapter = new Local(storage_path('app/public/'));
+        $filesystem = new Filesystem($filesystemAdapter);
+        $pool = new FilesystemCachePool($filesystem);
+        $pool->setFolder('/tmp/github-api-cache');
+        $client = new \Github\Client();
+        $client->addCache($pool);
+        $result = $client->api('repo')->commits()->all('shihjay2', 'hieofone-directory', array('sha' => 'master'));
+        $client->removeCache();
         return $result;
     }
 
     public function github_single($sha)
     {
-        $client = new \Github\Client(
-            new \Github\HttpClient\CachedHttpClient(array('cache_dir' => '/tmp/github-api-cache'))
-        );
-        $client = new \Github\HttpClient\CachedHttpClient();
-        $client->setCache(
-            new \Github\HttpClient\Cache\FilesystemCache('/tmp/github-api-cache')
-        );
-        $client = new \Github\Client($client);
+        $filesystemAdapter = new Local(storage_path('app/public/'));
+        $filesystem = new Filesystem($filesystemAdapter);
+        $pool = new FilesystemCachePool($filesystem);
+        $pool->setFolder('/tmp/github-api-cache');
+        $client = new \Github\Client();
+        $client->addCache($pool);
         $result = $client->api('repo')->commits()->show('shihjay2', 'hieofone-directory', $sha);
+        $client->removeCache();
         return $result;
     }
 
@@ -313,11 +314,6 @@ class OauthController extends Controller
         Session::put('message_action', $message_action);
         return redirect()->route('home');
     }
-
-    /**
-    * Welcome page functions
-    *
-    */
 
     public function welcome(Request $request)
     {
@@ -1042,9 +1038,9 @@ class OauthController extends Controller
             $proceed = false;
             $admin_status = 'no';
             if ($admin == 'admin') {
-                $admin_parser = new NameParser();
-                $admin_name_arr = $admin_parser->parse_name($request->input('name'));
-                $admin_name_query = DB::table('owner')->where('firstname', '=', $admin_name_arr['fname'])->where('lastname', '=', $admin_name_arr['lname'])->first();
+                $admin_parser = new Parser();
+                $admin_nameObject = $admin_parser->parse($request->input('name'));
+                $admin_name_query = DB::table('owner')->where('firstname', '=', $admin_nameObject->getFirstName())->where('lastname', '=', $admin_nameObject->getLastName())->first();
                 if ($admin_name_query) {
                     $uport_user = DB::table('oauth_users')->where('sub', '=', $admin_name_query->sub)->first();
                     $proceed = true;
@@ -1082,9 +1078,9 @@ class OauthController extends Controller
                 $missing_creds = [];
                 foreach ($uport_credentials as $uport_credential_key => $uport_credential_value) {
                     if ($uport_credential_key == 'name') {
-                        $parser = new NameParser();
-                        $name_arr = $parser->parse_name($request->input('name'));
-                        $name_query = DB::table($user_table)->where($uport_credential_value['fname'], '=', $name_arr['fname'])->where($uport_credential_value['lname'], '=', $name_arr['lname'])->get();
+                        $parser = new Parser();
+                        $nameObject = $parser->parse($request->input('name'));
+                        $name_query = DB::table($user_table)->where($uport_credential_value['fname'], '=', $nameObject->getFirstName())->where($uport_credential_value['lname'], '=', $nameObject->getLastName())->get();
                         if ($name_query) {
                             foreach ($name_query as $name_row) {
                                 $username_arr[$uport_credential_key][] = $name_row->{$table_key};
@@ -1330,69 +1326,84 @@ class OauthController extends Controller
             $current_version = File::get(base_path() . "/.version");
             $composer = false;
             if ($type !== '') {
-                if ($type == 'composer_install') {
-                    $install = new Process("/usr/local/bin/composer install");
-                    $install->setWorkingDirectory(base_path());
-                    $install->setEnv(['COMPOSER_HOME' => '/usr/local/bin/composer']);
-                    $install->setTimeout(null);
-                    $install->run();
-                    $return = nl2br($install->getOutput());
-                }
-                if ($type == 'migrate') {
-                    $migrate = new Process("php artisan migrate --force");
-                    $migrate->setWorkingDirectory(base_path());
-                    $migrate->setTimeout(null);
-                    $migrate->run();
-                    $return = nl2br($migrate->getOutput());
-                }
-                $result1 = $this->github_single($type);
-                if (isset($result1['files'])) {
-                    foreach ($result1['files'] as $row1) {
-                        $filename = base_path() . "/" . $row1['filename'];
-                        if ($row1['status'] == 'added' || $row1['status'] == 'modified' || $row1['status'] == 'renamed') {
-                            $github_url = str_replace(' ', '%20', $row1['raw_url']);
-                            if ($github_url !== '') {
-                                $file = file_get_contents($github_url);
-                                $parts = explode('/', $row1['filename']);
-                                array_pop($parts);
-                                $dir = implode('/', $parts);
-                                if (!is_dir(base_path() . "/" . $dir)) {
-                                    if ($parts[0] == 'public') {
-                                        mkdir(base_path() . "/" . $dir, 0777, true);
-                                    } else {
-                                        mkdir(base_path() . "/" . $dir, 0755, true);
-                                    }
-                                }
-                                file_put_contents($filename, $file);
-                                if ($row1['filename'] == 'composer.json' || $row1['filename'] == 'composer.lock') {
-                                    $composer = true;
-                                }
-                            }
-                        }
-                        if ($row1['status'] == 'removed') {
-                            if (file_exists($filename)) {
-                                unlink($filename);
-                            }
-                        }
-                    }
-                    define('STDIN',fopen("php://stdin","r"));
-                    File::put(base_path() . "/.version", $type);
-                    $return = "System Updated with version " . $type . " from " . $current_version;
-                    $migrate = new Process("php artisan migrate --force");
-                    $migrate->setWorkingDirectory(base_path());
-                    $migrate->setTimeout(null);
-                    $migrate->run();
-                    $return .= '<br>' . nl2br($migrate->getOutput());
-                    if ($composer == true) {
+                if ($type == 'composer_install' || $type == 'migrate' || $type == 'clear_cache') {
+                    if ($type == 'composer_install') {
                         $install = new Process("/usr/local/bin/composer install");
                         $install->setWorkingDirectory(base_path());
                         $install->setEnv(['COMPOSER_HOME' => '/usr/local/bin/composer']);
                         $install->setTimeout(null);
                         $install->run();
-                        $return .= '<br>' .nl2br($install->getOutput());
+                        $return = nl2br($install->getOutput());
+                    }
+                    if ($type == 'migrate') {
+                        $migrate = new Process("php artisan migrate --force");
+                        $migrate->setWorkingDirectory(base_path());
+                        $migrate->setTimeout(null);
+                        $migrate->run();
+                        $return = nl2br($migrate->getOutput());
+                    }
+                    if ($type == 'clear_cache') {
+                        $clear_cache = new Process("php artisan cache:clear");
+                        $clear_cache->setWorkingDirectory(base_path());
+                        $clear_cache->setTimeout(null);
+                        $clear_cache->run();
+                        $return = nl2br($clear_cache->getOutput());
+                        $clear_view = new Process("php artisan view:clear");
+                        $clear_view->setWorkingDirectory(base_path());
+                        $clear_view->setTimeout(null);
+                        $clear_view->run();
+                        $return .= '<br>' . nl2br($clear_view->getOutput());
                     }
                 } else {
-                    $return = "Wrong version number";
+                    $result1 = $this->github_single($type);
+                    if (isset($result1['files'])) {
+                        foreach ($result1['files'] as $row1) {
+                            $filename = base_path() . "/" . $row1['filename'];
+                            if ($row1['status'] == 'added' || $row1['status'] == 'modified' || $row1['status'] == 'renamed') {
+                                $github_url = str_replace(' ', '%20', $row1['raw_url']);
+                                if ($github_url !== '') {
+                                    $file = file_get_contents($github_url);
+                                    $parts = explode('/', $row1['filename']);
+                                    array_pop($parts);
+                                    $dir = implode('/', $parts);
+                                    if (!is_dir(base_path() . "/" . $dir)) {
+                                        if ($parts[0] == 'public') {
+                                            mkdir(base_path() . "/" . $dir, 0777, true);
+                                        } else {
+                                            mkdir(base_path() . "/" . $dir, 0755, true);
+                                        }
+                                    }
+                                    file_put_contents($filename, $file);
+                                    if ($row1['filename'] == 'composer.json' || $row1['filename'] == 'composer.lock') {
+                                        $composer = true;
+                                    }
+                                }
+                            }
+                            if ($row1['status'] == 'removed') {
+                                if (file_exists($filename)) {
+                                    unlink($filename);
+                                }
+                            }
+                        }
+                        define('STDIN',fopen("php://stdin","r"));
+                        File::put(base_path() . "/.version", $type);
+                        $return = "System Updated with version " . $type . " from " . $current_version;
+                        $migrate = new Process("php artisan migrate --force");
+                        $migrate->setWorkingDirectory(base_path());
+                        $migrate->setTimeout(null);
+                        $migrate->run();
+                        $return .= '<br>' . nl2br($migrate->getOutput());
+                        if ($composer == true) {
+                            $install = new Process("/usr/local/bin/composer install");
+                            $install->setWorkingDirectory(base_path());
+                            $install->setEnv(['COMPOSER_HOME' => '/usr/local/bin/composer']);
+                            $install->setTimeout(null);
+                            $install->run();
+                            $return .= '<br>' .nl2br($install->getOutput());
+                        }
+                    } else {
+                        $return = "Wrong version number";
+                    }
                 }
             } else {
                 $result = $this->github_all();
@@ -1454,6 +1465,16 @@ class OauthController extends Controller
                         $install->run();
                         $return .= '<br>' .nl2br($install->getOutput());
                     }
+                    $clear_cache = new Process("php artisan cache:clear");
+                    $clear_cache->setWorkingDirectory(base_path());
+                    $clear_cache->setTimeout(null);
+                    $clear_cache->run();
+                    $return .= '<br>' . nl2br($clear_cache->getOutput());
+                    $clear_view = new Process("php artisan view:clear");
+                    $clear_view->setWorkingDirectory(base_path());
+                    $clear_view->setTimeout(null);
+                    $clear_view->run();
+                    $return .= '<br>' . nl2br($clear_view->getOutput());
                 } else {
                     $return = "No update needed";
                 }

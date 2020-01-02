@@ -5,7 +5,7 @@
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading">Sign up to the {{ $name }} Directory</div>
+				<div class="panel-heading"><span style="font-size:large">Sign up to the {{ $name }} Directory</span></div>
 				<div class="panel-body">
 					<div style="text-align: center;">
 					  <i class="fa fa-child fa-5x" aria-hidden="true" style="margin:20px;text-align: center;"></i>

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # ssl installation script
 
 set -e

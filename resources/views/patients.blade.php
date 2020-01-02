@@ -9,7 +9,7 @@
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
 			<div class="panel panel-default">
-				<div class="panel-heading">Patients</div>
+				<div class="panel-heading"><span style="font-size:large">Patients</span></div>
 				<div class="panel-body" style="text-align: center;">
 					<p>Welome to the Directory for {{ $name }}.  Do you have an existing Trustee authorization server?</p>
 					<button type="button" class="btn btn-primary btn-block" id="no">

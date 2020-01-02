@@ -9,7 +9,7 @@
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
 			<div class="panel panel-default">
-				<div class="panel-heading">Support</div>
+				<div class="panel-heading"><span style="font-size:large">Support</span></div>
 				<div class="panel-body" style="text-align: center;">
 					<p>Welome to the Directory for {{ $name }}.</p>
 					<p>To start, please <a href="http://bit.ly/TrusteeForum" target="_blank">see this document</a> for any general questions about Trustee.</p>

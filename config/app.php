@@ -162,8 +162,6 @@ return [
         Kordy\Ticketit\TicketitServiceProvider::class,
         GrahamCampbell\Markdown\MarkdownServiceProvider::class,
         Jenssegers\Date\DateServiceProvider::class,
-        Riari\Forum\ForumServiceProvider::class,
-        Riari\Forum\Frontend\ForumFrontendServiceProvider::class,
         SocialiteProviders\Generators\GeneratorsServiceProvider::class,
         SocialiteProviders\Manager\ServiceProvider::class
     ],

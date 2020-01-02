@@ -9,7 +9,7 @@
 	<div class="row">
 		<div class="col-md-10 col-md-offset-1">
 			<div class="panel panel-default">
-				<div class="panel-heading">Privacy Policy</div>
+				<div class="panel-heading"><span style="font-size:large">Privacy Policy</span></div>
 				<div class="panel-body">
 					<h4>The Directory Privacy Policy was updated on {{ $date }}.</h4>
 					<h4>Your privacy is important to Directory. So we’ve developed a Privacy Policy that covers how we collect, use, disclose, transfer, and store your information.</h4>

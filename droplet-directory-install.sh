@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # install script for hieofone-directory on a droplet - Ubuntu 16.04 server
 
 set -e
