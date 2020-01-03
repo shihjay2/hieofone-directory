@@ -2,6 +2,6 @@
 # Run scheduler
 while [ true ]
 do
-  php /var/www/artisan schedule:run
+  php /var/www/directory/artisan schedule:run
   sleep 60
 done
