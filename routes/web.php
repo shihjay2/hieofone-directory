@@ -31,8 +31,13 @@ App::singleton('oauth2', function () {
     $refresh_config['unset_refresh_token_after_use'] = false;
     // create server
     $server = new OAuth2\Server($storage, $config);
-    $publicKey  = File::get(base_path() . "/.pubkey.pem");
-    $privateKey = File::get(base_path() . "/.privkey.pem");
+    if (env('DOCKER') == '1') {
+        $publicKey = env('PUBKEY');
+        $privateKey = env('PRIVKEY');
+    } else {
+        $publicKey  = File::get(base_path() . "/.pubkey.pem");
+        $privateKey = File::get(base_path() . "/.privkey.pem");
+    }
     // create storage for OpenID Connect
     $keyStorage = new OAuth2\Storage\Memory(['keys' => [
         'public_key'  => $publicKey,
