@@ -319,11 +319,6 @@ class OauthController extends Controller
     {
         $query = DB::table('owner')->first();
         if ($query) {
-             // Set Ticketit settings
-            $layout['value'] = 'layouts.app';
-            DB::table('ticketit_settings')->where('id', '=', '5')->update($layout);
-            $bootstrap['value'] = '3';
-            DB::table('ticketit_settings')->where('id', '=', '6')->update($bootstrap);
             if ($query->homepage == '0') {
                 return redirect()->route('welcome0');
             }
