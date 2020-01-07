@@ -12,6 +12,7 @@
 						<p>These do not pertain to resources registered in the Trustee Authorizaion Server that the Directory itself will be able to access</p>
 					</div>
 					<form class="form-horizontal" role="form" method="POST" action="{{ URL::to('change_policy') }}">
+						{{ csrf_field() }}
 						<div style="text-align: center;">
 							{!! $content !!}
 						</div>
