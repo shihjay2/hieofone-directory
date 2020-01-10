@@ -2788,9 +2788,17 @@ class OauthController extends Controller
     {
         $return = [];
         $query = DB::table('oauth_rp')->where('type', '=', 'as')->get();
-        if ($query) {
+        if ($query->count()) {
             foreach ($query as $row) {
                 $return[] = $row->as_name;
+            }
+        }
+        $query1 = DB::table('oauth_users')->get();
+        if ($query1->count()) {
+            foreach ($query1 as $row1) {
+                if (!in_array($row1->username, $return)) {
+                    $return[] = $row1->username;
+                }
             }
         }
         return $return;
