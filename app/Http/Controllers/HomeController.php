@@ -221,6 +221,9 @@ class HomeController extends Controller
         $oidc = new OpenIDConnectUMAClient($client->as_uri, $client->client_id, $client->client_secret);
         $oidc->startSession();
         $oidc->setSessionName('directory');
+        if (file_exists(base_path() . '/fakelerootx1.pem')) {
+            $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+        }
         $oidc->setUMA(true);
         $oidc->refreshToken($client->refresh_token);
         Session::put('uma_auth_access_token_nosh', $oidc->getAccessToken());
@@ -347,6 +350,9 @@ class HomeController extends Controller
         $oidc = new OpenIDConnectUMAClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
         $oidc->startSession();
         $oidc->setRedirectURL($url);
+        if (file_exists(base_path() . '/fakelerootx1.pem')) {
+            $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+        }
         $oidc->rqp_claims($permission_ticket);
 	}
 
@@ -362,6 +368,9 @@ class HomeController extends Controller
             $oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
             $oidc->startSession();
             $oidc->setSessionName('directory');
+            if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+            }
             $oidc->setAccessToken(Session::get('uma_auth_access_token_nosh'));
             $oidc->setRedirectURL($url);
             $result1 = $oidc->rpt_request($permission_ticket);
@@ -462,6 +471,9 @@ class HomeController extends Controller
         Session::save();
 		$oidc = new OpenIDConnectUMAClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
         $oidc->startSession();
+        if (file_exists(base_path() . '/fakelerootx1.pem')) {
+            $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+        }
 		$oidc->requestAAT();
 		Session::put('uma_aat', $oidc->getAccessToken());
 		// Get permission ticket
@@ -492,6 +504,9 @@ class HomeController extends Controller
 			$url = route('uma_api_search');
 			$oidc = new OpenIDConnectUMAClient($as_uri, $client_id, $client_secret);
             $oidc->startSession();
+            if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+            }
 			$oidc->setAccessToken(Session::get('uma_aat'));
 			$oidc->setRedirectURL($url);
 			$result1 = $oidc->rpt_request($permission_ticket);
@@ -600,6 +615,9 @@ class HomeController extends Controller
             $url1 = route('uma_auth');
             $oidc = new OpenIDConnectUMAClient($as_uri);
             $oidc->startSession();
+            if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+            }
             $oidc->setClientName($client_name);
             $oidc->setSessionName('nosh');
             $oidc->addRedirectURLs($url1);
@@ -671,6 +689,9 @@ class HomeController extends Controller
         $oidc = new OpenIDConnectUMAClient(Session::get('uma_uri'), Session::get('uma_client_id'), Session::get('uma_client_secret'));
         $oidc->startSession();
         $oidc->setSessionName('directory');
+        if (file_exists(base_path() . '/fakelerootx1.pem')) {
+            $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+        }
         $oidc->setRedirectURL(route('uma_register_auth'));
         $oidc->setUMA(true);
         $oidc->setUMAType('client');
@@ -723,6 +744,9 @@ class HomeController extends Controller
         $oidc = new OpenIDConnectUMAClient($patient->hieofone_as_url, $patient->hieofone_as_client_id, $patient->hieofone_as_client_secret);
         $oidc->startSession();
         $oidc->setSessionName('nosh');
+        if (file_exists(base_path() . '/fakelerootx1.pem')) {
+            $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+        }
         $oidc->setUMA(true);
         $oidc->refreshToken($patient->hieofone_as_refresh_token);
         Session::put('uma_auth_access_token_nosh', $oidc->getAccessToken());

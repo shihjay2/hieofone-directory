@@ -2353,6 +2353,9 @@ class OauthController extends Controller
 		$oidc = new OpenIDConnectUMAClient($open_id_url, $client_id, $client_secret);
         $oidc->startSession();
 		$oidc->setRedirectURL($url);
+        if (file_exists(base_path() . '/fakelerootx1.pem')) {
+            $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+        }
 		$oidc->addScope('openid');
 		$oidc->addScope('email');
 		$oidc->addScope('profile');
@@ -2383,6 +2386,9 @@ class OauthController extends Controller
 		$oidc = new OpenIDConnectUMAClient($open_id_url, $client_id, $client_secret);
         $oidc->startSession();
         $oidc->setSessionName('directory');
+        if (file_exists(base_path() . '/fakelerootx1.pem')) {
+            $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+        }
 		$oidc->setRedirectURL($url);
 		$oidc->addScope('openid');
 		$oidc->addScope('email');
@@ -2518,6 +2524,9 @@ class OauthController extends Controller
             		$oidc->setClientName($client_name);
             		// $oidc->setRedirectURL($url1);
                     $oidc->setSessionName('directory');
+                    if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                        $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+                    }
                     $oidc->addRedirectURLs($url1);
                     $oidc->addRedirectURLs(route('uma_auth'));
                     $oidc->addRedirectURLs(route('uma_api'));
@@ -2651,6 +2660,9 @@ class OauthController extends Controller
                 $oidc->startSession();
 				$oidc->setClientName($client_name);
                 $oidc->setSessionName('directory');
+                if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                    $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+                }
                 $oidc->addRedirectURLs($url1);
                 $oidc->addRedirectURLs(route('directory_auth'));
                 $oidc->addRedirectURLs(route('uma_api'));
@@ -2731,6 +2743,9 @@ class OauthController extends Controller
                 $oidc->startSession();
 				$oidc->setClientName($client_name);
                 $oidc->setSessionName('directory');
+                if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                    $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+                }
                 $oidc->addRedirectURLs($url1);
                 $oidc->addRedirectURLs(route('directory_auth'));
                 $oidc->addRedirectURLs(route('uma_api'));
@@ -3012,6 +3027,9 @@ class OauthController extends Controller
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
+                if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                    $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+                }
                 $oidc->setRedirectURL(route('oidc_relay_connect'));
                 $oidc->providerConfigParam(['authorization_endpoint' => $as->fhir_auth_url]);
                 $oidc->providerConfigParam(['token_endpoint' => $as->fhir_token_url]);
@@ -3064,6 +3082,9 @@ class OauthController extends Controller
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
+                if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                    $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+                }
                 $oidc->setRedirectURL(route('oidc_relay_connect'));
                 $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
                 $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
@@ -3111,6 +3132,9 @@ class OauthController extends Controller
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
+                if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                    $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+                }
                 $oidc->setRedirectURL(route('oidc_relay_connect'));
                 $oidc->providerConfigParam(['authorization_endpoint' => $authorization_endpoint]);
                 $oidc->providerConfigParam(['token_endpoint' => $token_endpoint]);
@@ -3150,6 +3174,9 @@ class OauthController extends Controller
                 $oidc->startSession();
                 $oidc->setState($state);
                 $oidc->setSessionName('directory');
+                if (file_exists(base_path() . '/fakelerootx1.pem')) {
+                    $oidc->setCertPath(base_path() . '/fakelerootx1.pem');
+                }
                 $oidc->setRedirectURL(env('GOOGLE_REDIRECT_URI'));
                 $oidc->addScope('profile');
                 $oidc->addScope('email');
