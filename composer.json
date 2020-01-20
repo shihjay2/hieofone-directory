@@ -29,6 +29,7 @@
         "bshaffer/oauth2-server-php": "^1.10",
         "cache/filesystem-adapter": "^1.0",
         "doctrine/dbal": "^2.5",
+        "fideloper/proxy": "^4.0",
         "google/apiclient": "~2.0",
         "graham-campbell/markdown": "^11.1",
         "jenssegers/date": "*",
