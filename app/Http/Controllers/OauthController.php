@@ -2865,21 +2865,27 @@ class OauthController extends Controller
                 if ($final_root_url == 'hieofone.org') {
                     $final_root_url = 'shihjay.xyz';
                 }
-                $dns_uri = 'https://dns.' . $final_root_url . '/A/' . $request->input('root_uri');
-                $ch = curl_init();
-                curl_setopt($ch,CURLOPT_URL, $dns_uri);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-                curl_setopt($ch,CURLOPT_FAILONERROR,1);
-                curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
-                curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-                curl_setopt($ch,CURLOPT_TIMEOUT, 60);
-                curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
-                $return = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                curl_close ($ch);
-                $return_arr = json_decode($return, true);
-                if ($httpCode !== 404 && $httpCode !== 0) {
-                    if ($return_arr[0]['value'] == $_SERVER['REMOTE_ADDR']) {
+                // $dns_uri = 'https://dns.' . $final_root_url . '/A/' . $request->input('root_uri');
+                // $ch = curl_init();
+                // curl_setopt($ch,CURLOPT_URL, $dns_uri);
+                // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+                // curl_setopt($ch,CURLOPT_FAILONERROR,1);
+                // curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+                // curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+                // curl_setopt($ch,CURLOPT_TIMEOUT, 60);
+                // curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,0);
+                // $return = curl_exec($ch);
+                // $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                // curl_close ($ch);
+                // $return_arr = json_decode($return, true);
+                $return_arr = dns_get_record($request->input('root_uri'));
+                if (isset($return_arr[0])) {
+                    if ($return_arr[0]['type'] == 'CNAME') {
+                        $return_arr = dns_get_record($return_arr[0]['target']);
+                    }
+                }
+                if (isset($return_arr[0])) {
+                    if ($return_arr[0]['ip'] == $_SERVER['REMOTE_ADDR']) {
                         // called from pNOSH or AS to set state with the origin
                         $query2 = DB::table('oidc_relay')->where('state', '=', $request->input('state'))->first();
                         if ($query2) {
