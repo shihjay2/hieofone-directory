@@ -2885,7 +2885,7 @@ class OauthController extends Controller
                     }
                 }
                 if (isset($return_arr[0])) {
-                    if ($return_arr[0]['ip'] == $_SERVER['REMOTE_ADDR']) {
+                    // if ($return_arr[0]['ip'] == $_SERVER['REMOTE_ADDR']) {
                         // called from pNOSH or AS to set state with the origin
                         $query2 = DB::table('oidc_relay')->where('state', '=', $request->input('state'))->first();
                         if ($query2) {
@@ -2906,9 +2906,9 @@ class OauthController extends Controller
                             DB::table('oidc_relay')->insert($data);
                             return 'OK';
                         }
-                    } else {
-                        return 'Not authorized - origin call not coming from the same server.';
-                    }
+                    // } else {
+                    //     return 'Not authorized - origin call not coming from the same server.';
+                    // }
                 } else {
                     return 'Not authorized - origin call check not working properly.';
                 }
