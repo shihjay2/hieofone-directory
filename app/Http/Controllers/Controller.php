@@ -562,6 +562,27 @@ class Controller extends BaseController
 		return true;
 	}
 
+	protected function nexmo($number, $message)
+	{
+		$url = "https://rest.nexmo.com/sms/json";
+		$post = http_build_query([
+			'api_key' => env('NEXMO_API'),
+			'api_secret' => env('NEXMO_SECRET'),
+			'to' => '1' . $number,
+			'from' => '15709315960',
+			'text' => $message
+		]);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$output = curl_exec($ch);
+		curl_close($ch);
+		return $output;
+	}
+
+
 	protected function add_user($code, $username='', $password='', $owner=false)
 	{
 		if (is_array($code)) {
@@ -631,7 +652,7 @@ class Controller extends BaseController
 
 	protected function npi_lookup($first, $last='')
 	{
-		$url = 'https://npiregistry.cms.hhs.gov/api/?';
+		$url = 'https://npiregistry.cms.hhs.gov/api/?version=2.1&';
 		$fields_arr = [
 			'number' => '',
 			'first_name' => '',
@@ -728,6 +749,51 @@ class Controller extends BaseController
 		$output = curl_exec($ch);
 		curl_close($ch);
 		return $output;
+	}
+
+	protected function zammad_request($url, $response_header=false, $token='', $data=[])
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+		if ($response_header == true) {
+			curl_setopt($ch, CURLOPT_HEADER, 1);
+		} else {
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+		}
+		if ($token != '') {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Authorization: Bearer ' . $token
+            ));
+        }
+		if (isset($data['title'])) {
+			$post_body = json_encode($data);
+            $content_type = 'application/json';
+            curl_setopt($ch,CURLOPT_URL, $endpoint);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_body);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                "Content-Type: {$content_type}",
+                'Content-Length: ' . strlen($post_body)
+            ]);
+		}
+		$output = curl_exec($ch);
+		// $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		// $header = substr($output, 0, $header_size);
+		// $headers = $this->get_headers_from_curl_response($header);
+		// if (empty($headers)) {
+		// 	$result = json_decode($output, true);
+		// } else {
+		// 	$header_val_arr = explode(', ', $headers[0]['WWW-Authenticate']);
+		// 	$header_val_arr1 = explode('=', $header_val_arr[1]);
+		// 	$body = substr($output, $header_size);
+		// 	$result = json_decode($body, true);
+		// 	$result['as_uri'] = trim(str_replace('"', '', $header_val_arr1[1]));
+		// }
+		curl_close($ch);
+		return $result;
 	}
 
 	/**

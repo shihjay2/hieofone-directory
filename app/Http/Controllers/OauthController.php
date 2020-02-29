@@ -2302,25 +2302,19 @@ class OauthController extends Controller
 			$this->validate($request, [
 				'email' => 'required',
 			]);
-            $text = 'From: ' . $request->input('email') . ';';
-            $html = '<p>From: ' . $request->input('email') . '</p>';
-            if ($request->has('message_text')) {
-                $text .= $request->input('message_text');
-                $html .= '<p>' . $request->input('message_text') . '</p>';
-            }
-            // $data = [
-            //     'subject' => 'Guest Support',
-            //     'content' => $text,
-            //     'html' => $html,
-            //     'status_id' => '1',
-            //     'priority_id' => '1',
-            //     'user_id' => '1',
-            //     'agent_id' => '1',
-            //     'category_id' => '1',
-            //     'created_at' => Date::now(),
-            //     'updated_at' => Date::now()
-            // ];
-            // $id = DB::table('ticketit')->insertGetId($data);
+            $data = [
+                'title' => 'Guest Support',
+                'group' => 'Users',
+                'customer' => $request->input('email'),
+                'article' => [
+                    'subject' => 'Question from ' . $request->input('email'),
+                    'body' => $request->input('message_text'),
+                    'type' => 'note',
+                    'internal' => false
+                ],
+                'note' => 'Question from ' . $request->input('email'),
+            ];
+            $this->zammad_request('https://support.trustee.ai/api/v1/tickets', false, Session::get('zammad_access_token'), $data);
             $data3['message_data'] = "This is message from the " . $owner->org_name . " Trustee Directory.<br><br>";
             $data3['message_data'] .= "You have a guest support question from " . $request->input('email') . "<br>";
             $data3['message_data'] .= "View it at " . url('/') . '/tickets/' . $id;
@@ -2334,15 +2328,39 @@ class OauthController extends Controller
 			];
             return view('support', $data2);
 		} else {
-			$data2 = [
-				'noheader' => true,
-                'name' => $owner->org_name,
-                'complete' => 'no'
-			];
-			return view('support', $data2);
+            if (env('ZAMMAD_CLIENT') == null) {
+                return redirect()->route('home');
+            }
+            if (Session::has('zammad_access_token')) {
+                $data2 = [
+    				'noheader' => true,
+                    'name' => $owner->org_name,
+                    'complete' => 'no'
+    			];
+    			return view('support', $data2);
+            } else {
+                return redirect()->route('support_oauth');
+            }
 		}
 		return redirect()->route('home');
 	}
+
+    public function support_oauth(Request $request)
+    {
+        $url = 'https://support.trustee.ai/oauth';
+        $client_id = env('ZAMMAD_CLIENT');
+        $client_secret = env('ZAMMAD_SECRET');
+        $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
+        $oidc->startSession();
+        $oidc->setSessionName('directory');
+        $oidc->setRedirectURL(route('support_oauth'));
+        $oidc->providerConfigParam(['authorization_endpoint' => 'https://support.trustee.ai/oauth/authorize']);
+        $oidc->providerConfigParam(['token_endpoint' => 'https://support.trustee.ai/oauth/token']);
+        $oidc->authenticate();
+        $token = $oidc->getAccessToken();
+        Session::put('zammad_access_token', $token);
+        return redirect()->route('support');
+    }
 
     public function uma_auth(Request $request)
 	{
