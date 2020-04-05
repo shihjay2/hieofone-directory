@@ -763,22 +763,19 @@ class Controller extends BaseController
 		} else {
 			curl_setopt($ch, CURLOPT_HEADER, 0);
 		}
+		$header = [];
 		if ($token != '') {
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                'Authorization: Bearer ' . $token
-            ));
+			$header[] = 'Authorization: Bearer ' . $token;
         }
 		if (isset($data['title'])) {
 			$post_body = json_encode($data);
             $content_type = 'application/json';
-            curl_setopt($ch,CURLOPT_URL, $endpoint);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post_body);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                "Content-Type: {$content_type}",
-                'Content-Length: ' . strlen($post_body)
-            ]);
+            $header[] = "Content-Type: {$content_type}";
+            $header[] = 'Content-Length: ' . strlen($post_body);
 		}
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 		$output = curl_exec($ch);
 		// $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 		// $header = substr($output, 0, $header_size);

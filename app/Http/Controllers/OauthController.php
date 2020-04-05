@@ -2350,12 +2350,14 @@ class OauthController extends Controller
         $url = 'https://support.trustee.ai/oauth';
         $client_id = env('ZAMMAD_CLIENT');
         $client_secret = env('ZAMMAD_SECRET');
-        $oidc = new OpenIDConnectUMAClient($token_url, $client_id, $client_secret);
+        $oidc = new OpenIDConnectUMAClient($url, $client_id, $client_secret);
         $oidc->startSession();
         $oidc->setSessionName('directory');
         $oidc->setRedirectURL(route('support_oauth'));
         $oidc->providerConfigParam(['authorization_endpoint' => 'https://support.trustee.ai/oauth/authorize']);
         $oidc->providerConfigParam(['token_endpoint' => 'https://support.trustee.ai/oauth/token']);
+        $oidc->providerConfigParam(['token_endpoint_auth_methods_supported' => []]);
+        $oidc->addScope('');
         $oidc->authenticate();
         $token = $oidc->getAccessToken();
         Session::put('zammad_access_token', $token);
